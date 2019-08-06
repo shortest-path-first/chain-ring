@@ -22,7 +22,7 @@
 		android:theme="@style/AppTheme">
 			<meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/pizza" />
+            android:value="@string/nativescript_google_maps_api_key" />
 
 		<activity
 			android:name="com.tns.NativeScriptActivity"

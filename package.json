@@ -27,6 +27,7 @@
     "@types/googlemaps": "^3.37.2",
     "nativescript-angular": "~8.0.0",
     "nativescript-google-maps-sdk": "^2.7.0",
+    "nativescript-oauth2": "^2.0.0",
     "nativescript-theme-core": "~1.0.6",
     "nativescript-ui-sidedrawer": "~7.0.0",
     "reflect-metadata": "~0.1.12",
