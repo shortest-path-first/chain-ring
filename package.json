@@ -26,6 +26,7 @@
     "@angular/router": "~8.0.0",
     "@types/googlemaps": "^3.37.2",
     "nativescript-angular": "~8.0.0",
+    "nativescript-google-maps-sdk": "^2.7.0",
     "nativescript-theme-core": "~1.0.6",
     "nativescript-ui-sidedrawer": "~7.0.0",
     "reflect-metadata": "~0.1.12",
@@ -34,6 +35,7 @@
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
+    "@agm/core": "^1.0.0-beta.7",
     "@angular/compiler-cli": "~8.0.0",
     "@ngtools/webpack": "~8.0.0",
     "codelyzer": "~4.5.0",

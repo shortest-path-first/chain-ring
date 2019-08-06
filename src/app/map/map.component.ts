@@ -1,6 +1,10 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ElementRef, ViewChild } from "@angular/core";
 import { RadSideDrawer } from "nativescript-ui-sidedrawer";
+import { registerElement } from "nativescript-angular/element-registry";
 import * as app from "tns-core-modules/application";
+
+registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
+
 
 @Component({
     selector: "Map",
