@@ -41,11 +41,11 @@ $page-content-placeholder-font-size: 20;
 **/
 
 // Colors
-$background: #fff;
+$background: transparent;
 $primary: lighten(#000, 13%);
 $secondary: lighten(#000, 46%);
 $disabled: lighten(#000, 62%);
-$accent: $accent-dark;
+$accent: #000;
 $error: $error-light;
 
 // SideDrawer

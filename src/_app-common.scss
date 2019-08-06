@@ -25,6 +25,7 @@
 //Action bar
 ActionBar .action-bar-title {
     horizontal-align: center;
+    font-family: 'Permanent Marker', cursive;
 }
 
  // Drawer navigation custom styles
@@ -34,6 +35,28 @@ $sidedrawer-header-image-offset-bottom: 5;
 $sidedrawer-list-item-offset-left: 15;
 $sidedrawer-list-icon-offset: 10;
 $sidedrawer-list-icon-size: 20;
+
+//Buttons styles
+.button {
+    background-color: black;
+    color: white;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: white;
+    border-width: 10px;
+    margin: 25px 30px;
+    width: 75%;
+    height: 20%;
+    opacity: 60%;
+    font-size: 60%;
+}
+
+//Body styles
+.body {
+    
+    background-image: linear-gradient(-45deg, #9c27b0, #393ef9);
+    //background-color: pink;
+}
 
 .sidedrawer {
     &.sidedrawer-left {
