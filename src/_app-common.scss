@@ -35,6 +35,28 @@ $sidedrawer-list-item-offset-left: 15;
 $sidedrawer-list-icon-offset: 10;
 $sidedrawer-list-icon-size: 20;
 
+//Buttons styles
+.button {
+    background-color: black;
+    color: white;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: white;
+    border-width: 10px;
+    margin: 25px 30px;
+    width: 75%;
+    height: 20%;
+    opacity: .8;
+    font-size: 60%;
+}
+
+//Body styles
+.body {
+    
+    background-image: linear-gradient(to bottom left, #393ef9, #9c27b0,);
+  
+}
+
 .sidedrawer {
     &.sidedrawer-left {
         background-color: $ab-background;
