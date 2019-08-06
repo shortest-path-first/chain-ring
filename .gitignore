@@ -1,5 +1,6 @@
 .env
 App_Resources/Android/src/main/res/values/nativescript_google_maps_api.xml
+
 # NativeScript
 hooks/
 node_modules/
