@@ -17,8 +17,8 @@
 <Page>
     <FlexboxLayout class="body" flexDirection="column">
         <Button class="button" text="Commute"></Button>
-        <Button class="button" text="Map"></Button>
-        <Button class="button" text="Stats"></Button>
+        <Button class="button" text="Map" (tap)="onButtonLinkTap('featured')"></Button>
+        <Button class="button" text="Stats" (tap)="onButtonLinkTap('/browse')"></Button>
         <Button class="button" text="Ride"></Button>
     </FlexboxLayout>
 </Page>
