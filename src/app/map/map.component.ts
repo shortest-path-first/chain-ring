@@ -3,6 +3,7 @@ import { RadSideDrawer } from "nativescript-ui-sidedrawer";
 import { registerElement } from "nativescript-angular/element-registry";
 import * as app from "tns-core-modules/application";
 
+
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
 
@@ -15,6 +16,7 @@ export class MapComponent implements OnInit {
 
     constructor() {
         // Use the component constructor to inject providers.
+
     }
 
     ngOnInit(): void {
@@ -25,4 +27,6 @@ export class MapComponent implements OnInit {
         const sideDrawer = <RadSideDrawer>app.getRootView();
         sideDrawer.showDrawer();
     }
+
+    
 }
