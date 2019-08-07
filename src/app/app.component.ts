@@ -4,6 +4,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { DrawerTransitionBase, RadSideDrawer, SlideInOnTopTransition } from "nativescript-ui-sidedrawer";
 import { filter } from "rxjs/operators";
 import * as app from "tns-core-modules/application";
+import dotenv from 'dotenv'
 
 @Component({
     moduleId: module.id,
@@ -15,10 +16,11 @@ export class AppComponent implements OnInit {
     private _sideDrawerTransition: DrawerTransitionBase;
 
     constructor(private router: Router, private routerExtensions: RouterExtensions) {
-        // Use the component constructor to inject services.
+        // Use the component constructor to inject services
     }
 
     ngOnInit(): void {
+        dotenv.config();
         this._activatedUrl = "/home";
         this._sideDrawerTransition = new SlideInOnTopTransition();
 
