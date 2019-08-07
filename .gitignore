@@ -1,6 +1,6 @@
 .env
 App_Resources/Android/src/main/res/values/nativescript_google_maps_api.xml
-
+App_Resources/auth-service.ts
 # NativeScript
 hooks/
 node_modules/
