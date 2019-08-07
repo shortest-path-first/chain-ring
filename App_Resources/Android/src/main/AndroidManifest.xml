@@ -44,7 +44,7 @@
 				<category android:name="android.intent.category.DEFAULT" />
 				<category android:name="android.intent.category.BROWSABLE" />
 				<data android:path="/auth"
-				android:scheme=""/>
+				android:scheme="com.googleusercontent.apps/742773304002-qm2pe9ohoeunucpuk5s9h5h3qbqm9bf0'"/>
 				
 			</intent-filter>
 		</activity>
