@@ -4,7 +4,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { DrawerTransitionBase, RadSideDrawer, SlideInOnTopTransition } from "nativescript-ui-sidedrawer";
 import { filter } from "rxjs/operators";
 import * as app from "tns-core-modules/application";
-
+import { configureOAuthProviders } from "../../App_Resources/auth-service";
 
 @Component({
     moduleId: module.id,
@@ -12,6 +12,7 @@ import * as app from "tns-core-modules/application";
     templateUrl: "app.component.html"
 })
 export class AppComponent implements OnInit {
+
     private _activatedUrl: string;
     private _sideDrawerTransition: DrawerTransitionBase;
 
@@ -20,7 +21,7 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit(): void {
-       
+       configureOAuthProviders();
         this._activatedUrl = "/home";
         this._sideDrawerTransition = new SlideInOnTopTransition();
 
