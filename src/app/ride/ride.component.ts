@@ -18,10 +18,16 @@ export class RideComponent implements OnInit {
 
     ngOnInit(): void {
         // Init your component properties here.
+      
     }
 
     onDrawerButtonTap(): void {
         const sideDrawer = <RadSideDrawer>app.getRootView();
         sideDrawer.showDrawer();
+        console.log('what the fuck')
+    }
+
+    onMapReady(){
+        console.log("map is ready");
     }
 }
