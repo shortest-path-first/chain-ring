@@ -1,6 +1,9 @@
 import { NgModule, NO_ERRORS_SCHEMA } from "@angular/core";
 import { NativeScriptCommonModule } from "nativescript-angular/common";
-import { AgmCoreModule } from "@agm/core"
+// adding to allow http requests
+import { HttpClientModule } from "@angular/common/http"
+
+
 
 import { MapRoutingModule } from "./map-routing.module";
 import { MapComponent } from "./map.component";
@@ -9,6 +12,7 @@ import { MapComponent } from "./map.component";
     imports: [
         NativeScriptCommonModule,
         MapRoutingModule,
+        HttpClientModule    
     ],
     declarations: [
         MapComponent
@@ -17,4 +21,9 @@ import { MapComponent } from "./map.component";
         NO_ERRORS_SCHEMA
     ]
 })
-export class MapModule { }
+
+export class MapModule { 
+    constructor() {
+
+    }
+}
