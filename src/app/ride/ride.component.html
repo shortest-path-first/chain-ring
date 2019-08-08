@@ -1,0 +1,15 @@
+
+<script src="https://maps.googleapis.com/maps/api/js?key=API_KEY">
+</script>
+<StackLayout class="page page-content" orientation="vertical">
+    <Page xmlns:maps="nativescript-google-maps-sdk">
+    </Page>
+    <Label class="page-icon fa" text="&#xf005;"></Label>
+    <Label class="page-placeholder" text="<!-- Page content goes here -->"></Label>
+    <maps:mapView latitude="{{ latitude }}" longitude="{{ longitude }}"
+        mapAnimationsEnabled="{{ mapAnimationsEnabled }}" zoom="{{ zoom }}" bearing="{{ bearing }}"
+        padding="{{ padding }}" mapReady="onMapReady" markerSelect="onMarkerSelect"
+        markerBeginDragging="onMarkerBeginDragging" markerEndDragging="onMarkerEndDragging" markerDrag="onMarkerDrag"
+        cameraChanged="onCameraChanged" cameraMove="onCameraMove">
+    </maps:mapView>
+</StackLayout>
