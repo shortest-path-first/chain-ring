@@ -8,9 +8,10 @@ const routes: Routes = [
     { path: "browse", loadChildren: "~/app/browse/browse.module#BrowseModule" },
     { path: "login", loadChildren: "~/app/login/login.module#LoginModule" },
     { path: "map", loadChildren: "~/app/map/map.module#MapModule" },
-    { path: "settings", loadChildren: "~/app/settings/settings.module#SettingsModule" }
-];
-
+    { path: "settings", loadChildren: "~/app/settings/settings.module#SettingsModule" },
+    { path: "ride", loadChildren: "../app/ride/ride.module#RideModule"}
+]; 
+ 
 @NgModule({
     imports: [NativeScriptRouterModule.forRoot(routes)],
     exports: [NativeScriptRouterModule]
