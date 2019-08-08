@@ -27,7 +27,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/nativescript_google_maps_api_key" />
 
-
 		<activity
 			android:name="com.tns.NativeScriptActivity"
 			android:label="@string/title_activity_kimera"
@@ -41,6 +40,15 @@
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+
+				<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:path="/auth"
+				android:scheme="com.googleusercontent.apps.742773304002-qm2pe9ohoeunucpuk5s9h5h3qbqm9bf0"/>
+				
 			</intent-filter>
 		</activity>
 		<activity android:name="com.tns.ErrorReportActivity"/>

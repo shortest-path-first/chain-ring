@@ -12,13 +12,10 @@
     <ActionItem icon="res://navigation/menu" android:visibility="collapsed" (tap)="onDrawerButtonTap()"
         ios.position="left">
     </ActionItem>
-    <Label class="action-bar-title" text="Chainring"></Label>
-</ActionBar>  
-<Page>
-    <FlexboxLayout class="body" flexDirection="column"> 
-        <Button class="button" text="Commute"></Button>
-        <Button class="button" text="Map" (tap)="onButtonLinkTap('/map')"></Button>
-        <Button class="button" text="Stats" (tap)="onButtonLinkTap('/browse')"></Button>
-        <Button class="button" text="Ride" (tap)="onButtonLinkTap('/ride')"></Button>
-    </FlexboxLayout>
-</Page>
+    <Label class="action-bar-title" text="Browse"></Label>
+</ActionBar>
+
+<GridLayout class="page page-content">
+    <Label class="page-icon fa" text="&#xf1ea;"></Label>
+    <Label class="page-placeholder" text="<!-- Page content goes here -->"></Label>
+</GridLayout>
