@@ -3,6 +3,8 @@ import { RadSideDrawer } from "nativescript-ui-sidedrawer";
 import * as app from "tns-core-modules/application";
 import { NavigationEnd, Router } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
+import * as geolocation from "nativescript-geolocation";
+import { Accuracy } from "tns-core-modules/ui/enums"; 
 
 @Component({
     selector: "Home",
@@ -17,7 +19,11 @@ export class HomeComponent implements OnInit {
 
     ngOnInit(): void {
         // Init your component properties here.
-        console.log('oh, come on')
+        geolocation.enableLocationRequest();
+        geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
+            .then((result) => {
+                console.log(result);
+            });
         
     }
 

@@ -20,7 +20,7 @@ function configureOAuthProviderGoogle(){
     clientId: '742773304002-qm2pe9ohoeunucpuk5s9h5h3qbqm9bf0.apps.googleusercontent.com',
     redirectUri: 'com.googleusercontent.apps.742773304002-qm2pe9ohoeunucpuk5s9h5h3qbqm9bf0:/auth',
     urlScheme: 'com.googleusercontent.apps.742773304002-qm2pe9ohoeunucpuk5s9h5h3qbqm9bf0',
-    scopes: ['email', 'profile', 'openid'],
+    scopes: ['email', 'profile', 'openId'],
   }
   const googleProvider = new TnsOaProviderGoogle(googleProviderOptions)
   return googleProvider;
