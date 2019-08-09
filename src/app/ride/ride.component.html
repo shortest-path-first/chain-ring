@@ -21,7 +21,8 @@
 <FlexboxLayout class="page page-content" align-items="stretch" flexDirection="column">
         <maps:mapView latitude="{{ latitude }}" longitude="{{ longitude }}"
         mapAnimationsEnabled="{{ mapAnimationsEnabled }}" zoom="{{ zoom }}" bearing="{{ bearing }}"
-        padding="{{ padding }}" (mapReady)="onMapReady($event)" markerSelect="onMarkerSelect"
+        padding="{{ padding }}" (mapReady)="onMapReady($event)" 
+        setMyLocationEnabled="true" markerSelect="onMarkerSelect"
         markerBeginDragging="onMarkerBeginDragging" markerEndDragging="onMarkerEndDragging" markerDrag="onMarkerDrag"
         cameraChanged="onCameraChanged" cameraMove="onCameraMove">
     </maps:mapView>

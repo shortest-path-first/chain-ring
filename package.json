@@ -27,6 +27,7 @@
     "@types/googlemaps": "^3.37.2",
     "decode-google-map-polyline": "^1.0.1",
     "dotenv": "^8.0.0",
+    "nativescript-accelerometer": "^2.0.1",
     "nativescript-angular": "~8.0.0",
     "nativescript-geolocation": "^5.1.0",
     "nativescript-google-maps-sdk": "^2.7.0",
