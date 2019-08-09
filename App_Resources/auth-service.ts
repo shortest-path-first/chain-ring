@@ -31,6 +31,7 @@ export function tnsOauthLogin(providerType){
   client.loginWithCompletion((tokenResult: ITnsOAuthTokenResult, error)=>{
     if(error){
       console.error("error loggin in:", error);
+      (error);
     } else {
       console.log(tokenResult); 
     }
