@@ -30,7 +30,7 @@
             <maps:mapView
                 width="95%"
                 [latitude]="latitude" [longitude]="longitude" mapAnimationsEnabled="{{ mapAnimationsEnabled }}"
-                [zoom]="zoom" padding="{{padding}}" mapReady="onMapReady"
+                [zoom]="zoom" padding="{{padding}}" (mapReady)="onMapReady($event)"
                 markerSelect="onMarkerSelect" markerBeginDragging="onMarkerBeginDragging" markerEndDragging="onMarkerEndDragging"
                 markerDrag="onMarkerDrag" cameraChanged="onCameraChanged" cameraMove="onCameraMove">
             </maps:mapView>
