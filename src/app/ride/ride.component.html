@@ -27,7 +27,7 @@
         cameraChanged="onCameraChanged" cameraMove="onCameraMove">
     </maps:mapView>
     <FlexboxLayout class="body" align-items="stretch" height="25%" flexDirection="row" justifyContent="space-around">
-        <Label class="far" text="&#xf0eb;" style="font-size: 50em; color: white;" ></Label>
+        <Label class="far" text="&#xf0eb;" style="font-size: 50em; color: white;" (tap)="onStopTap()"></Label>
         <Label class="fas" text="&#xf3fd;" style="font-size: 50em; color: white;"></Label>
         <Label class="fas" text="&#xf276;" style="font-size: 50em; color: white;" (tap)="onPinTap()"></Label>
         <Label class="fas" text="&#xf015;" style="font-size: 50em; color: white"></Label>
