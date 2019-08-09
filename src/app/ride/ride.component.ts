@@ -21,8 +21,7 @@ let mapView;
 let watchId;
 let speed = 0;
 let ticks = 0;
-// rideMarkers = {markers: []};
-let rideMarkers;
+let rideMarkers = {markers: []};
 
 
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
@@ -60,7 +59,7 @@ export class RideComponent implements OnInit {
                
                 marker.position = mapsModule.Position.positionFromLatLng(result.latitude, result.longitude);
                 mapView.addMarker(marker);
-                rideMarkers.markers.push({lat: result.latitude, lng: result.longitude});
+                rideMarkers.markers.push({markerLat: result.latitude, markerLon: result.longitude});
                 console.log(rideMarkers);               
             })
     
@@ -70,10 +69,8 @@ export class RideComponent implements OnInit {
         geolocation.clearWatch(watchId);
 
        
-        let markersString = rideMarkers;
-       
-        // let params = new HttpParams().set('markers', JSON.stringify(rideMarkers));
-        this.http.post(this.ROOT_URL + "/rides", markersString, {
+
+        this.http.post(this.ROOT_URL + "/marker", rideMarkers, {
             headers: new HttpHeaders({  
                 'Content-Type': 'application/json',
             })})
@@ -130,7 +127,7 @@ export class RideComponent implements OnInit {
         
         var flightPlanCoordinates = decodePolyline(line);
         let testLine = polylineEncoder.encode(flightPlanCoordinates);
-        rideMarkers = testLine;
+      
        
        const polyline = new mapsModule.Polyline();
        for (let i = 0; i < flightPlanCoordinates.length; i++){
