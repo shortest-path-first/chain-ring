@@ -5,10 +5,14 @@ import * as app from "tns-core-modules/application";
 import { HttpClient, HttpParams} from "@angular/common/http"
 import { Place } from "./map";
 import { Observable } from 'rxjs';
-import { type } from "os";
 var mapsModule = require("nativescript-google-maps-sdk");
+const decodePolyline = require('decode-google-map-polyline');
+
 
 let actualMap
+let markerLat
+let markerLng
+let holder
 
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
@@ -25,7 +29,7 @@ export class MapComponent implements OnInit {
     zoom = 11
     markers = []
 
-    readonly ROOT_URL = "https://ed15a2e7.ngrok.io"
+    readonly ROOT_URL = "https://4d906e1b.ngrok.io"
 
     places: Observable<Place[]>;
 
@@ -49,18 +53,13 @@ export class MapComponent implements OnInit {
             this.markers = response
             this.markers.forEach((place) => {
                 const {lat, lng} = place[0]
-                console.log(lat, lng)
+                console.log('markers added')
                 let marker = new mapsModule.Marker({});
                     marker.position = mapsModule.Position.positionFromLatLng(lat, lng),
                     marker.title = place[1],
                     marker.snippet = place[2]
-                
                 actualMap.addMarker(marker)
-                // marker.setMap(actualMap)
-            })
-
-            
-
+            })  
         }, err => {
             console.log(err.message);
         }, () => {
@@ -68,10 +67,40 @@ export class MapComponent implements OnInit {
         })
     }
 
+    onMarkerPick(args){
+        markerLat = args.marker.position.latitude;
+        markerLng = args.marker.position.longitude;
+    }
+
     onMapReady(args) {
-        console.log(args);
+        console.log('map reassign');
         actualMap = args.object
-        // actualMap = args.object
-        
+    }
+
+    getDirections(){
+        let params = new HttpParams().set('place', `${markerLat},${markerLng}`);
+        this.http.get<Place[]>(this.ROOT_URL + "/mapPolyline", { params }).subscribe(response => {
+            //do something with response
+            holder = response
+            const { polyLine } = holder
+            console.log(polyLine);
+            var flightPlanCoordinates = decodePolyline(polyLine)
+            const path = new mapsModule.Polyline();
+            for (let i = 0; i < flightPlanCoordinates.length; i++){
+                let coord = flightPlanCoordinates[i];
+                path.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
+            }
+            path.visible = true;
+            path.width = 10;
+            path.geodesic = false;
+            actualMap.latitude = flightPlanCoordinates[0].lat;
+            actualMap.longitude = flightPlanCoordinates[0].lng;
+            actualMap.zoom = 15;
+            actualMap.addPolyline(path);
+        }, err => {
+            console.log("error", err.message);
+        }, () => {
+            console.log("completed");
+        })
     }
 }

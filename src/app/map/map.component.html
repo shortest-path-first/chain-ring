@@ -20,8 +20,6 @@
         xmlns="http://schemas.nativescript.org/tns.xsd"
         class="body">
         <StackLayout orientation="vertical" width="100%" height="95%">
-
-
             <TextField #searchPlace
             id="searchBox" text="" backgroundColor="white" width="95%" height="100"
             (returnPress)="getPlaces(searchPlace.text)"
@@ -29,10 +27,11 @@
             ></TextField>
             <maps:mapView
                 width="95%"
+                height="75%"
                 [latitude]="latitude" [longitude]="longitude" mapAnimationsEnabled="{{ mapAnimationsEnabled }}"
                 [zoom]="zoom" padding="{{padding}}" (mapReady)="onMapReady($event)"
-                markerSelect="onMarkerSelect" markerBeginDragging="onMarkerBeginDragging" markerEndDragging="onMarkerEndDragging"
-                markerDrag="onMarkerDrag" cameraChanged="onCameraChanged" cameraMove="onCameraMove">
+                (markerSelect)="onMarkerPick($event)">
             </maps:mapView>
+            <Button width="95%" height="100" text="Start Ride" (tap)="getDirections()"></Button>
         </StackLayout>
     </Page>
