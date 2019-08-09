@@ -1,6 +1,6 @@
 import { NavigationEnd, Router } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
-import { HttpClient, HttpParams } from "@angular/common/http"
+import { HttpClient, HttpHeaders } from "@angular/common/http"
 import { Observable } from 'rxjs';
 import { Component, OnInit } from "@angular/core";
 import { RadSideDrawer } from "nativescript-ui-sidedrawer";
@@ -21,7 +21,9 @@ let mapView;
 let watchId;
 let speed = 0;
 let ticks = 0;
-let rideMarkers = {markers: []};
+// rideMarkers = {markers: []};
+let rideMarkers;
+
 
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
@@ -32,7 +34,7 @@ registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView
 })
 export class RideComponent implements OnInit {
 
-    readonly ROOT_URL = "https://7be0faec.ngrok.io"
+    readonly ROOT_URL = "https://696a0775.ngrok.io"
 
     places: Observable<Ride[]>;
    
@@ -60,13 +62,29 @@ export class RideComponent implements OnInit {
                 mapView.addMarker(marker);
                 rideMarkers.markers.push({lat: result.latitude, lng: result.longitude});
                 console.log(rideMarkers);               
-            });
+            })
+    
     }
     
     onStopTap(): void {
         geolocation.clearWatch(watchId);
-        console.log("stopped ride");
-    }
+
+       
+        let markersString = rideMarkers;
+       
+        // let params = new HttpParams().set('markers', JSON.stringify(rideMarkers));
+        this.http.post(this.ROOT_URL + "/rides", markersString, {
+            headers: new HttpHeaders({  
+                'Content-Type': 'application/json',
+            })})
+            .subscribe(
+                data => {
+                    console.log("POST Request is successful ", data);
+                },
+                error => {
+                    console.log("Error", error);
+                })
+    } 
 
     drawUserPath(): void {
         let newPath = new mapsModule.Polyline();
@@ -109,8 +127,10 @@ export class RideComponent implements OnInit {
         let newPath = new mapsModule.Polyline();
         let newPathCoords = [];
         let line = "a`~uDhyxdPr@TxAaC~CeFhD}FtDcGdGyJbA_Bl@s@b@u@~@aB|DoGbJiOBEPW?ALQYWsBcBiEsD}HaHUW_@y@E_@KyFKyFQiHQeGSaJGkBPeAZw@p@qAV}@OaG[iMAQgBF"
+        
         var flightPlanCoordinates = decodePolyline(line);
         let testLine = polylineEncoder.encode(flightPlanCoordinates);
+        rideMarkers = testLine;
        
        const polyline = new mapsModule.Polyline();
        for (let i = 0; i < flightPlanCoordinates.length; i++){
