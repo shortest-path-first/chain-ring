@@ -5,7 +5,7 @@ import * as app from "tns-core-modules/application";
 import { HttpClient, HttpParams} from "@angular/common/http"
 import { Place } from "./map";
 import { Observable } from 'rxjs';
-import { type } from "os";
+
 var mapsModule = require("nativescript-google-maps-sdk");
 
 let actualMap
@@ -25,7 +25,7 @@ export class MapComponent implements OnInit {
     zoom = 11
     markers = []
 
-    readonly ROOT_URL = "https://ed15a2e7.ngrok.io"
+    readonly ROOT_URL = 'https://696a0775.ngrok.io'
 
     places: Observable<Place[]>;
 
