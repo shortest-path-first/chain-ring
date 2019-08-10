@@ -12,7 +12,8 @@ const decodePolyline = require('decode-google-map-polyline');
 let actualMap
 let markerLat
 let markerLng
-let holder
+let linePlaceHolder
+let markers = []
 
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
@@ -29,7 +30,7 @@ export class MapComponent implements OnInit {
     zoom = 11
     markers = []
 
-    readonly ROOT_URL = "https://4d906e1b.ngrok.io"
+    readonly ROOT_URL = "https://2c7dbe02.ngrok.io"
 
     places: Observable<Place[]>;
 
@@ -47,19 +48,36 @@ export class MapComponent implements OnInit {
     }
 
     getPlaces(text) {
+        // search params from search bar
         let params = new HttpParams().set('place', text);
+        this.markers.forEach((marker)=> {
+            marker.visible = false;
+        })
+
+        // http request using the text provided
         this.http.get<Place[]>(this.ROOT_URL + "/mapSearch", {params}).subscribe(response => {
-            //do something with response
+            // assigning response info to markers array and then placing each marker on our map
             this.markers = response
+
+            var totalLat = 0;
+            var totalLng = 0;
+
             this.markers.forEach((place) => {
                 const {lat, lng} = place[0]
+                totalLat += lat;
+                totalLng += lng;
                 console.log('markers added')
                 let marker = new mapsModule.Marker({});
                     marker.position = mapsModule.Position.positionFromLatLng(lat, lng),
                     marker.title = place[1],
                     marker.snippet = place[2]
+                    this.markers.push(marker);
+                    markers.push(marker);
                 actualMap.addMarker(marker)
             })  
+            // recenter map over choices
+            actualMap.latitude = (totalLat / markers.length)
+            actualMap.longitude = (totalLng / markers.length)
         }, err => {
             console.log(err.message);
         }, () => {
@@ -68,23 +86,31 @@ export class MapComponent implements OnInit {
     }
 
     onMarkerPick(args){
+        // sets marker selected to marker on component
         markerLat = args.marker.position.latitude;
         markerLng = args.marker.position.longitude;
     }
 
     onMapReady(args) {
+        // assigns the map to acutalMap on component
         console.log('map reassign');
         actualMap = args.object
     }
 
     getDirections(){
+        this.markers.forEach((marker) => {
+            marker.visible = false;
+        })
+        // params are set to the marker selected, info coming from component
         let params = new HttpParams().set('place', `${markerLat},${markerLng}`);
+        // http request to get directions between user point and marker selected
         this.http.get<Place[]>(this.ROOT_URL + "/mapPolyline", { params }).subscribe(response => {
-            //do something with response
-            holder = response
-            const { polyLine } = holder
-            console.log(polyLine);
+            // reassigns response to variable to avoid dealing with "<Place[]>"
+            linePlaceHolder = response
+            const { polyLine } = linePlaceHolder
             var flightPlanCoordinates = decodePolyline(polyLine)
+
+            
             const path = new mapsModule.Polyline();
             for (let i = 0; i < flightPlanCoordinates.length; i++){
                 let coord = flightPlanCoordinates[i];
@@ -93,9 +119,24 @@ export class MapComponent implements OnInit {
             path.visible = true;
             path.width = 10;
             path.geodesic = false;
-            actualMap.latitude = flightPlanCoordinates[0].lat;
-            actualMap.longitude = flightPlanCoordinates[0].lng;
-            actualMap.zoom = 15;
+            actualMap.latitude = ((flightPlanCoordinates[0].lat + flightPlanCoordinates[flightPlanCoordinates.length - 1].lat) / 2); 
+            actualMap.longitude = ((flightPlanCoordinates[0].lng + flightPlanCoordinates[flightPlanCoordinates.length - 1].lng) / 2);
+            actualMap.zoom = 12;
+            
+            let start = new mapsModule.Marker({});
+            start.position = mapsModule.Position.positionFromLatLng(flightPlanCoordinates[0].lat, flightPlanCoordinates[0].lng),
+            start.title = 'Start',
+            start.snippet = '3, 2, 1, GO'
+            this.markers.push(start);
+            actualMap.addMarker(start)
+
+            let finish = new mapsModule.Marker({});
+            finish.position = mapsModule.Position.positionFromLatLng(flightPlanCoordinates[flightPlanCoordinates.length - 1].lat, flightPlanCoordinates[flightPlanCoordinates.length - 1].lng),
+                finish.title = 'End',
+                finish.snippet = 'Your Final Destination'
+            this.markers.push(finish);
+            actualMap.addMarker(finish)
+            
             actualMap.addPolyline(path);
         }, err => {
             console.log("error", err.message);
