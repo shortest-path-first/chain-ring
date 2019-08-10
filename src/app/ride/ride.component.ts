@@ -37,7 +37,7 @@ export class RideComponent implements OnInit {
 
     places: Observable<Ride[]>;
    
-    constructor(private http: HttpClient) {
+    constructor(private http: HttpClient, private router: Router, private routerExtensions: RouterExtensions) {
         // Use the component constructor to inject providers.
     }
 
@@ -67,9 +67,7 @@ export class RideComponent implements OnInit {
     
     onStopTap(): void {
         geolocation.clearWatch(watchId);
-
-       
-
+        let avgSpeed = (speed * 2.23694)/ ticks;
         this.http.post(this.ROOT_URL + "/marker", rideMarkers, {
             headers: new HttpHeaders({  
                 'Content-Type': 'application/json',
@@ -81,6 +79,12 @@ export class RideComponent implements OnInit {
                 error => {
                     console.log("Error", error);
                 })
+
+            this.routerExtensions.navigate(['/browse'], {
+            transition: {
+                name: "fade"
+            }
+        });
     } 
 
     drawUserPath(): void {
@@ -88,6 +92,7 @@ export class RideComponent implements OnInit {
         let newPathCoords = [];
         watchId = geolocation.watchLocation((loc) => {
             if (loc) {
+                
                 let lat = loc.latitude;
                 let long = loc.longitude;
                 if (newPathCoords.length === 0) {
@@ -96,6 +101,7 @@ export class RideComponent implements OnInit {
                     mapView.longitude = long;
                 } else if (newPathCoords[newPathCoords.length - 1].lat !== lat && newPathCoords[newPathCoords.length - 1].long !== long) {
                     if(loc.speed !== 0){
+                        ticks++;
                         speed += loc.speed;
                     }
                     newPath.addPoint(mapsModule.Position.positionFromLatLng(lat, long));
