@@ -28,7 +28,7 @@ export class MapComponent implements OnInit {
     zoom = 11;
     markers = [];
 
-    readonly ROOT_URL = "https://6fc76d3d.ngrok.io";
+    readonly ROOT_URL = "https://a50c461e.ngrok.io";
 
     places: Observable<Array<Place>>;
 

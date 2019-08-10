@@ -31,7 +31,7 @@ registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView
 })
 export class RideComponent implements OnInit {
 
-    readonly ROOT_URL = "https://696a0775.ngrok.io"
+    readonly ROOT_URL = "https://a50c461e.ngrok.io";
    
     constructor(private http: HttpClient, private router: Router, private routerExtensions: RouterExtensions) {
         // Use the component constructor to inject providers.

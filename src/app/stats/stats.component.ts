@@ -15,14 +15,15 @@ export class StatsComponent implements OnInit {
     averageSpeed = 22;
     totalDistance = 1000;
     moneySaved = 90000;
-    pieChart = 5;
-    readonly ROOT_URL = "https://2c7dbe02.ngrok.io";
+    stationaryTime = 5;
+    holder;
+    readonly ROOT_URL = "https://a50c461e.ngrok.io";
 
     storedStats: Observable<Array<storedStats>>;
 
     constructor(private http: HttpClient) {
         // Use the component constructor to inject providers.
-        this.placeHolder();
+        this.userTotalInfo();
     }
     ngOnInit(): void {
         // Init your component properties here.
@@ -33,12 +34,22 @@ export class StatsComponent implements OnInit {
         sideDrawer.showDrawer();
     }
 
-    placeHolder() {
-        console.log("yaaaaaaaaaaaaas");
-    }
-
     userTotalInfo() {
-        console.log("thats a more a ");
-        
+        console.log("thats a more a");
+        const name = "Franco";
+        const params = new HttpParams().set("name", name);
+        this.http.get<Array<storedStats>>(this.ROOT_URL + "/userTotals", { params }).subscribe((response) => {
+            console.log(response);
+            this.holder = response;
+            const { avgSpeed, totalDistance, costSavings, stationaryTime } = this.holder;
+            this.averageSpeed = avgSpeed;
+            this.totalDistance = totalDistance;
+            this.moneySaved = costSavings;
+            this.stationaryTime = stationaryTime;
+        }, (err) => {
+            console.log(err.message);
+        }, () => {
+            console.log("completed");
+        });
     }
 }
