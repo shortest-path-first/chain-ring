@@ -16,7 +16,7 @@
 </ActionBar>
 <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY">
 </script>
-    <Page xmlns:maps="nativescript-google-maps-sdk">
+    <Page xmlns:maps="nativescript-google-maps-sdk"> 
     </Page>
 <FlexboxLayout class="page page-content" align-items="stretch" flexDirection="column">
         <maps:mapView latitude="{{ latitude }}" longitude="{{ longitude }}"
@@ -27,8 +27,9 @@
         cameraChanged="onCameraChanged" cameraMove="onCameraMove">
     </maps:mapView>
     <FlexboxLayout class="body" align-items="stretch" height="25%" flexDirection="row" justifyContent="space-around">
-        <Label class="far" text="&#xf0eb;" style="font-size: 50em; color: white;" (tap)="onStopTap()"></Label>
-        <Label class="fas" text="&#xf3fd;" style="font-size: 50em; color: white;"></Label>
+        <Label *ngIf="show" text="{{currentSpeed}}" style="font-size: 50em; color: white;" ></Label>
+        <Label class="fas" text="&#xf04d;" style="font-size: 50em; color: white;" (tap)="onStopTap()"></Label>
+        <Label class="fas" text="&#xf3fd;" style="font-size: 50em; color: white;" (tap)="onSpeedTap()"></Label>
         <Label class="fas" text="&#xf276;" style="font-size: 50em; color: white;" (tap)="onPinTap()"></Label>
         <Label class="fas" text="&#xf015;" style="font-size: 50em; color: white"></Label>
     </FlexboxLayout>
