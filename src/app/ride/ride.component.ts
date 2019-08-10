@@ -58,6 +58,7 @@ export class RideComponent implements OnInit {
     }
 
     onPinTap(): void {
+        
         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
                 let marker = new mapsModule.Marker();
@@ -73,23 +74,29 @@ export class RideComponent implements OnInit {
     onStopTap(): void {
         geolocation.clearWatch(watchId);
         let avgSpeed = (this.speed * 2.23694)/ ticks;
-         console.log(avgSpeed);
+         console.log(this.newPathCoords);
         let pathPolyline = polylineEncoder.encode(this.newPathCoords);
         let first = this.newPathCoords[0];
         let last = this.newPathCoords[this.newPathCoords.length - 1];
         let start = first.time.getTime();
         let stop = last.time.getTime();
-        let duration = (stop - start)/ 1000;
-        console.log("duration",duration, start, stop, );
+        let direction = [];
+        let spd = [];
+        this.newPathCoords.forEach((blip) => {
+            direction.push(blip.direction);
+            spd.push(blip.nowSpeed);  
+        })
+        let duration = stop - start;
+        console.log("duration",duration, start, stop);
         this.http.post(this.ROOT_URL + "/marker", rideMarkers, {
             headers: new HttpHeaders({  
                 'Content-Type': 'application/json',
             })})
             .subscribe(()=>{
-                console.log("success");
+                console.log("success"); 
             });
 
-        let info = {pathPolyline, first, last, avgSpeed};
+        let info = {pathPolyline, first, last, avgSpeed, direction, spd};
         this.http.post(this.ROOT_URL + "/ride", info, {
             headers: new HttpHeaders({
                 'Content-Type': 'application/json',
@@ -116,19 +123,21 @@ export class RideComponent implements OnInit {
         
         watchId = geolocation.watchLocation((loc) => {
             if (loc) {
-                this.currentSpeed = loc.speed;
+                this.currentSpeed = loc.direction;
                 console.log(loc.speed);
+                this.speed += loc.speed;
+                ticks++;
                 let lat = loc.latitude;
                 let long = loc.longitude;
                 let time = loc.timestamp;
+                let direction = loc.direction;
+                let nowSpeed = this.currentSpeed;
                 if (this.newPathCoords.length === 0) {
-                    this.newPathCoords.push({ lat, long, time });
+                    this.newPathCoords.push({ lat, long, time, direction, nowSpeed });
                     this.mapView.latitiude = lat;
                     this.mapView.longitude = long;
-                } else {
-                    ticks++;
-                    this.speed += loc.speed;
-                    this.newPathCoords.push({ lat, long, time });
+                } else if (this.newPathCoords[this.newPathCoords.length - 1].lat !== lat && this.newPathCoords[this.newPathCoords.length - 1].long !== long) {
+                    this.newPathCoords.push({ lat, long, time, direction, nowSpeed });
                     newPath.addPoint(mapsModule.Position.positionFromLatLng(lat, long));
                     newPath.visible = true;
                     newPath.width = 10;
