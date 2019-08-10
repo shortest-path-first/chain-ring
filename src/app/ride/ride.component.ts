@@ -9,8 +9,7 @@ import * as app from "tns-core-modules/application";
 import * as geolocation from "nativescript-geolocation";
 import { Accuracy } from "tns-core-modules/ui/enums"; 
 import { Color } from "tns-core-modules/color/color";
-import { Ride } from "./ride"
-var accelerometer = require("nativescript-accelerometer");
+// var accelerometer = require("nativescript-accelerometer");
 //const style = require("../../../App_Resources/style.json")
 
 var mapsModule = require("nativescript-google-maps-sdk");
@@ -32,9 +31,13 @@ registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView
 })
 export class RideComponent implements OnInit {
 
+<<<<<<< HEAD
     readonly ROOT_URL = "https://6fc76d3d.ngrok.io"
 
     places: Observable<Ride[]>;
+=======
+    readonly ROOT_URL = "https://696a0775.ngrok.io"
+>>>>>>> bf84c1b4f220741f658cf6e9feef8be13bfa5d90
    
     constructor(private http: HttpClient, private router: Router, private routerExtensions: RouterExtensions) {
         // Use the component constructor to inject providers.
