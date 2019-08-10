@@ -15,7 +15,18 @@
     <Label class="action-bar-title" text="Browse"></Label>
 </ActionBar>
 
-<GridLayout class="page page-content">
-    <Label class="page-icon fa" text="&#xf1ea;"></Label>
-    <Label class="page-placeholder" text="<!-- Page content goes here -->"></Label>
-</GridLayout>
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" class="body">
+    <GridLayout columns="*, *, *, *, *, *, *, *, *, *, *, *" rows="*, *, *, *, *, *, *, *, *, *" width="95%" height="95%">
+        <Label text="Last Ride" row="0" col="0" rowSpan="1" colSpan="4"class="stats-header"></Label>
+        <Label text="Recent" row="0" col="4" rowSpan="1" colSpan="4" class="stats-header"></Label>
+        <Label text="Total" row="0" col="8" rowSpan="1" colSpan="4" class="stats-header"></Label>
+        <Label text="Average Speed" row="2" col="0" colSpan="6" rowSpan="2" class="stats-info-line"></Label>
+        <Label [text]=averageSpeed row="2" col="6" colSpan="6" rowSpan="2" class="stats-info-line"></Label>
+        <Label text="Total Distance" row="4" col="0" colSpan="6" rowSpan="2" class="stats-info-line"></Label>
+        <Label [text]=totalDistance row="4" col="6" colSpan="6" rowSpan="2" class="stats-info-line"></Label>
+        <Label text="Money Saved" row="6" col="0" colSpan="6" rowSpan="2" class="stats-info-line"></Label>
+        <Label [text]=moneySaved row="6" col="6" colSpan="6" rowSpan="2" class="stats-info-line"></Label>
+        <Label text="A Pie chart" row="8" col="0" colSpan="6" rowSpan="2" class="stats-info-line"></Label>
+        <Label [text]=pieChart row="8" col="6" colSpan="6" rowSpan="2" class="stats-info-line"></Label>
+    </GridLayout>
+</Page>
