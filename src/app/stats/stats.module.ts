@@ -1,5 +1,7 @@
 import { NgModule, NO_ERRORS_SCHEMA } from "@angular/core";
 import { NativeScriptCommonModule } from "nativescript-angular/common";
+// adding to allow http requests
+import { HttpClientModule } from "@angular/common/http";
 
 import { StatsRoutingModule } from "./stats-routing.module";
 import { StatsComponent } from "./stats.component";
@@ -7,7 +9,8 @@ import { StatsComponent } from "./stats.component";
 @NgModule({
     imports: [
         NativeScriptCommonModule,
-        StatsRoutingModule
+        StatsRoutingModule,
+        HttpClientModule
     ],
     declarations: [
         StatsComponent
