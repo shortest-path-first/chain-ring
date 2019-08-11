@@ -9,16 +9,20 @@
     NavigationButton as a side-drawer button in iOS is not possible,
     because its function is to always navigate back in the application.
     -->
-    <ActionItem icon="res://navigation/menu" android:visibility="collapsed" (tap)="onDrawerButtonTap()"
+    <ActionItem text="res://navigation/menu" android:visibility="collapsed" (tap)="onDrawerButtonTap()"
         ios.position="left">
     </ActionItem>
-    <Label class="action-bar-title" text="Chainring"></Label>
+    <Label class="header" text="Chainring"></Label>
 </ActionBar>  
 <Page>
     <FlexboxLayout class="body" flexDirection="column"> 
+        
         <Button class="button" text="Commute"></Button>
-        <Button class="button" text="Map" (tap)="onButtonLinkTap('/map')"></Button>
-        <Button class="button" text="Stats" (tap)="onButtonLinkTap('/browse')"></Button>
-        <Button class="button" text="Ride" (tap)="onButtonLinkTap('/ride')"></Button>
+        <Button class="button"  (tap)="onButtonLinkTap('/map')">
+        <FormattedString><Span class="fas" text="&#xf5a0;   Map"></Span></FormattedString></Button>
+        <Button class="button" (tap)="onButtonLinkTap('/browse')">
+        <FormattedString><Span class="fas" text="&#xf080;   Stats"></Span></FormattedString></Button>
+        <Button class="button" (tap)="onButtonLinkTap('/ride')">
+        <FormattedString><Span class="fas" text="&#xf206;  Ride"></Span></FormattedString></Button>
     </FlexboxLayout>
 </Page>

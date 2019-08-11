@@ -30,11 +30,7 @@ export class MapComponent implements OnInit {
     zoom = 11
     markers = []
 
-<<<<<<< HEAD
     readonly ROOT_URL = "https://6fc76d3d.ngrok.io"
-=======
-    readonly ROOT_URL = "https://2c7dbe02.ngrok.io"
->>>>>>> bf84c1b4f220741f658cf6e9feef8be13bfa5d90
 
     places: Observable<Place[]>;
 
@@ -113,7 +109,6 @@ export class MapComponent implements OnInit {
             linePlaceHolder = response
             const { polyLine } = linePlaceHolder
             var flightPlanCoordinates = decodePolyline(polyLine)
-
             
             const path = new mapsModule.Polyline();
             for (let i = 0; i < flightPlanCoordinates.length; i++){

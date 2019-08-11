@@ -27,11 +27,11 @@
         cameraChanged="onCameraChanged" cameraMove="onCameraMove">
     </maps:mapView>
     <FlexboxLayout class="body" align-items="stretch" height="25%" flexDirection="row" justifyContent="space-around">
-        <Label *ngIf="show" text="{{currentSpeed}}" style="font-size: 50em; color: white;" ></Label>
+        <Label *ngIf="show" text="{{currentSpeed}}" class="speed" ></Label>
         <Label class="fas" text="&#xf04d;" style="font-size: 50em; color: white;" (tap)="onStopTap()"></Label>
         <Label class="fas" text="&#xf3fd;" style="font-size: 50em; color: white;" (tap)="onSpeedTap()"></Label>
         <Label class="fas" text="&#xf276;" style="font-size: 50em; color: white;" (tap)="onPinTap()"></Label>
-        <Label class="fas" text="&#xf015;" style="font-size: 50em; color: white"></Label>
+        <Label class="fas" text="&#xf015;" style="font-size: 50em; color: white" (tap)="onHomeTap()"></Label>
     </FlexboxLayout>
 </FlexboxLayout>
 

@@ -11,7 +11,8 @@ import { Accuracy } from "tns-core-modules/ui/enums";
 import { Color } from "tns-core-modules/color/color";
 // var accelerometer = require("nativescript-accelerometer");
 //const style = require("../../../App_Resources/style.json")
-
+import { Image } from "tns-core-modules/ui/image";
+import { ImageSource } from "tns-core-modules/image-source";
 var mapsModule = require("nativescript-google-maps-sdk");
 const decodePolyline = require('decode-google-map-polyline');
 const polylineEncoder = require('google-polyline')
@@ -31,14 +32,8 @@ registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView
 })
 export class RideComponent implements OnInit {
 
-<<<<<<< HEAD
     readonly ROOT_URL = "https://6fc76d3d.ngrok.io"
 
-    places: Observable<Ride[]>;
-=======
-    readonly ROOT_URL = "https://696a0775.ngrok.io"
->>>>>>> bf84c1b4f220741f658cf6e9feef8be13bfa5d90
-   
     constructor(private http: HttpClient, private router: Router, private routerExtensions: RouterExtensions) {
         // Use the component constructor to inject providers.
     }
@@ -71,26 +66,33 @@ export class RideComponent implements OnInit {
                 rideMarkers.markers.push({markerLat: result.latitude, markerLon: result.longitude});
                 console.log(rideMarkers);               
             })
-    
     }
+
+    onHomeTap(): void {
+        this.routerExtensions.navigate(['/home'], {
+            transition: {
+                name: "fade"
+            }
+    });
+}
     
     onStopTap(): void {
         geolocation.clearWatch(watchId);
         let avgSpeed = (this.speed * 2.23694)/ ticks;
-         console.log(this.newPathCoords);
         let pathPolyline = polylineEncoder.encode(this.newPathCoords);
         let first = this.newPathCoords[0];
         let last = this.newPathCoords[this.newPathCoords.length - 1];
         let start = first.time.getTime();
         let stop = last.time.getTime();
-        let direction = [];
-        let spd = [];
-        this.newPathCoords.forEach((blip) => {
-            direction.push(blip.direction);
-            spd.push(blip.nowSpeed);  
-        })
+        // let direction = [];
+        // let spd = [];
+        // this.newPathCoords.forEach((blip) => {
+        //     direction.push(blip.direction);
+        //     spd.push(blip.nowSpeed);  
+        // })
         let duration = stop - start;
-        console.log("duration",duration, start, stop);
+        let what = duration/ 10000;
+        console.log("duration", what);
         this.http.post(this.ROOT_URL + "/marker", rideMarkers, {
             headers: new HttpHeaders({  
                 'Content-Type': 'application/json',
@@ -98,8 +100,7 @@ export class RideComponent implements OnInit {
             .subscribe(()=>{
                 console.log("success"); 
             });
-
-        let info = {pathPolyline, first, last, avgSpeed, direction, spd};
+        let info = {pathPolyline, first, last, avgSpeed, duration};
         this.http.post(this.ROOT_URL + "/ride", info, {
             headers: new HttpHeaders({
                 'Content-Type': 'application/json',
@@ -118,7 +119,6 @@ export class RideComponent implements OnInit {
 
     onSpeedTap(): void {
         this.show = !this.show;
-        
     } 
 
     drawUserPath(): void {
@@ -126,8 +126,7 @@ export class RideComponent implements OnInit {
         
         watchId = geolocation.watchLocation((loc) => {
             if (loc) {
-                this.currentSpeed = loc.direction;
-                console.log(loc.speed);
+                this.currentSpeed = loc.speed * 2.23694;
                 this.speed += loc.speed;
                 ticks++;
                 let lat = loc.latitude;
@@ -136,11 +135,12 @@ export class RideComponent implements OnInit {
                 let direction = loc.direction;
                 let nowSpeed = this.currentSpeed;
                 if (this.newPathCoords.length === 0) {
-                    this.newPathCoords.push({ lat, long, time, direction, nowSpeed });
+                    this.newPathCoords.push({ lat, long, time });
                     this.mapView.latitiude = lat;
                     this.mapView.longitude = long;
+                    this.mapView.bearing = loc.direction;
                 } else if (this.newPathCoords[this.newPathCoords.length - 1].lat !== lat && this.newPathCoords[this.newPathCoords.length - 1].long !== long) {
-                    this.newPathCoords.push({ lat, long, time, direction, nowSpeed });
+                    this.newPathCoords.push({ lat, long, time });
                     newPath.addPoint(mapsModule.Position.positionFromLatLng(lat, long));
                     newPath.visible = true;
                     newPath.width = 10;
@@ -149,13 +149,15 @@ export class RideComponent implements OnInit {
                     this.mapView.addPolyline(newPath);
                     this.mapView.latitiude = loc.latitude;
                     this.mapView.longitude = loc.longitude;
+                    this.mapView.bearing = loc.direction;
                 }
             }
         }, (e) => {
             console.log("Error: " + e.message);
         }, {
                 desiredAccuracy: Accuracy.high,
-                updateTime: 1000,
+                updateTime: 3000,
+                updateDistance: 0.1,
                 minimumUpdateTime: 100
             });
     }
@@ -178,6 +180,7 @@ export class RideComponent implements OnInit {
         polyline.width = 10;
         polyline.geodesic = false;
         polyline.color = new Color("purple");
+        this.mapView.mapAnimationsEnabled = true;
         this.mapView.latitude = flightPlanCoordinates[0].lat;
         this.mapView.longitude = flightPlanCoordinates[0].lng;        
         this.mapView.zoom = 20;
@@ -185,6 +188,7 @@ export class RideComponent implements OnInit {
         this.mapView.addPolyline(polyline);
         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
+                
                 let marker = new mapsModule.Marker();
                 marker.position = mapsModule.Position.positionFromLatLng(result.latitude, result.longitude);
                 this.mapView.addMarker(marker);

@@ -19,6 +19,7 @@
     font-family: Font Awesome 5 Free, fa-solid-900;
     font-weight: 900; 
 }
+
 // Common page class
 .page-content {
     .page-placeholder {
@@ -60,17 +61,27 @@ $sidedrawer-list-icon-size: 20;
     border-width: 10px;
     margin: 25px 30px;
     width: 40%;
-    height: 20%;
+    height: 18%;
     opacity: .5;
-    font-size: 60%;
+    font-size: 50%;
+    font-family: Roboto-Medium;
 }
 
+.speed {
+    font-family: Orbitron-Black;
+}
 //Body styles
 
     .body {
         background-image: linear-gradient(to bottom left, #393ef9, #9c27b0,);
     }
 
+//Header font
+    .header {
+        font-family: "PermanentMarker-Regular";
+        font-size: 30rem;
+        
+    }
 
 .sidedrawer {
     &.sidedrawer-left {
