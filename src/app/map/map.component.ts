@@ -28,11 +28,7 @@ export class MapComponent implements OnInit {
     zoom = 11;
     markers = [];
 
-<<<<<<< HEAD
     readonly ROOT_URL = "https://6fc76d3d.ngrok.io"
-=======
-    readonly ROOT_URL = "https://a50c461e.ngrok.io";
->>>>>>> 9c748a125eb163fdfac6add28c92505a438d3602
 
     places: Observable<Array<Place>>;
 
@@ -108,17 +104,10 @@ export class MapComponent implements OnInit {
         // http request to get directions between user point and marker selected
         this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
             // reassigns response to variable to avoid dealing with "<Place[]>"
-<<<<<<< HEAD
-            linePlaceHolder = response
-            const { polyLine } = linePlaceHolder
-            var flightPlanCoordinates = decodePolyline(polyLine)
-            
-=======
             linePlaceHolder = response;
             const { polyLine } = linePlaceHolder;
             const flightPlanCoordinates = decodePolyline(polyLine);
 
->>>>>>> 9c748a125eb163fdfac6add28c92505a438d3602
             const path = new mapsModule.Polyline();
             // tslint:disable-next-line: prefer-for-of
             for (let i = 0; i < flightPlanCoordinates.length; i++) {
