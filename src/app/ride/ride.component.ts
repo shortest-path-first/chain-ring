@@ -9,10 +9,10 @@ import * as app from "tns-core-modules/application";
 import * as geolocation from "nativescript-geolocation";
 import { Accuracy } from "tns-core-modules/ui/enums"; 
 import { Color } from "tns-core-modules/color/color";
+import { SpeechRecognition } from "nativescript-speech-recognition";
 // var accelerometer = require("nativescript-accelerometer");
 //const style = require("../../../App_Resources/style.json")
-import { Image } from "tns-core-modules/ui/image";
-import { ImageSource } from "tns-core-modules/image-source";
+
 var mapsModule = require("nativescript-google-maps-sdk");
 const decodePolyline = require('decode-google-map-polyline');
 const polylineEncoder = require('google-polyline')
@@ -51,6 +51,7 @@ export class RideComponent implements OnInit {
     newPathCoords = [];
     totalDistance = 0.0;
     distanceString = "0.0"
+    speechRecognition;
     
     ngOnInit(): void {
         // Init your component properties here.
@@ -141,6 +142,10 @@ export class RideComponent implements OnInit {
 
     onStopTap(): void {
         geolocation.clearWatch(this.watchId);
+        this.speechRecognition.stopListening()
+        .then(()=>{
+            console.log('stopped listening')
+        })
         let avgSpeed = (this.speed * 2.23694)/ this.allSpeeds.length;
         let speedBreakdown = this.findSpeedBreakdown(this.allSpeeds);
         let pathPolyline = polylineEncoder.encode(this.newPathCoords);
@@ -181,10 +186,13 @@ export class RideComponent implements OnInit {
         this.show = !this.show;
     } 
 
+    
+
     drawUserPath(): void {
         let newPath = new mapsModule.Polyline();
         
         this.watchId = geolocation.watchLocation((loc) => {
+            this.handleSpeech();
             if (loc) {
                 this.currentSpeed = loc.speed * 2.23694;
                 this.speedString = this.currentSpeed.toFixed(1);
@@ -229,29 +237,68 @@ export class RideComponent implements OnInit {
             });
     }
 
+    handleSpeech(){
+        this.speechRecognition.startListening(
+            {
+                // optional, uses the device locale by default
+                locale: "en-US",
+                // set to true to get results back continuously
+                returnPartialResults: true,
+                // this callback will be invoked repeatedly during recognition
+                onResult: (transcription) => {
+                    if (transcription.text.includes("speed")) {
+                       this.show = this.show!;
+                       console.log('speed!')
+                    }
+                   ;
+                },
+                onError: (error) => {
+                    // because of the way iOS and Android differ, this is either:
+                    // - iOS: A 'string', describing the issue. 
+                    // - Android: A 'number', referencing an 'ERROR_*' constant from https://developer.android.com/reference/android/speech/SpeechRecognizer.
+                    //            If that code is either 6 or 7 you may want to restart listening.
+                }
+            }
+        ).then(
+            (started) => { console.log(`started listening`) },
+            (errorMessage) => { console.log(`Error: ${errorMessage}`); }
+        )
+            .catch((error) => {
+                // same as the 'onError' handler, but this may not return if the error occurs after listening has successfully started (because that resolves the promise,
+                // hence the' onError' handler was created.
+                console.error(error);
+            });
+}
+    
 
     onMapReady(args){
-        this.mapView = args.object;  
-    
-        const line = polylineHolder;
+        this.mapView = args.object; 
+        this.speechRecognition = new SpeechRecognition();
+        this.speechRecognition.available().then(
+            (available: boolean) => console.log(available ? "YES!" : "NO"),
+            (err: string) => console.log(err)
+        ); 
         
+        const line = polylineHolder;
         var flightPlanCoordinates = decodePolyline(line);
-      
-       const polyline = new mapsModule.Polyline();
-       for (let i = 0; i < flightPlanCoordinates.length; i++){
-           let coord = flightPlanCoordinates[i];
-           polyline.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
-       }
-        polyline.visible = true;
-        polyline.width = 10;
-        polyline.geodesic = false;
-        polyline.color = new Color("purple");
+        if(flightPlanCoordinates !== undefined){
+            const polyline = new mapsModule.Polyline();
+            for (let i = 0; i < flightPlanCoordinates.length; i++){
+                let coord = flightPlanCoordinates[i];
+                polyline.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
+            }
+             polyline.visible = true;
+             polyline.width = 10;
+             polyline.geodesic = false;
+             polyline.color = new Color("purple");
+             this.mapView.latitude = flightPlanCoordinates[0].lat;
+             this.mapView.longitude = flightPlanCoordinates[0].lng;        
+             this.mapView.addPolyline(polyline);
+        } 
+
         this.mapView.mapAnimationsEnabled = true;
-        this.mapView.latitude = flightPlanCoordinates[0].lat;
-        this.mapView.longitude = flightPlanCoordinates[0].lng;        
         this.mapView.zoom = 15;
         this.mapView.tilt = 45;
-        this.mapView.addPolyline(polyline);
         this.mapView.myLocationButtonEnabled = true;
         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
@@ -260,6 +307,8 @@ export class RideComponent implements OnInit {
                 // marker.icon = image;
                 marker.position = mapsModule.Position.positionFromLatLng(result.latitude, result.longitude);
                 this.mapView.addMarker(marker);
+                this.mapView.latitude = result.latitude;
+                this.mapView.longitude = result.longitude;
             });
         // accelerometer.startAccelerometerUpdates(function (data) {
         //     //  console.log("x: " + data.x + "y: " + data.y + "z: " + data.z);
