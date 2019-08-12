@@ -4,7 +4,7 @@ import * as app from "tns-core-modules/application";
 import { NavigationEnd, Router } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
 import * as geolocation from "nativescript-geolocation";
-import { Accuracy } from "tns-core-modules/ui/enums"; 
+import { Accuracy } from "tns-core-modules/ui/enums";
 
 @Component({
     selector: "Home",
@@ -18,7 +18,7 @@ export class HomeComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        // Init your component properties here.   
+        // Init your component properties here.
         geolocation.enableLocationRequest();
         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
@@ -32,8 +32,8 @@ export class HomeComponent implements OnInit {
         sideDrawer.showDrawer();
     }
 
-    onButtonLinkTap(navItemRoute: string): void { 
-        console.log('tapped');
+    onButtonLinkTap(navItemRoute: string): void {
+        console.log("tapped");
         this.routerExtensions.navigate([navItemRoute], {
             transition: {
                 name: "fade"

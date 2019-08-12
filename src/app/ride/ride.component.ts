@@ -17,10 +17,7 @@ var mapsModule = require("nativescript-google-maps-sdk");
 const decodePolyline = require('decode-google-map-polyline');
 const polylineEncoder = require('google-polyline')
 
-
 let rideMarkers = {markers: []};
-
-
 
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
@@ -30,9 +27,9 @@ registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView
     templateUrl: "./ride.component.html"
 })
 export class RideComponent implements OnInit {
-    
-    readonly ROOT_URL = "https://6fc76d3d.ngrok.io"
-    
+
+    readonly ROOT_URL = "https://3c712b5f.ngrok.io";
+
     constructor(private http: HttpClient, private router: Router, private routerExtensions: RouterExtensions) {
         // Use the component constructor to inject providers.
     }
