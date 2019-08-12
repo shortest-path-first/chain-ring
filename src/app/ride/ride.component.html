@@ -19,20 +19,31 @@
     <Page xmlns:maps="nativescript-google-maps-sdk"> 
     </Page>
 <FlexboxLayout class="page page-content" align-items="stretch" flexDirection="column">
-        <maps:mapView latitude="{{ latitude }}" longitude="{{ longitude }}"
+    <AbsoluteLayout>
+        <maps:mapView width="100%" height="100%" latitude="{{ latitude }}" longitude="{{ longitude }}"
         mapAnimationsEnabled="{{ mapAnimationsEnabled }}" zoom="{{ zoom }}" bearing="{{ bearing }}"
-        padding="{{ padding }}" (mapReady)="onMapReady($event)" 
-        setMyLocationEnabled="true" markerSelect="onMarkerSelect"
-        markerBeginDragging="onMarkerBeginDragging" markerEndDragging="onMarkerEndDragging" markerDrag="onMarkerDrag"
-        cameraChanged="onCameraChanged" cameraMove="onCameraMove">
+        padding="{{ padding }}" (mapReady)="onMapReady($event)" setMyLocationEnabled="true"
+        markerSelect="onMarkerSelect" markerBeginDragging="onMarkerBeginDragging"
+        markerEndDragging="onMarkerEndDragging" markerDrag="onMarkerDrag" cameraChanged="onCameraChanged"
+        cameraMove="onCameraMove">
     </maps:mapView>
+    <AbsoluteLayout *ngIf="show" text="margin='30'" class="test">
+        <Label text="SPD" class="speed" style="font-size: 20em;" left="1%"></Label>
+        <Label style="background-color: black; width: 100%; height: 1%;" top="77%"></Label>
+        <Label text="{{speedString[0]}}" class="speed" bottom="45%" top="6%" left="53%" right="35%" style="font-size: 68em;"></Label>
+        <Label text="{{speedString[2]}}" class="speed" top="15%" left="107.5%" style="font-size: 45em; text-align: center;"></Label>
+        <Label text="MPH" class="speed" top="60%" left="109%" style="font-size: 13em"></Label>
+        <Label text="DIST" class="speed" style="font-size: 20em;" left="1%" top="77%"></Label>
+        <Label text="{{distanceString}}" class="speed" style="font-size: 60em; letter-spacing: -5px" left="30%" right="10%" top="87%"></Label>
+    </AbsoluteLayout>
+</AbsoluteLayout>
     <FlexboxLayout class="body" align-items="stretch" height="25%" flexDirection="row" justifyContent="space-around">
-        <Label *ngIf="show" text="{{currentSpeed}}" class="speed" ></Label>
         <Label class="fas" text="&#xf04d;" style="font-size: 50em; color: white;" (tap)="onStopTap()"></Label>
         <Label class="fas" text="&#xf3fd;" style="font-size: 50em; color: white;" (tap)="onSpeedTap()"></Label>
         <Label class="fas" text="&#xf276;" style="font-size: 50em; color: white;" (tap)="onPinTap()"></Label>
         <Label class="fas" text="&#xf015;" style="font-size: 50em; color: white" (tap)="onHomeTap()"></Label>
     </FlexboxLayout>
 </FlexboxLayout>
+
 
 
