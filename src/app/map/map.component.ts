@@ -5,6 +5,10 @@ import * as app from "tns-core-modules/application";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Place } from "./map";
 import { Observable } from "rxjs";
+import * as geolocation from "nativescript-geolocation";
+import { Accuracy } from "tns-core-modules/ui/enums";
+import { RouterExtensions } from "nativescript-angular/router";
+import { NavigationEnd, Router } from "@angular/router";
 const mapsModule = require("nativescript-google-maps-sdk");
 const decodePolyline = require("decode-google-map-polyline");
 
@@ -12,7 +16,7 @@ let actualMap;
 let markerLat;
 let markerLng;
 let linePlaceHolder;
-const markers = [];
+let markers = [];
 
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
@@ -25,19 +29,29 @@ export class MapComponent implements OnInit {
 
     latitude = 30;
     longitude = -90.15;
-    zoom = 11;
+    zoom = 12;
     markers = [];
+    bottomButtonText = "Get Directions";
+    markerSelected = false;
+    readyToRide = false;
 
-    readonly ROOT_URL = "https://6fc76d3d.ngrok.io"
+    readonly ROOT_URL = "https://3c712b5f.ngrok.io";
 
     places: Observable<Array<Place>>;
 
-    constructor(private http: HttpClient) {
+    constructor(private http: HttpClient, private router: Router, private routerExtensions: RouterExtensions) {
         // Use the component constructor to inject providers.
     }
 
     ngOnInit(): void {
         // Init your component properties here.
+        geolocation.enableLocationRequest();
+        geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
+            .then((result) => {
+                // console.log(result);
+                this.latitude = result.latitude;
+                this.longitude = result.longitude;
+            });
     }
 
     onDrawerButtonTap(): void {
@@ -47,10 +61,13 @@ export class MapComponent implements OnInit {
 
     getPlaces(text) {
         // search params from search bar
-        const params = new HttpParams().set("place", text);
+        this.readyToRide = false;
+        const params = new HttpParams().set("place", text).set("userLoc", `${this.latitude},${this.longitude}`);
         this.markers.forEach((marker) => {
             marker.visible = false;
         });
+        this.markers = [];
+        markers = [];
 
         // http request using the text provided
         this.http.get<Array<Place>>(this.ROOT_URL + "/mapSearch", {params}).subscribe((response) => {
@@ -76,6 +93,7 @@ export class MapComponent implements OnInit {
             // recenter map over choices
             actualMap.latitude = (totalLat / markers.length);
             actualMap.longitude = (totalLng / markers.length);
+            actualMap.zoom = 12;
         }, (err) => {
             console.log(err.message);
         }, () => {
@@ -87,6 +105,14 @@ export class MapComponent implements OnInit {
         // sets marker selected to marker on component
         markerLat = args.marker.position.latitude;
         markerLng = args.marker.position.longitude;
+        this.markerSelected = true;
+        this.readyToRide = false;
+        this.bottomButtonText = "Get Directions";
+    }
+
+    removeGetDirections() {
+        this.markerSelected = false;
+        this.readyToRide = false;
     }
 
     onMapReady(args) {
@@ -96,14 +122,19 @@ export class MapComponent implements OnInit {
     }
 
     getDirections() {
-        this.markers.forEach((marker) => {
-            marker.visible = false;
-        });
-        // params are set to the marker selected, info coming from component
-        const params = new HttpParams().set("place", `${markerLat},${markerLng}`);
-        // http request to get directions between user point and marker selected
-        this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
-            // reassigns response to variable to avoid dealing with "<Place[]>"
+        if (this.readyToRide === false) {
+
+            this.markers.forEach((marker) => {
+                marker.visible = false;
+            });
+            this.markers = [];
+            markers = [];
+            // params are set to the marker selected, info coming from component
+            // tslint:disable-next-line: max-line-length
+            const params = new HttpParams().set("place", `${markerLat},${markerLng}`).set("userLoc", `${this.latitude},${this.longitude}`);
+            // http request to get directions between user point and marker selected
+            this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
+                // reassigns response to variable to avoid dealing with "<Place[]>"
             linePlaceHolder = response;
             const { polyLine } = linePlaceHolder;
             const flightPlanCoordinates = decodePolyline(polyLine);
@@ -130,7 +161,7 @@ export class MapComponent implements OnInit {
             start.snippet = "3, 2, 1, GO";
             this.markers.push(start);
             actualMap.addMarker(start);
-
+            
             const finish = new mapsModule.Marker({});
             // tslint:disable-next-line: max-line-length
             finish.position = mapsModule.Position.positionFromLatLng(flightPlanCoordinates[flightPlanCoordinates.length - 1].lat, flightPlanCoordinates[flightPlanCoordinates.length - 1].lng);
@@ -139,10 +170,19 @@ export class MapComponent implements OnInit {
             this.markers.push(finish);
             actualMap.addMarker(finish);
             actualMap.addPolyline(path);
+            this.readyToRide = true;
         }, (err) => {
             console.log("error", err.message);
         }, () => {
             console.log("completed");
         });
+        } else if (this.readyToRide === true) {
+            console.log("tapped");
+            this.routerExtensions.navigate(["/ride"], {
+                transition: {
+                    name: "fade"
+                }
+            });
+    }
     }
 }

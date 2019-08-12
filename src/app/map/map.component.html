@@ -30,8 +30,8 @@
                 height="75%"
                 [latitude]="latitude" [longitude]="longitude" mapAnimationsEnabled="{{ mapAnimationsEnabled }}"
                 [zoom]="zoom" padding="{{padding}}" (mapReady)="onMapReady($event)"
-                (markerSelect)="onMarkerPick($event)">
+                (markerSelect)="onMarkerPick($event)" (coordinateTapped)="removeGetDirections()">
             </maps:mapView>
-            <Button width="95%" height="100" text="Start Ride" (tap)="getDirections()"></Button>
+            <Button *ngIf=markerSelected width="95%" height="100" [text]=bottomButtonText (tap)="getDirections()"></Button>
         </StackLayout>
     </Page>
