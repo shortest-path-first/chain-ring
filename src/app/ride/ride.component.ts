@@ -1,4 +1,4 @@
-import { NavigationEnd, Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
 import { HttpClient, HttpHeaders } from "@angular/common/http"
 import { Observable } from 'rxjs';
@@ -18,6 +18,7 @@ const decodePolyline = require('decode-google-map-polyline');
 const polylineEncoder = require('google-polyline')
 
 let rideMarkers = {markers: []};
+let polylineHolder;
 
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
@@ -30,8 +31,13 @@ export class RideComponent implements OnInit {
 
     readonly ROOT_URL = "https://3c712b5f.ngrok.io";
 
-    constructor(private http: HttpClient, private router: Router, private routerExtensions: RouterExtensions) {
+    // tslint:disable-next-line: max-line-length
+    constructor(private http: HttpClient, private router: Router, private routerExtensions: RouterExtensions, private route: ActivatedRoute) {
         // Use the component constructor to inject providers.
+        this.route.queryParams.subscribe((params) => {
+            const {polyLine} = params;
+            polylineHolder = polyLine;
+        });
     }
     
     mapView;
@@ -227,7 +233,7 @@ export class RideComponent implements OnInit {
     onMapReady(args){
         this.mapView = args.object;  
     
-        let line = "a`~uDhyxdPr@TxAaC~CeFhD}FtDcGdGyJbA_Bl@s@b@u@~@aB|DoGbJiOBEPW?ALQYWsBcBiEsD}HaHUW_@y@E_@KyFKyFQiHQeGSaJGkBPeAZw@p@qAV}@OaG[iMAQgBF"
+        const line = polylineHolder;
         
         var flightPlanCoordinates = decodePolyline(line);
       

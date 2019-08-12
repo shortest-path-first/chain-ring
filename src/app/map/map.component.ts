@@ -8,7 +8,7 @@ import { Observable } from "rxjs";
 import * as geolocation from "nativescript-geolocation";
 import { Accuracy } from "tns-core-modules/ui/enums";
 import { RouterExtensions } from "nativescript-angular/router";
-import { NavigationEnd, Router } from "@angular/router";
+import { Router, NavigationExtras } from "@angular/router";
 const mapsModule = require("nativescript-google-maps-sdk");
 const decodePolyline = require("decode-google-map-polyline");
 
@@ -179,11 +179,13 @@ export class MapComponent implements OnInit {
         });
         } else if (this.readyToRide === true) {
             console.log("tapped");
-            this.routerExtensions.navigate(["/ride"], {
-                transition: {
-                    name: "fade"
+            const { polyLine } = linePlaceHolder;
+            const params: NavigationExtras = {
+                queryParams: {
+                    polyLine
                 }
-            });
+            };
+            this.routerExtensions.navigate(["/ride"], params);
     }
     }
 }
