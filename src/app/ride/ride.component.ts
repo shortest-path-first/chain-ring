@@ -206,7 +206,11 @@ export class RideComponent implements OnInit {
                     let lastLat = this.newPathCoords[this.newPathCoords.length - 1].lat;
                     let lastLng = this.newPathCoords[this.newPathCoords.length - 1].long
                     this.totalDistance += this.calculateDistance(lat, long, lastLat, lastLng);
-                    this.distanceString = this.totalDistance.toFixed(1);
+                    if(this.totalDistance !== 0){
+                        this.distanceString = this.totalDistance.toFixed(1);
+                    } else {
+                        this.distanceString = "0.0";
+                    }
                     this.newPathCoords.push({ lat, long, time });
                     newPath.addPoint(mapsModule.Position.positionFromLatLng(lat, long));
                     newPath.visible = true;
@@ -233,10 +237,9 @@ export class RideComponent implements OnInit {
     onMapReady(args){
         this.mapView = args.object;  
     
-        const line = polylineHolder;
-        
-        var flightPlanCoordinates = decodePolyline(line);
-      
+      const line = polylineHolder;
+        if(line !== undefined){
+       var flightPlanCoordinates = decodePolyline(line);
        const polyline = new mapsModule.Polyline();
        for (let i = 0; i < flightPlanCoordinates.length; i++){
            let coord = flightPlanCoordinates[i];
@@ -248,11 +251,9 @@ export class RideComponent implements OnInit {
         polyline.color = new Color("purple");
         this.mapView.mapAnimationsEnabled = true;
         this.mapView.latitude = flightPlanCoordinates[0].lat;
-        this.mapView.longitude = flightPlanCoordinates[0].lng;        
-        this.mapView.zoom = 15;
-        this.mapView.tilt = 45;
+        this.mapView.longitude = flightPlanCoordinates[0].lng;
         this.mapView.addPolyline(polyline);
-        this.mapView.myLocationButtonEnabled = true;
+    } else {
         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
                 let marker = new mapsModule.Marker();
@@ -260,7 +261,13 @@ export class RideComponent implements OnInit {
                 // marker.icon = image;
                 marker.position = mapsModule.Position.positionFromLatLng(result.latitude, result.longitude);
                 this.mapView.addMarker(marker);
+                this.mapView.latitude = result.latitude;
+                this.mapView.longitude = result.longitude;
             });
+    }     
+        this.mapView.zoom = 20;
+        this.mapView.tilt = 45;
+        this.mapView.myLocationButtonEnabled = true;
         // accelerometer.startAccelerometerUpdates(function (data) {
         //     //  console.log("x: " + data.x + "y: " + data.y + "z: " + data.z);
             
