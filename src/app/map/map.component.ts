@@ -155,6 +155,7 @@ export class MapComponent implements OnInit {
             actualMap.zoom = 12;
             
             const start = new mapsModule.Marker({});
+           
             // tslint:disable-next-line: max-line-length
             start.position = mapsModule.Position.positionFromLatLng(flightPlanCoordinates[0].lat, flightPlanCoordinates[0].lng);
             start.title = "Start";

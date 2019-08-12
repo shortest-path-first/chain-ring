@@ -17,11 +17,7 @@ var mapsModule = require("nativescript-google-maps-sdk");
 const decodePolyline = require('decode-google-map-polyline');
 const polylineEncoder = require('google-polyline')
 
-let watchId;
-let ticks = 0;
 let rideMarkers = {markers: []};
-
-
 
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
@@ -37,13 +33,17 @@ export class RideComponent implements OnInit {
     constructor(private http: HttpClient, private router: Router, private routerExtensions: RouterExtensions) {
         // Use the component constructor to inject providers.
     }
-
+    
     mapView;
+    watchId;
     show = false; 
-    speed = 0;
+    speed = 0; 
+    topSpeed = 0;
+    allSpeeds = [];
     currentSpeed = 0;
     newPathCoords = [];
-
+    totalDistance = 0;
+    
     ngOnInit(): void {
         // Init your component properties here.
       
@@ -60,11 +60,9 @@ export class RideComponent implements OnInit {
         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
                 let marker = new mapsModule.Marker();
-               
                 marker.position = mapsModule.Position.positionFromLatLng(result.latitude, result.longitude);
                 this.mapView.addMarker(marker);
                 rideMarkers.markers.push({markerLat: result.latitude, markerLon: result.longitude});
-                console.log(rideMarkers);               
             })
     }
 
@@ -76,23 +74,76 @@ export class RideComponent implements OnInit {
     });
 }
     
+    calculateDistance(lat1, lon1, lat2, lon2): number {
+        if ((lat1 == lat2) && (lon1 == lon2)) {
+            let dist = 0;
+            return dist;
+        }
+        else {
+            var radlat1 = Math.PI * lat1 / 180;
+            var radlat2 = Math.PI * lat2 / 180;
+            var theta = lon1 - lon2;
+            var radtheta = Math.PI * theta / 180;
+            var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+            if (dist > 1) {
+                dist = 1;
+            }
+            dist = Math.acos(dist);
+            dist = dist * 180 / Math.PI;
+            dist = dist * 60 * 1.1515;
+    }
+    return Number(dist.toFixed(2));
+}
+
+    findSpeedBreakdown(speeds): any[] {
+        let breakdown = speeds.reduce((tally, speed) => {
+            if (speed < .25 * this.topSpeed) {
+                if (tally['0'] === undefined) {
+                    tally['0'] = 1;
+                } else {
+                    tally['0']++
+                }
+            } else if (speed < .50 * this.topSpeed) {
+                if (tally['1'] === undefined) {
+                    tally['1'] = 1;
+                } else {
+                    tally['1']++;
+                }
+            } else if (speed < .75 * this.topSpeed) {
+                if (tally['2'] === undefined) {
+                    tally['2'] = 1;
+                } else {
+                    tally['2']++;
+                }
+            } else {
+                if (tally['3'] === undefined) {
+                    tally['3'] = 1
+                } else {
+                    tally['3']++;
+                }
+            }
+            return tally;
+        }, {});
+        let portions = [];
+        for (var key in breakdown) {
+            portions.push((breakdown[key] / speeds.length * 100).toFixed(1));
+        }
+        return portions;
+    }
+
     onStopTap(): void {
-        geolocation.clearWatch(watchId);
-        let avgSpeed = (this.speed * 2.23694)/ ticks;
+        geolocation.clearWatch(this.watchId);
+        let avgSpeed = (this.speed * 2.23694)/ this.allSpeeds.length;
+        let speedBreakdown = this.findSpeedBreakdown(this.allSpeeds);
         let pathPolyline = polylineEncoder.encode(this.newPathCoords);
         let first = this.newPathCoords[0];
         let last = this.newPathCoords[this.newPathCoords.length - 1];
         let start = first.time.getTime();
         let stop = last.time.getTime();
-        // let direction = [];
-        // let spd = [];
-        // this.newPathCoords.forEach((blip) => {
-        //     direction.push(blip.direction);
-        //     spd.push(blip.nowSpeed);  
-        // })
+    
         let duration = stop - start;
-        let what = duration/ 10000;
-        console.log("duration", what);
+        duration = duration/ 10000;
+        console.log("duration", duration);
         this.http.post(this.ROOT_URL + "/marker", rideMarkers, {
             headers: new HttpHeaders({  
                 'Content-Type': 'application/json',
@@ -100,7 +151,8 @@ export class RideComponent implements OnInit {
             .subscribe(()=>{
                 console.log("success"); 
             });
-        let info = {pathPolyline, first, last, avgSpeed, duration};
+        let info = {pathPolyline, first, last, avgSpeed, duration, speedBreakdown,
+            topSpeed: this.topSpeed, totalDistance: this.totalDistance};
         this.http.post(this.ROOT_URL + "/ride", info, {
             headers: new HttpHeaders({
                 'Content-Type': 'application/json',
@@ -109,7 +161,7 @@ export class RideComponent implements OnInit {
         .subscribe(()=>{
             console.log('ride');   
         });
-            this.routerExtensions.navigate(['/browse'], { 
+            this.routerExtensions.navigate(['/stats'], { 
             queryParams: {avgSpeed},
             transition: {
                 name: "fade"
@@ -124,22 +176,27 @@ export class RideComponent implements OnInit {
     drawUserPath(): void {
         let newPath = new mapsModule.Polyline();
         
-        watchId = geolocation.watchLocation((loc) => {
+        this.watchId = geolocation.watchLocation((loc) => {
             if (loc) {
                 this.currentSpeed = loc.speed * 2.23694;
+                if(this.currentSpeed > this.topSpeed){
+                    this.topSpeed = this.currentSpeed;
+                }
+                this.allSpeeds.push(this.currentSpeed);
                 this.speed += loc.speed;
-                ticks++;
                 let lat = loc.latitude;
                 let long = loc.longitude;
                 let time = loc.timestamp;
-                let direction = loc.direction;
-                let nowSpeed = this.currentSpeed;
+                
                 if (this.newPathCoords.length === 0) {
                     this.newPathCoords.push({ lat, long, time });
-                    this.mapView.latitiude = lat;
+                    this.mapView.latitude = lat;
                     this.mapView.longitude = long;
                     this.mapView.bearing = loc.direction;
                 } else if (this.newPathCoords[this.newPathCoords.length - 1].lat !== lat && this.newPathCoords[this.newPathCoords.length - 1].long !== long) {
+                    let lastLat = this.newPathCoords[this.newPathCoords.length - 1].lat;
+                    let lastLng = this.newPathCoords[this.newPathCoords.length - 1].long
+                    this.totalDistance += this.calculateDistance(lat, long, lastLat, lastLng);
                     this.newPathCoords.push({ lat, long, time });
                     newPath.addPoint(mapsModule.Position.positionFromLatLng(lat, long));
                     newPath.visible = true;
@@ -147,7 +204,7 @@ export class RideComponent implements OnInit {
                     newPath.geodesic = false;
                     newPath.color = new Color("red");
                     this.mapView.addPolyline(newPath);
-                    this.mapView.latitiude = loc.latitude;
+                    this.mapView.latitude = loc.latitude;
                     this.mapView.longitude = loc.longitude;
                     this.mapView.bearing = loc.direction;
                 }
@@ -165,7 +222,6 @@ export class RideComponent implements OnInit {
 
     onMapReady(args){
         this.mapView = args.object;  
-        let newPath = new mapsModule.Polyline();
     
         let line = "a`~uDhyxdPr@TxAaC~CeFhD}FtDcGdGyJbA_Bl@s@b@u@~@aB|DoGbJiOBEPW?ALQYWsBcBiEsD}HaHUW_@y@E_@KyFKyFQiHQeGSaJGkBPeAZw@p@qAV}@OaG[iMAQgBF"
         
@@ -183,13 +239,15 @@ export class RideComponent implements OnInit {
         this.mapView.mapAnimationsEnabled = true;
         this.mapView.latitude = flightPlanCoordinates[0].lat;
         this.mapView.longitude = flightPlanCoordinates[0].lng;        
-        this.mapView.zoom = 20;
+        this.mapView.zoom = 15;
         this.mapView.tilt = 45;
         this.mapView.addPolyline(polyline);
+        this.mapView.myLocationButtonEnabled = true;
         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
-                
                 let marker = new mapsModule.Marker();
+                // var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+                // marker.icon = image;
                 marker.position = mapsModule.Position.positionFromLatLng(result.latitude, result.longitude);
                 this.mapView.addMarker(marker);
             });
