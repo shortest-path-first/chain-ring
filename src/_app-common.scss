@@ -69,6 +69,20 @@ $sidedrawer-list-icon-size: 20;
 
 .speed {
     font-family: Orbitron-Black;
+    color: black;
+    opacity: 1 !important;
+}
+
+.test {
+    background-color: rgb(172, 168, 168);
+    opacity: .6;
+    margin-top: 65%;
+    margin-left: 5%;
+    margin-bottom: 5%;
+    width: 40%;
+    height: 31%;
+    border: solid black 3px;
+    border-radius: 15px;
 }
 //Body styles
 

@@ -44,8 +44,10 @@ export class RideComponent implements OnInit {
     topSpeed = 0;
     allSpeeds = [];
     currentSpeed = 0;
+    speedString = '';
     newPathCoords = [];
-    totalDistance = 0;
+    totalDistance = 0.0;
+    distanceString = "0.0"
     
     ngOnInit(): void {
         // Init your component properties here.
@@ -182,6 +184,7 @@ export class RideComponent implements OnInit {
         this.watchId = geolocation.watchLocation((loc) => {
             if (loc) {
                 this.currentSpeed = loc.speed * 2.23694;
+                this.speedString = this.currentSpeed.toFixed(1);
                 if(this.currentSpeed > this.topSpeed){
                     this.topSpeed = this.currentSpeed;
                 }
@@ -200,6 +203,7 @@ export class RideComponent implements OnInit {
                     let lastLat = this.newPathCoords[this.newPathCoords.length - 1].lat;
                     let lastLng = this.newPathCoords[this.newPathCoords.length - 1].long
                     this.totalDistance += this.calculateDistance(lat, long, lastLat, lastLng);
+                    this.distanceString = this.totalDistance.toFixed(1);
                     this.newPathCoords.push({ lat, long, time });
                     newPath.addPoint(mapsModule.Position.positionFromLatLng(lat, long));
                     newPath.visible = true;
