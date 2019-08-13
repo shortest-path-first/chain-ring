@@ -20,6 +20,7 @@ const polylineEncoder = require('google-polyline')
 let rideMarkers = {markers: []};
 let polylineHolder;
 
+
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
 @Component({
@@ -47,10 +48,12 @@ export class RideComponent implements OnInit {
     topSpeed = 0;
     allSpeeds = [];
     currentSpeed = 0;
-    speedString = '';
+    speedString = '0';
+    speedStringDecimal = '0';
     newPathCoords = [];
     totalDistance = 0.0;
-    distanceString = "0.0";
+    distanceString = "0"
+    distanceStringDecimal = "0";
     speechRecognition = new SpeechRecognition();
     
     ngOnInit(): void {
@@ -196,10 +199,13 @@ export class RideComponent implements OnInit {
         let newPath = new mapsModule.Polyline();
         
         this.watchId = geolocation.watchLocation((loc) => {
-            this.handleSpeech();
+            //this.handleSpeech();
             if (loc) {
                 this.currentSpeed = loc.speed * 2.23694;
-                this.speedString = this.currentSpeed.toFixed(1);
+                //this.speedString = this.currentSpeed.toFixed(1).slice(0, -2);
+                //this.speedStringDecimal = this.currentSpeed.toFixed(1).slice(-1);
+                this.speedString = '10';
+                this.speedStringDecimal = "9";
                 if(this.currentSpeed > this.topSpeed){
                     this.topSpeed = this.currentSpeed;
                 }
@@ -218,7 +224,9 @@ export class RideComponent implements OnInit {
                     let lastLat = this.newPathCoords[this.newPathCoords.length - 1].lat;
                     let lastLng = this.newPathCoords[this.newPathCoords.length - 1].long
                     this.totalDistance += this.calculateDistance(lat, long, lastLat, lastLng);
-                    this.distanceString = this.totalDistance.toFixed(1);
+                    this.distanceString = this.totalDistance.toFixed(1).slice(0, -2);
+                    this.distanceStringDecimal = this.totalDistance.toFixed(1).slice(-1);
+                    
                     this.newPathCoords.push({ lat, long, time });
                     newPath.addPoint(mapsModule.Position.positionFromLatLng(lat, long));
                     newPath.visible = true;
@@ -226,9 +234,10 @@ export class RideComponent implements OnInit {
                     newPath.geodesic = false;
                     //newPath.color = new Color("red");
                     this.mapView.addPolyline(newPath);
-                    this.mapView.latitude = loc.latitude;
-                    this.mapView.longitude = loc.longitude;
+                    this.mapView.latitude = lat;
+                    this.mapView.longitude = long;
                     this.mapView.bearing = loc.direction;
+                    this.mapView.zoom = 15;
                 }
             }
         }, (e) => {
@@ -256,7 +265,6 @@ export class RideComponent implements OnInit {
                     console.log('speed!', this.show)
                     } else if(transcription.text.includes("pothole")){
                         this.onPinTap();
-                    
                     }
                 },
                 onError: (error) => {
@@ -275,13 +283,13 @@ export class RideComponent implements OnInit {
                 // hence the' onError' handler was created.
                 console.error("Wherror",error);
             });
-             this.speechRecognition.stopListening()
-             .then(()=>{
+            this.speechRecognition.stopListening()
+            .then(()=>{
                  //this.handleSpeech();
-             })
-             .catch((err)=>{
+            })
+            .catch((err)=>{
                 console.log(err);
-             })
+            })
 }
     
 
@@ -302,13 +310,13 @@ export class RideComponent implements OnInit {
                 let coord = flightPlanCoordinates[i];
                 polyline.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
             }
-             polyline.visible = true;
-             polyline.width = 10;
-             polyline.geodesic = false;
-             //polyline.color = new Color("purple");
-             this.mapView.latitude = flightPlanCoordinates[0].lat;
-             this.mapView.longitude = flightPlanCoordinates[0].lng;        
-             this.mapView.addPolyline(polyline);
+            polyline.visible = true;
+            polyline.width = 10;
+            polyline.geodesic = false;
+            polyline.color = new Color("purple");
+            this.mapView.latitude = flightPlanCoordinates[0].lat;
+            this.mapView.longitude = flightPlanCoordinates[0].lng;        
+            this.mapView.addPolyline(polyline);
         } 
 
         this.mapView.mapAnimationsEnabled = true;
@@ -325,7 +333,6 @@ export class RideComponent implements OnInit {
                 this.mapView.latitude = result.latitude;
                 this.mapView.longitude = result.longitude;
             });
-      
         this.drawUserPath();
     }
 }
