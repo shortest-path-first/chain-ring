@@ -41,7 +41,7 @@ export class RideComponent implements OnInit {
     totalDistance = 0.0;
     distanceString = "0.0";
 
-    readonly ROOT_URL = "https://09b0a776.ngrok.io";
+    readonly ROOT_URL = "https://a5589e8b.ngrok.io";
 
     // tslint:disable-next-line: max-line-length
     constructor(private http: HttpClient, private router: Router, private routerExtensions: RouterExtensions, private route: ActivatedRoute) {

@@ -37,7 +37,7 @@ export class MapComponent implements OnInit {
     markerSelected = false;
     readyToRide = false;
 
-    readonly ROOT_URL = "https://09b0a776.ngrok.io";
+    readonly ROOT_URL = "https://a5589e8b.ngrok.io";
 
     places: Observable<Array<Place>>;
 
