@@ -42,7 +42,7 @@ export class RideComponent implements OnInit {
     
     mapView;
     watchId;
-    show = false; 
+    show;
     speed = 0; 
     topSpeed = 0;
     allSpeeds = [];
@@ -50,8 +50,8 @@ export class RideComponent implements OnInit {
     speedString = '';
     newPathCoords = [];
     totalDistance = 0.0;
-    distanceString = "0.0"
-    speechRecognition;
+    distanceString = "0.0";
+    speechRecognition = new SpeechRecognition();
     
     ngOnInit(): void {
         // Init your component properties here.
@@ -82,7 +82,7 @@ export class RideComponent implements OnInit {
             }
     });
 }
-    
+   
     calculateDistance(lat1, lon1, lat2, lon2): number {
         if ((lat1 == lat2) && (lon1 == lon2)) {
             let dist = 0;
@@ -174,6 +174,7 @@ export class RideComponent implements OnInit {
         .subscribe(()=>{
             console.log('ride');   
         });
+        
             this.routerExtensions.navigate(['/stats'], { 
             queryParams: {avgSpeed},
             transition: {
@@ -183,10 +184,13 @@ export class RideComponent implements OnInit {
     } 
 
     onSpeedTap(): void {
-        this.show = !this.show;
+        console.log("called");
+        if(this.show === undefined){
+            this.show = true;
+        } else{
+            this.show = !this.show;
+        }
     } 
-
-    
 
     drawUserPath(): void {
         let newPath = new mapsModule.Polyline();
@@ -220,7 +224,7 @@ export class RideComponent implements OnInit {
                     newPath.visible = true;
                     newPath.width = 10;
                     newPath.geodesic = false;
-                    newPath.color = new Color("red");
+                    //newPath.color = new Color("red");
                     this.mapView.addPolyline(newPath);
                     this.mapView.latitude = loc.latitude;
                     this.mapView.longitude = loc.longitude;
@@ -246,14 +250,17 @@ export class RideComponent implements OnInit {
                 returnPartialResults: true,
                 // this callback will be invoked repeatedly during recognition
                 onResult: (transcription) => {
-                    if (transcription.text.includes("speed")) {
-                       this.show = this.show!;
-                       console.log('speed!')
+                
+                    if (transcription.text.includes("speedometer")) {
+                    this.onSpeedTap();
+                    console.log('speed!', this.show)
+                    } else if(transcription.text.includes("pothole")){
+                        this.onPinTap();
+                    
                     }
-                   ;
                 },
                 onError: (error) => {
-                    // because of the way iOS and Android differ, this is either:
+                
                     // - iOS: A 'string', describing the issue. 
                     // - Android: A 'number', referencing an 'ERROR_*' constant from https://developer.android.com/reference/android/speech/SpeechRecognizer.
                     //            If that code is either 6 or 7 you may want to restart listening.
@@ -266,22 +273,30 @@ export class RideComponent implements OnInit {
             .catch((error) => {
                 // same as the 'onError' handler, but this may not return if the error occurs after listening has successfully started (because that resolves the promise,
                 // hence the' onError' handler was created.
-                console.error(error);
+                console.error("Wherror",error);
             });
+             this.speechRecognition.stopListening()
+             .then(()=>{
+                 //this.handleSpeech();
+             })
+             .catch((err)=>{
+                console.log(err);
+             })
 }
     
 
     onMapReady(args){
         this.mapView = args.object; 
-        this.speechRecognition = new SpeechRecognition();
+        //this.show = false;
+        
         this.speechRecognition.available().then(
             (available: boolean) => console.log(available ? "YES!" : "NO"),
             (err: string) => console.log(err)
         ); 
         
         const line = polylineHolder;
+        if(line !== undefined){
         var flightPlanCoordinates = decodePolyline(line);
-        if(flightPlanCoordinates !== undefined){
             const polyline = new mapsModule.Polyline();
             for (let i = 0; i < flightPlanCoordinates.length; i++){
                 let coord = flightPlanCoordinates[i];
@@ -290,7 +305,7 @@ export class RideComponent implements OnInit {
              polyline.visible = true;
              polyline.width = 10;
              polyline.geodesic = false;
-             polyline.color = new Color("purple");
+             //polyline.color = new Color("purple");
              this.mapView.latitude = flightPlanCoordinates[0].lat;
              this.mapView.longitude = flightPlanCoordinates[0].lng;        
              this.mapView.addPolyline(polyline);
@@ -310,11 +325,7 @@ export class RideComponent implements OnInit {
                 this.mapView.latitude = result.latitude;
                 this.mapView.longitude = result.longitude;
             });
-        // accelerometer.startAccelerometerUpdates(function (data) {
-        //     //  console.log("x: " + data.x + "y: " + data.y + "z: " + data.z);
-            
-        // }, { sensorDelay: "normal" });
+      
         this.drawUserPath();
-
-     }
+    }
 }
