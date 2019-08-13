@@ -27,7 +27,7 @@
         markerEndDragging="onMarkerEndDragging" markerDrag="onMarkerDrag" cameraChanged="onCameraChanged"
         cameraMove="onCameraMove">
     </maps:mapView>
-    <AbsoluteLayout *ngIf="show" text="margin='30'" class="test">
+    <AbsoluteLayout *ngIf="show" [text]=distanceString class="test">
         <Label text="SPD" class="speed" style="font-size: 20em;" left="1%"></Label>
         <Label style="background-color: black; width: 100%; height: 1%;" top="77%"></Label>
         <Label text="{{speedString[0]}}" class="speed" bottom="45%" top="6%" left="53%" right="35%" style="font-size: 68em;"></Label>
