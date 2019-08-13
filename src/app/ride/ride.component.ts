@@ -10,9 +10,10 @@ import * as geolocation from "nativescript-geolocation";
 import { Accuracy } from "tns-core-modules/ui/enums"; 
 import { Color } from "tns-core-modules/color/color";
 import { SpeechRecognition } from "nativescript-speech-recognition";
-// var accelerometer = require("nativescript-accelerometer");
-//const style = require("../../../App_Resources/style.json")
 
+
+//const style = require("../../../App_Resources/style.json")
+var insomnia = require("nativescript-insomnia");
 var mapsModule = require("nativescript-google-maps-sdk");
 const decodePolyline = require('decode-google-map-polyline');
 const polylineEncoder = require('google-polyline')
@@ -149,6 +150,9 @@ export class RideComponent implements OnInit {
         .then(()=>{
             console.log('stopped listening')
         })
+          insomnia.allowSleepAgain().then(function() {
+        console.log("Insomnia is inactive, good night!");
+        });
         let avgSpeed = (this.speed * 2.23694)/ this.allSpeeds.length;
         let speedBreakdown = this.findSpeedBreakdown(this.allSpeeds);
         let pathPolyline = polylineEncoder.encode(this.newPathCoords);
@@ -197,7 +201,9 @@ export class RideComponent implements OnInit {
 
     drawUserPath(): void {
         let newPath = new mapsModule.Polyline();
-        
+        insomnia.keepAwake().then(function() {
+        console.log("Insomnia is active");
+        })
         this.watchId = geolocation.watchLocation((loc) => {
             //this.handleSpeech();
             if (loc) {
@@ -224,8 +230,10 @@ export class RideComponent implements OnInit {
                     let lastLat = this.newPathCoords[this.newPathCoords.length - 1].lat;
                     let lastLng = this.newPathCoords[this.newPathCoords.length - 1].long
                     this.totalDistance += this.calculateDistance(lat, long, lastLat, lastLng);
-                    this.distanceString = this.totalDistance.toFixed(1).slice(0, -2);
-                    this.distanceStringDecimal = this.totalDistance.toFixed(1).slice(-1);
+                    // this.distanceString = this.totalDistance.toFixed(1).slice(0, -2);
+                    // this.distanceStringDecimal = this.totalDistance.toFixed(1).slice(-1);
+                    this.distanceString = "10";
+                    this.distanceStringDecimal = ""
                     
                     this.newPathCoords.push({ lat, long, time });
                     newPath.addPoint(mapsModule.Position.positionFromLatLng(lat, long));
@@ -320,8 +328,8 @@ export class RideComponent implements OnInit {
         } 
 
         this.mapView.mapAnimationsEnabled = true;
-        this.mapView.zoom = 15;
-        this.mapView.tilt = 45;
+        this.mapView.zoom = 18;
+        this.mapView.tilt = 10;
         this.mapView.myLocationButtonEnabled = true;
         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
@@ -332,6 +340,9 @@ export class RideComponent implements OnInit {
                 this.mapView.addMarker(marker);
                 this.mapView.latitude = result.latitude;
                 this.mapView.longitude = result.longitude;
+            })
+            .catch((err)=>{
+                console.error("Get location error:", err);
             });
         this.drawUserPath();
     }

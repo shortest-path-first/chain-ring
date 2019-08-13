@@ -5,7 +5,6 @@ import { NativeScriptUISideDrawerModule } from "nativescript-ui-sidedrawer/angul
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
-import { TNSFontIconModule } from 'nativescript-ngx-fonticon';
 
 @NgModule({
     bootstrap: [
@@ -15,10 +14,6 @@ import { TNSFontIconModule } from 'nativescript-ngx-fonticon';
         AppRoutingModule,
         NativeScriptModule,
         NativeScriptUISideDrawerModule,
-        TNSFontIconModule.forRoot({
-            'fa': './assets/font-awesome.css',
-            'ion': './assets/ionicons.css'
-        })
     ],
     declarations: [
         AppComponent
