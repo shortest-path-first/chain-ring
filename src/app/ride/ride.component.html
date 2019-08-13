@@ -27,11 +27,19 @@
         markerEndDragging="onMarkerEndDragging" markerDrag="onMarkerDrag" cameraChanged="onCameraChanged"
         cameraMove="onCameraMove">
     </maps:mapView>
+<<<<<<< HEAD
     <AbsoluteLayout *ngIf="show" text="margin='30'" class="test">
         <Label text="SPD" class="speed" style="font-size: 20em;" left="2px"></Label>
         <Label text="{{speedString}}" class="speed" bottom="45%" top="6%" left="30%" right="45%" style="font-size: 68em;"></Label>
         <Label text="{{speedStringDecimal}}" class="speed" top="15%" left="107.5%" style="font-size: 45em; text-align: center;"></Label>
         <Label style="background-color: black; width: 100%; height: 1%;" top="155px"></Label>
+=======
+    <AbsoluteLayout *ngIf="show" [text]=distanceString class="test">
+        <Label text="SPD" class="speed" style="font-size: 20em;" left="1%"></Label>
+        <Label style="background-color: black; width: 100%; height: 1%;" top="77%"></Label>
+        <Label text="{{speedString[0]}}" class="speed" bottom="45%" top="6%" left="53%" right="35%" style="font-size: 68em;"></Label>
+        <Label text="{{speedString[2]}}" class="speed" top="15%" left="107.5%" style="font-size: 45em; text-align: center;"></Label>
+>>>>>>> 23f81e0660c32efb4621a987b82b336bb3abf18c
         <Label text="MPH" class="speed" top="60%" left="109%" style="font-size: 13em"></Label>
         <Label text="DIST" class="speed" style="font-size: 20em;" left="1%" top="77%"></Label>
         <Label text="{{distanceString}}.{{distanceStringDecimal}}" class="speed" style="font-size: 60em; letter-spacing: -5px;" left="10%" right="5px" top="87%"></Label>

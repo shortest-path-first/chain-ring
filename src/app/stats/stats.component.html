@@ -18,16 +18,16 @@
 
 <Page xmlns="http://schemas.nativescript.org/tns.xsd" class="body">
     <GridLayout columns="*, *, *, *, *, *, *, *, *, *, *, *" rows="*, *, *, *, *, *, *, *, *, *" width="95%" height="95%">
-        <Label text="Last Ride" row="0" col="0" rowSpan="1" colSpan="4"class="stats-header"></Label>
-        <Label text="Recent" row="0" col="4" rowSpan="1" colSpan="4" class="stats-header"></Label>
-        <Label text="Total" row="0" col="8" rowSpan="1" colSpan="4" class="stats-header"></Label>
-        <Label text="Average Speed" row="2" col="0" colSpan="6" rowSpan="2" class="stats-info-line"></Label>
-        <Label [text]=averageSpeed row="2" col="6" colSpan="6" rowSpan="2" class="stats-info-line"></Label>
-        <Label text="Total Distance" row="4" col="0" colSpan="6" rowSpan="2" class="stats-info-line"></Label>
-        <Label [text]=totalDistance row="4" col="6" colSpan="6" rowSpan="2" class="stats-info-line"></Label>
-        <Label text="Money Saved" row="6" col="0" colSpan="6" rowSpan="2" class="stats-info-line"></Label>
-        <Label [text]=moneySaved row="6" col="6" colSpan="6" rowSpan="2" class="stats-info-line"></Label>
-        <Label text="A Pie chart" row="8" col="0" colSpan="6" rowSpan="2" class="stats-info-line"></Label>
-        <Label [text]=stationaryTime row="8" col="6" colSpan="6" rowSpan="2" class="stats-info-line"></Label>
+        <Label row="0" col="0" rowSpan="1" colSpan="4" class="stats-header" text="Last Ride"></Label>
+        <Label row="0" col="4" rowSpan="1" colSpan="4" class="stats-header" text="Recent"></Label>
+        <Label row="0" col="8" rowSpan="1" colSpan="4" class="stats-header" text="Total"></Label>
+        <Label row="2" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Average Speed"></Label>
+        <Label row="2" col="6" colSpan="6" rowSpan="2" class="stats-info-line" [text]=averageSpeed></Label>
+        <Label row="4" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Total Distance"></Label>
+        <Label row="4" col="6" colSpan="6" rowSpan="2" class="stats-info-line" [text]=totalDistance ></Label>
+        <Label row="6" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Money Saved"></Label>
+        <Label row="6" col="6" colSpan="6" rowSpan="2" class="stats-info-line" [text]=moneySaved></Label>
+        <Label row="8" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="A Pie chart"></Label>
+        <Label row="8" col="6" colSpan="6" rowSpan="2" class="stats-info-line" [text]=stationaryTime></Label>
     </GridLayout>
 </Page>
