@@ -1,4 +1,4 @@
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, Router, NavigationExtras } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable } from "rxjs";
@@ -30,7 +30,7 @@ registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView
 })
 export class RideComponent implements OnInit {
 
-     mapView;
+    mapView;
     watchId;
     show;
     speed = 0; 
@@ -67,8 +67,7 @@ export class RideComponent implements OnInit {
    
     }
 
-    onPinTap(): void {
-        
+    onPinTap(): void {    
         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
                 const marker = new mapsModule.Marker();
@@ -105,7 +104,6 @@ export class RideComponent implements OnInit {
             dist = dist * 180 / Math.PI;
             dist = dist * 60 * 1.1515;
     }
-    
         return Number(dist.toFixed(2));
 }
 
@@ -182,13 +180,17 @@ export class RideComponent implements OnInit {
         .subscribe(() => {
             console.log("ride");
         });
-
-        this.routerExtensions.navigate(["/stats"], {
-            queryParams: {avgSpeed},
-            transition: {
-                name: "fade"
-            } 
-        });
+          const params: NavigationExtras = {
+                queryParams: {
+                    polyLine: pathPolyline,
+                    average: avgSpeed,
+                    duration,
+                    breakdown: speedBreakdown,
+                    totalDistance: this.totalDistance,
+                    topSpeed: this.topSpeed,
+                }
+            };
+      this.routerExtensions.navigate(["/stats"], params);
     }
 
     onSpeedTap(): void {

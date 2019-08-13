@@ -4,6 +4,7 @@ import * as app from "tns-core-modules/application";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { storedStats } from "./stats";
 import { Observable } from "rxjs";
+import { ActivatedRoute, Router, NavigationExtras } from "@angular/router";
 
 @Component({
     selector: "Stats",
@@ -11,7 +12,7 @@ import { Observable } from "rxjs";
     templateUrl: "./stats.component.html"
 })
 export class StatsComponent implements OnInit {
-
+    duration;
     averageSpeed = 22;
     totalDistance = 1000;
     moneySaved = 90000;
@@ -21,9 +22,15 @@ export class StatsComponent implements OnInit {
 
     storedStats: Observable<Array<storedStats>>;
 
-    constructor(private http: HttpClient) {
+    constructor(private http: HttpClient, private router: Router, private route: ActivatedRoute) {
         // Use the component constructor to inject providers.
         this.userTotalInfo();
+         this.route.queryParams.subscribe((params) => {
+           console.log(params);
+            this.averageSpeed = params.average;
+            this.totalDistance = params.totalDistance;
+            this.duration = params.duration;
+        });
     }
     ngOnInit(): void {
         // Init your component properties here.
