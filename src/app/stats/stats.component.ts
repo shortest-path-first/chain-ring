@@ -17,7 +17,7 @@ export class StatsComponent implements OnInit {
     moneySaved = 90000;
     stationaryTime = 5;
     holder;
-    readonly ROOT_URL = "https://3c712b5f.ngrok.io";
+    readonly ROOT_URL = "https://09b0a776.ngrok.io";
 
     storedStats: Observable<Array<storedStats>>;
 
@@ -35,7 +35,6 @@ export class StatsComponent implements OnInit {
     }
 
     userTotalInfo() {
-        console.log("thats a more a");
         const name = "Franco";
         const params = new HttpParams().set("name", name);
         this.http.get<Array<storedStats>>(this.ROOT_URL + "/userTotals", { params }).subscribe((response) => {

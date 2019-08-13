@@ -2,13 +2,12 @@ import { Component, OnInit } from "@angular/core";
 import { RadSideDrawer } from "nativescript-ui-sidedrawer";
 import * as app from "tns-core-modules/application";
 
-
 @Component({
-    selector: "Browse",
+    selector: "Commute",
     moduleId: module.id,
-    templateUrl: "./browse.component.html"
+    templateUrl: "./commute.component.html"
 })
-export class BrowseComponent implements OnInit {
+export class CommuteComponent implements OnInit {
 
     constructor() {
         // Use the component constructor to inject providers.
