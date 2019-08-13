@@ -9,7 +9,6 @@ import * as app from "tns-core-modules/application";
 import * as geolocation from "nativescript-geolocation";
 import { Accuracy } from "tns-core-modules/ui/enums";
 import { Color } from "tns-core-modules/color/color";
-<<<<<<< HEAD
 import { SpeechRecognition } from "nativescript-speech-recognition";
 
 
@@ -18,16 +17,6 @@ var insomnia = require("nativescript-insomnia");
 var mapsModule = require("nativescript-google-maps-sdk");
 const decodePolyline = require('decode-google-map-polyline');
 const polylineEncoder = require('google-polyline')
-=======
-// var accelerometer = require("nativescript-accelerometer");
-// const style = require("../../../App_Resources/style.json")
-import { Image } from "tns-core-modules/ui/image";
-import { ImageSource } from "tns-core-modules/image-source";
-let mapsModule = require("nativescript-google-maps-sdk");
-const decodePolyline = require("decode-google-map-polyline");
-const polylineEncoder = require("google-polyline");
->>>>>>> 23f81e0660c32efb4621a987b82b336bb3abf18c
-
 const rideMarkers = {markers: []};
 let polylineHolder;
 
@@ -41,31 +30,7 @@ registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView
 })
 export class RideComponent implements OnInit {
 
-    mapView;
-    watchId;
-    show = false;
-    speed = 0;
-    topSpeed = 0;
-    allSpeeds = [];
-    currentSpeed = 0;
-    speedString = "";
-    newPathCoords = [];
-    totalDistance = 0.0;
-    distanceString = "0.0";
-
-    readonly ROOT_URL = "https://09b0a776.ngrok.io";
-
-    // tslint:disable-next-line: max-line-length
-    constructor(private http: HttpClient, private router: Router, private routerExtensions: RouterExtensions, private route: ActivatedRoute) {
-        // Use the component constructor to inject providers.
-        this.route.queryParams.subscribe((params) => {
-            const {polyLine} = params;
-            polylineHolder = polyLine;
-        });
-    }
-    
-<<<<<<< HEAD
-    mapView;
+     mapView;
     watchId;
     show;
     speed = 0; 
@@ -79,9 +44,18 @@ export class RideComponent implements OnInit {
     distanceString = "0"
     distanceStringDecimal = "0";
     speechRecognition = new SpeechRecognition();
+
+    readonly ROOT_URL = "https://09b0a776.ngrok.io";
+
+    // tslint:disable-next-line: max-line-length
+    constructor(private http: HttpClient, private router: Router, private routerExtensions: RouterExtensions, private route: ActivatedRoute) {
+        // Use the component constructor to inject providers.
+        this.route.queryParams.subscribe((params) => {
+            const {polyLine} = params;
+            polylineHolder = polyLine;
+        });
+    }
     
-=======
->>>>>>> 23f81e0660c32efb4621a987b82b336bb3abf18c
     ngOnInit(): void {
         // Init your component properties here.
       
@@ -173,7 +147,6 @@ export class RideComponent implements OnInit {
 
     onStopTap(): void {
         geolocation.clearWatch(this.watchId);
-<<<<<<< HEAD
         this.speechRecognition.stopListening()
         .then(()=>{
             console.log('stopped listening')
@@ -188,15 +161,6 @@ export class RideComponent implements OnInit {
         let last = this.newPathCoords[this.newPathCoords.length - 1];
         let start = first.time.getTime();
         let stop = last.time.getTime();
-=======
-        const avgSpeed = (this.speed * 2.23694) / this.allSpeeds.length;
-        const speedBreakdown = this.findSpeedBreakdown(this.allSpeeds);
-        const pathPolyline = polylineEncoder.encode(this.newPathCoords);
-        const first = this.newPathCoords[0];
-        const last = this.newPathCoords[this.newPathCoords.length - 1];
-        const start = first.time.getTime();
-        const stop = last.time.getTime();
->>>>>>> 23f81e0660c32efb4621a987b82b336bb3abf18c
     
         let duration = stop - start;
         duration = duration / 10000;
@@ -218,12 +182,8 @@ export class RideComponent implements OnInit {
         .subscribe(() => {
             console.log("ride");
         });
-<<<<<<< HEAD
-        
-            this.routerExtensions.navigate(['/stats'], { 
-=======
+
         this.routerExtensions.navigate(["/stats"], {
->>>>>>> 23f81e0660c32efb4621a987b82b336bb3abf18c
             queryParams: {avgSpeed},
             transition: {
                 name: "fade"
@@ -232,7 +192,6 @@ export class RideComponent implements OnInit {
     }
 
     onSpeedTap(): void {
-<<<<<<< HEAD
         console.log("called");
         if(this.show === undefined){
             this.show = true;
@@ -241,33 +200,23 @@ export class RideComponent implements OnInit {
         }
     } 
 
+    
     drawUserPath(): void {
-        let newPath = new mapsModule.Polyline();
+        const newPath = new mapsModule.Polyline();
         insomnia.keepAwake().then(function() {
         console.log("Insomnia is active");
         })
-=======
-        this.show = !this.show;
-    }
 
-    drawUserPath(): void {
-        const newPath = new mapsModule.Polyline();
-        
->>>>>>> 23f81e0660c32efb4621a987b82b336bb3abf18c
         this.watchId = geolocation.watchLocation((loc) => {
             //this.handleSpeech();
             if (loc) {
                 this.currentSpeed = loc.speed * 2.23694;
-<<<<<<< HEAD
+
                 //this.speedString = this.currentSpeed.toFixed(1).slice(0, -2);
                 //this.speedStringDecimal = this.currentSpeed.toFixed(1).slice(-1);
                 this.speedString = '10';
                 this.speedStringDecimal = "9";
                 if(this.currentSpeed > this.topSpeed){
-=======
-                this.speedString = this.currentSpeed.toFixed(1);
-                if (this.currentSpeed > this.topSpeed) {
->>>>>>> 23f81e0660c32efb4621a987b82b336bb3abf18c
                     this.topSpeed = this.currentSpeed;
                 }
                 this.allSpeeds.push(this.currentSpeed);
@@ -314,7 +263,7 @@ export class RideComponent implements OnInit {
             });
     }
 
-<<<<<<< HEAD
+
     handleSpeech(){
         this.speechRecognition.startListening(
             {
@@ -387,30 +336,6 @@ export class RideComponent implements OnInit {
         this.mapView.mapAnimationsEnabled = true;
         this.mapView.zoom = 18;
         this.mapView.tilt = 10;
-=======
-    onMapReady(args) {
-        this.mapView = args.object;
-    
-        const line = polylineHolder;
-        
-        let flightPlanCoordinates = decodePolyline(line);
-      
-        const polyline = new mapsModule.Polyline();
-        for (let i = 0; i < flightPlanCoordinates.length; i++) {
-           const coord = flightPlanCoordinates[i];
-           polyline.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
-       }
-        polyline.visible = true;
-        polyline.width = 10;
-        polyline.geodesic = false;
-        polyline.color = new Color("purple");
-        this.mapView.mapAnimationsEnabled = true;
-        this.mapView.latitude = flightPlanCoordinates[0].lat;
-        this.mapView.longitude = flightPlanCoordinates[0].lng;
-        this.mapView.zoom = 15;
-        this.mapView.tilt = 45;
-        this.mapView.addPolyline(polyline);
->>>>>>> 23f81e0660c32efb4621a987b82b336bb3abf18c
         this.mapView.myLocationButtonEnabled = true;
         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
