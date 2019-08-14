@@ -47,6 +47,8 @@ export class RideComponent implements OnInit {
     distanceStringDecimal = "0";
     speechRecognition = new SpeechRecognition();
     timeoutId;
+    left;
+    right;
     colorCount = 0;
     colorArray = ['#393ef9', '#4638f1', '#6036ea', '#7335e2', '#8533da', '#9532d2', '#9330ca', '#b02fc3',
     '#bb2dbb', '#b32ca2', '#ab2a8a', '#a42974', '#9c2760', '#a42974', '#ab2a8a', '#b32ca2', '#bb2dbb', 
@@ -236,6 +238,9 @@ export class RideComponent implements OnInit {
     }
 
     onHomeTap(): void {
+        geolocation.clearWatch(this.watchId);
+    
+        this.listen = false;
         this.routerExtensions.navigate(["/home"], {
             transition: {
                 name: "fade"
@@ -312,6 +317,14 @@ export class RideComponent implements OnInit {
     })
     }
 
+    onDirectionsTap(): void{
+            console.log("hit");
+            this.directionWords = this.directionWords.slice(1);
+            this.directionDistances = this.directionDistances.slice(1);
+            this.turnPoints = this.turnPoints.slice(1);
+            this.checkForManeuver();
+    }
+
     onStopTap(): void {
         geolocation.clearWatch(this.watchId);
         clearTimeout(this.timeoutId);
@@ -375,6 +388,41 @@ export class RideComponent implements OnInit {
         }
     } 
 
+    checkForManeuver(lat, long){
+        // check if position is within a block of turn
+        if(lat > this.turnPoints[0].lat - .001 || lat < this.turnPoints[0].lat + .001
+            && long > this.turnPoints[0].lng - .001 || long < this.turnPoints[0].lng + .001){
+        // check maneuver direction
+            // if(this.directionWords[0].indexOf("left") !== -1){
+            //     this.left = true;
+            //     this.right = false;
+            // } else if (this.directionWords[0].indexOf("right") !== -1){
+            //     this.right = true;
+            //     this.left = false;
+            // } else {
+            //     this.left = false;
+            //     this.right = false;
+            // }
+        }
+           if(this.directionWords[0].indexOf("left") !== -1){
+                this.left = true;
+                this.right = false;
+            } else if (this.directionWords[0].indexOf("right") !== -1){
+                this.right = true;
+                this.left = false;
+            } else {
+                this.left = false;
+                this.right = false;
+            }
+
+        if(lat > this.turnPoints[0].lat - .0001 || lat < this.turnPoints[0].lat + .0001
+            && long > this.turnPoints[0].lng - .0001 || long < this.turnPoints[0].lng + .0001){
+                this.directionWords.unshift();
+                this.directionDistances.unshift();
+                this.turnPoints.unshift();
+             
+            }
+    }
 
     drawUserPath(): void {
         insomnia.keepAwake().then(function() {
@@ -385,7 +433,6 @@ export class RideComponent implements OnInit {
                 const newPath = new mapsModule.Polyline();
             if (loc) {
                 this.currentSpeed = loc.speed * 2.23694;
-
                 this.speedString = this.currentSpeed.toFixed(1).slice(0, -2);
                 this.speedStringDecimal = this.currentSpeed.toFixed(1).slice(-1);
                
@@ -397,7 +444,8 @@ export class RideComponent implements OnInit {
                 const lat = loc.latitude;
                 const long = loc.longitude;
                 const time = loc.timestamp;
-                
+                this.checkForManeuver(lat, long);
+
                 if (this.newPathCoords.length === 0) {
                     this.newPathCoords.push({ lat, long, time });
                     this.mapView.latitude = lat;
@@ -412,7 +460,7 @@ export class RideComponent implements OnInit {
                     }
                     this.distanceString = this.totalDistance.toFixed(1).slice(0, -2);
                     this.distanceStringDecimal = this.totalDistance.toFixed(1).slice(-1);
-                   
+                    
                     this.newPathCoords.push({ lat, long, time });
                     newPath.addPoint(mapsModule.Position.positionFromLatLng(lastLat, lastLng));
                     newPath.addPoint(mapsModule.Position.positionFromLatLng(lat, long));
@@ -510,7 +558,8 @@ export class RideComponent implements OnInit {
         ); 
         //this.handleSpeech();
         this.listen = true;
-       
+        this.directionsParser();
+        
         const line = polylineHolder;
         if(line !== undefined){
             this.directedRide = true;
