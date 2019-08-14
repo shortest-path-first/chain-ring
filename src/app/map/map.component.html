@@ -16,8 +16,10 @@
 </ActionBar>
 <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY">
 </script>
+<ScrollView>
+
     <Page xmlns:maps="nativescript-google-maps-sdk"
-        xmlns="http://schemas.nativescript.org/tns.xsd"
+    xmlns="http://schemas.nativescript.org/tns.xsd"
         class="body">
         <StackLayout orientation="vertical" width="100%" height="95%">
             <TextField #searchPlace
@@ -26,12 +28,17 @@
             hint="Search Places"
             ></TextField>
             <maps:mapView
-                width="95%"
-                height="75%"
+            width="95%"
+            height=400
                 [latitude]="latitude" [longitude]="longitude" mapAnimationsEnabled="{{ mapAnimationsEnabled }}"
                 [zoom]="zoom" padding="{{padding}}" (mapReady)="onMapReady($event)"
                 (markerSelect)="onMarkerPick($event)" (coordinateTapped)="removeGetDirections()">
             </maps:mapView>
             <Button *ngIf=markerSelected width="95%" height="100" [text]=bottomButtonText (tap)="getDirections()"></Button>
+            <StackLayout *ngFor="let step of turnByList" class="direction-info-line" height="100">
+                <Label [text]="step" height="50"></Label>
+            </StackLayout>
         </StackLayout>
     </Page>
+
+</ScrollView>

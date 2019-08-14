@@ -11,9 +11,6 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { Router, NavigationExtras } from "@angular/router";
 const mapsModule = require("nativescript-google-maps-sdk");
 const decodePolyline = require("decode-google-map-polyline");
-import { Image } from "tns-core-modules/ui/image";
-import * as http from "http";
-
 
 declare var com: any;
 
@@ -40,8 +37,9 @@ export class MapComponent implements OnInit {
     bottomButtonText = "Get Directions";
     markerSelected = false;
     readyToRide = false;
+    turnByList: Array<object> = [];
 
-    readonly ROOT_URL = "https://a5589e8b.ngrok.io";
+    readonly ROOT_URL = "https://a3a3288b.ngrok.io";
 
     places: Observable<Array<Place>>;
 
@@ -58,13 +56,6 @@ export class MapComponent implements OnInit {
                 this.latitude = result.latitude;
                 this.longitude = result.longitude;
             });
-        http.getImage("URL_IMAGE").then((result) => {
-            let icon = new Image();
-            icon.imageSource = result;
-            marker.icon = icon;
-        }, (error) => {
-            console.log(error);
-        });
     }
 
     onDrawerButtonTap(): void {
@@ -121,6 +112,9 @@ export class MapComponent implements OnInit {
     removeGetDirections() {
         this.markerSelected = false;
         this.readyToRide = false;
+        this.markers.forEach((marker) => { marker.visible = false; });
+        this.markers = [];
+        markers = [];
     }
 
     onMapReady(args) {
@@ -136,7 +130,6 @@ export class MapComponent implements OnInit {
         uiSettings.setCompassEnabled(true);
         gMap.setMyLocationEnabled(true);
     }
-    
 
     getDirections() {
         if (this.readyToRide === false) {
@@ -155,6 +148,7 @@ export class MapComponent implements OnInit {
                 directionsResponse = response;
                 const { polyLine, turnByTurn } = directionsResponse;
                 turnBy = turnByTurn;
+                this.turnByList = turnBy;
                 const bikePath = decodePolyline(polyLine);
                 const path = new mapsModule.Polyline();
                 // tslint:disable-next-line: prefer-for-of
@@ -173,8 +167,6 @@ export class MapComponent implements OnInit {
                 start.title = "Start";
                 start.snippet = "3, 2, 1, GO";
                 start.color = "green";
-
-                start.icon = "/images/beachflag.png";
                 
                 this.markers.push(start);
                 builder.include(start.android.getPosition());
