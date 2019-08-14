@@ -10,7 +10,7 @@ import * as geolocation from "nativescript-geolocation";
 import { Accuracy } from "tns-core-modules/ui/enums";
 import { Color } from "tns-core-modules/color/color";
 import { SpeechRecognition, SpeechRecognitionTranscription } from "nativescript-speech-recognition";
-
+import { Vibrate } from 'nativescript-vibrate';
 
 //const style = require("../../../App_Resources/style.json")
 var insomnia = require("nativescript-insomnia");
@@ -49,6 +49,7 @@ export class RideComponent implements OnInit {
     timeoutId;
     left;
     right;
+    straight;
     colorCount = 0;
     colorArray = ['#393ef9', '#4638f1', '#6036ea', '#7335e2', '#8533da', '#9532d2', '#9330ca', '#b02fc3',
     '#bb2dbb', '#b32ca2', '#ab2a8a', '#a42974', '#9c2760', '#a42974', '#ab2a8a', '#b32ca2', '#bb2dbb', 
@@ -322,10 +323,10 @@ export class RideComponent implements OnInit {
             this.directionWords = this.directionWords.slice(1);
             this.directionDistances = this.directionDistances.slice(1);
             this.turnPoints = this.turnPoints.slice(1);
-            this.checkForManeuver();
+            this.checkForManeuver(10, 10);
     }
 
-    onStopTap(): void {
+    onStopTap(): void {left
         geolocation.clearWatch(this.watchId);
         clearTimeout(this.timeoutId);
         this.listen = false;
@@ -389,7 +390,7 @@ export class RideComponent implements OnInit {
     } 
 
     checkForManeuver(lat, long){
-        // check if position is within a block of turn
+        if(this.turPoints.length){
         if(lat > this.turnPoints[0].lat - .001 || lat < this.turnPoints[0].lat + .001
             && long > this.turnPoints[0].lng - .001 || long < this.turnPoints[0].lng + .001){
         // check maneuver direction
@@ -407,12 +408,19 @@ export class RideComponent implements OnInit {
            if(this.directionWords[0].indexOf("left") !== -1){
                 this.left = true;
                 this.right = false;
+                this.straight = false;
             } else if (this.directionWords[0].indexOf("right") !== -1){
                 this.right = true;
+                this.left = false;
+                this.straight = false;
+            } else if (this.directionWords[0].indexOf("straight") !== -1){
+                this.straight = true;
+                this.right = false;
                 this.left = false;
             } else {
                 this.left = false;
                 this.right = false;
+                this.straight = false;
             }
 
         if(lat > this.turnPoints[0].lat - .0001 || lat < this.turnPoints[0].lat + .0001
@@ -422,6 +430,9 @@ export class RideComponent implements OnInit {
                 this.turnPoints.unshift();
              
             }
+
+        }
+        // check if position is within a block of turn
     }
 
     drawUserPath(): void {
