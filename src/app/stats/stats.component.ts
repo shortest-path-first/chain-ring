@@ -6,6 +6,7 @@ import { storedStats } from "./stats";
 import { Observable } from "rxjs";
 import { ActivatedRoute, Router, NavigationExtras } from "@angular/router";
 
+
 @Component({
     selector: "Stats",
     moduleId: module.id,
@@ -13,29 +14,31 @@ import { ActivatedRoute, Router, NavigationExtras } from "@angular/router";
 })
 export class StatsComponent implements OnInit {
     duration;
-    averageSpeed = 22;
-    totalDistance = 1000;
+    averageSpeed;
+    totalDistance;
     moneySaved = 90000;
     stationaryTime = 5;
     holder;
+
     readonly ROOT_URL = "https://09b0a776.ngrok.io";
 
     storedStats: Observable<Array<storedStats>>;
 
     constructor(private http: HttpClient, private router: Router, private route: ActivatedRoute) {
         // Use the component constructor to inject providers.
+
         this.userTotalInfo();
          this.route.queryParams.subscribe((params) => {
            console.log(params);
             this.averageSpeed = params.average;
-            this.totalDistance = params.totalDistance;
+            this.totalDistance = params.totalDistance.toFixed(1);
             this.duration = params.duration;
         });
     }
     ngOnInit(): void {
         // Init your component properties here.
-    }
 
+    }
     onDrawerButtonTap(): void {
         const sideDrawer = <RadSideDrawer>app.getRootView();
         sideDrawer.showDrawer();
