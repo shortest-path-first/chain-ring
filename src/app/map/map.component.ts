@@ -11,14 +11,18 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { Router, NavigationExtras } from "@angular/router";
 const mapsModule = require("nativescript-google-maps-sdk");
 const decodePolyline = require("decode-google-map-polyline");
+import { Image } from "tns-core-modules/ui/image";
+import * as http from "http";
+
 
 declare var com: any;
 
 let actualMap;
 let markerLat;
 let markerLng;
-let encodedPolyLine;
+let directionsResponse;
 let markers = [];
+let turnBy;
 
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
@@ -54,6 +58,13 @@ export class MapComponent implements OnInit {
                 this.latitude = result.latitude;
                 this.longitude = result.longitude;
             });
+        http.getImage("URL_IMAGE").then((result) => {
+            let icon = new Image();
+            icon.imageSource = result;
+            marker.icon = icon;
+        }, (error) => {
+            console.log(error);
+        });
     }
 
     onDrawerButtonTap(): void {
@@ -134,14 +145,16 @@ export class MapComponent implements OnInit {
             });
             this.markers = [];
             markers = [];
+
             // params are set to the marker selected, info coming from component
             // tslint:disable-next-line: max-line-length
             const params = new HttpParams().set("place", `${markerLat},${markerLng}`).set("userLoc", `${this.latitude},${this.longitude}`);
             // http request to get directions between user point and marker selected
             this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
                 // reassigns response to variable to avoid dealing with "<Place[]>"
-                encodedPolyLine = response;
-                const { polyLine } = encodedPolyLine;
+                directionsResponse = response;
+                const { polyLine, turnByTurn } = directionsResponse;
+                turnBy = turnByTurn;
                 const bikePath = decodePolyline(polyLine);
                 const path = new mapsModule.Polyline();
                 // tslint:disable-next-line: prefer-for-of
@@ -159,6 +172,10 @@ export class MapComponent implements OnInit {
                 start.position = mapsModule.Position.positionFromLatLng(bikePath[0].lat, bikePath[0].lng);
                 start.title = "Start";
                 start.snippet = "3, 2, 1, GO";
+                start.color = "green";
+
+                start.icon = "/images/beachflag.png";
+                
                 this.markers.push(start);
                 builder.include(start.android.getPosition());
                 actualMap.addMarker(start);
@@ -183,7 +200,7 @@ export class MapComponent implements OnInit {
             });
         } else if (this.readyToRide === true) {
             console.log("tapped");
-            const { polyLine } = encodedPolyLine;
+            const { polyLine } = directionsResponse;
             const params: NavigationExtras = {
                 queryParams: {
                     polyLine
