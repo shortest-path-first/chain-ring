@@ -51,7 +51,155 @@ export class RideComponent implements OnInit {
     colorArray = ['#393ef9', '#4638f1', '#6036ea', '#7335e2', '#8533da', '#9532d2', '#9330ca', '#b02fc3',
     '#bb2dbb', '#b32ca2', '#ab2a8a', '#a42974', '#9c2760', '#a42974', '#ab2a8a', '#b32ca2', '#bb2dbb', 
     '#b02fc3', '#9330ca', '#9532d2', '#8533da', '#7335e2', '#6036ea', '#4638f1'];
-    
+    directedRide = false;
+    directionDistances = [];
+    directionWords = [];
+    turnPoints = [];
+    steps = [
+                        {
+                            "distance": {
+                                "text": "102 ft",
+                                "value": 31
+                            },
+                            "duration": {
+                                "text": "1 min",
+                                "value": 5
+                            },
+                            "end_location": {
+                                "lat": 29.9775096,
+                                "lng": -90.08047979999999
+                            },
+                            "html_instructions": "Head <b>south</b> on <b>N White St</b> toward <b>Esplanade Ave</b>",
+                            "polyline": {
+                                "points": "a`~uDhyxdP`@JPH"
+                            },
+                            "start_location": {
+                                "lat": 29.977767,
+                                "lng": -90.08036919999999
+                            },
+                            "travel_mode": "BICYCLING"
+                        },
+                        {
+                            "distance": {
+                                "text": "0.9 mi",
+                                "value": 1478
+                            },
+                            "duration": {
+                                "text": "7 mins",
+                                "value": 396
+                            },
+                            "end_location": {
+                                "lat": 29.9692147,
+                                "lng": -90.0684981
+                            },
+                            "html_instructions": "Turn <b>left</b> onto <b>Esplanade Ave</b>",
+                            "maneuver": "turn-left",
+                            "polyline": {
+                                "points": "m~}uD~yxdPf@w@p@iAT_@T_@dAcBl@aAl@_AN[h@aA`A_Bx@qARYt@oAp@gA|@uAbAaBr@kAnAuBf@y@Ze@TWV[@CNWLQBGLUp@kA`AaBzBmDvBmDtBoDhB}CJM?A@A@AFK@AFI?ALQ"
+                            },
+                            "start_location": {
+                                "lat": 29.9775096,
+                                "lng": -90.08047979999999
+                            },
+                            "travel_mode": "BICYCLING"
+                        },
+                        {
+                            "distance": {
+                                "text": "0.3 mi",
+                                "value": 563
+                            },
+                            "duration": {
+                                "text": "2 mins",
+                                "value": 140
+                            },
+                            "end_location": {
+                                "lat": 29.9728401,
+                                "lng": -90.06463289999999
+                            },
+                            "html_instructions": "Turn <b>left</b> onto <b>N Claiborne Ave</b>",
+                            "maneuver": "turn-left",
+                            "polyline": {
+                                "points": "qj|uDbovdPYWuAkA]Wg@e@aDmC_DoC}CqCMMGIIMUk@CMAQAYAg@"
+                            },
+                            "start_location": {
+                                "lat": 29.9692147,
+                                "lng": -90.0684981
+                            },
+                            "travel_mode": "BICYCLING"
+                        },
+                        {
+                            "distance": {
+                                "text": "0.5 mi",
+                                "value": 850
+                            },
+                            "duration": {
+                                "text": "4 mins",
+                                "value": 244
+                            },
+                            "end_location": {
+                                "lat": 29.972658,
+                                "lng": -90.05600269999999
+                            },
+                            "html_instructions": "Continue straight to stay on <b>N Claiborne Ave</b>",
+                            "maneuver": "straight",
+                            "polyline": {
+                                "points": "ga}uD|vudPCuACaBG}BC{BEmBK{DEe@K_FMeFE{BGkBPeAHYP]T_@NYHS@CBIRs@"
+                            },
+                            "start_location": {
+                                "lat": 29.9728401,
+                                "lng": -90.06463289999999
+                            },
+                            "travel_mode": "BICYCLING"
+                        },
+                        {
+                            "distance": {
+                                "text": "0.2 mi",
+                                "value": 354
+                            },
+                            "duration": {
+                                "text": "1 min",
+                                "value": 63
+                            },
+                            "end_location": {
+                                "lat": 29.9728897,
+                                "lng": -90.0523341
+                            },
+                            "html_instructions": "Continue onto <b>LA-39 S</b>",
+                            "polyline": {
+                                "points": "c`}uD~`tdPA_@MaFMaFIeDAc@A]AQ"
+                            },
+                            "start_location": {
+                                "lat": 29.972658,
+                                "lng": -90.05600269999999
+                            },
+                            "travel_mode": "BICYCLING"
+                        },
+                        {
+                            "distance": {
+                                "text": "190 ft",
+                                "value": 58
+                            },
+                            "duration": {
+                                "text": "1 min",
+                                "value": 51
+                            },
+                            "end_location": {
+                                "lat": 29.9734092,
+                                "lng": -90.0523748
+                            },
+                            "html_instructions": "Turn <b>left</b> onto <b>St Roch Ave</b><div style=\"font-size:0.9em\">Destination will be on the right</div>",
+                            "maneuver": "turn-left",
+                            "polyline": {
+                                "points": "qa}uD`jsdPgBF"
+                            },
+                            "start_location": {
+                                "lat": 29.9728897,
+                                "lng": -90.0523341
+                            },
+                            "travel_mode": "BICYCLING"
+                        }
+                    ]
+
 
     readonly ROOT_URL = "https://09b0a776.ngrok.io";
 
@@ -96,7 +244,6 @@ export class RideComponent implements OnInit {
 }
    
     calculateDistance(lat1, lon1, lat2, lon2): number {
-        
         if ((lat1 == lat2) && (lon1 == lon2)) {
             var dist = 0;
             
@@ -120,7 +267,6 @@ export class RideComponent implements OnInit {
 }
 
     findSpeedBreakdown(speeds): Array<any> {
-
         const breakdown = speeds.reduce((tally, speed) => {
             if (speed < .25 * this.topSpeed) {
                 if (tally["0"] === undefined) {
@@ -156,6 +302,14 @@ export class RideComponent implements OnInit {
             }
         }
         return portions;
+    }
+
+    directionsParser(): void{
+        this.steps.forEach((step)=>{
+        this.directionDistances.push(step.distance.text);
+        this.directionWords.push(step['html_instructions'].replace(/<\/?[^>]+(>|$)/g, ""));
+        this.turnPoints.push(step['end_location']);
+    })
     }
 
     onStopTap(): void {
@@ -359,6 +513,8 @@ export class RideComponent implements OnInit {
        
         const line = polylineHolder;
         if(line !== undefined){
+            this.directedRide = true;
+            this.directionsParser();
         var flightPlanCoordinates = decodePolyline(line);
             const polyline = new mapsModule.Polyline();
             for (let i = 0; i < flightPlanCoordinates.length; i++){
