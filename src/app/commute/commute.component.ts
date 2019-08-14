@@ -28,7 +28,7 @@ export class CommuteComponent implements OnInit {
     workLat = 29.951965;
     workLng = -90.070227;
 
-    readonly ROOT_URL = "https://a5589e8b.ngrok.io";
+    readonly ROOT_URL = "https://a3a3288b.ngrok.io";
 
     // tslint:disable-next-line: max-line-length
     locations = [{lat: 29.955727, lng: -90.120515, label: "Cane's Chicken Fingers"}, {lat: 29.9624226, lng: -90.042877, label: "Pizza Delicious"}];
