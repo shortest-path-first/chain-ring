@@ -35,8 +35,9 @@
                 (markerSelect)="onMarkerPick($event)" (coordinateTapped)="removeGetDirections()">
             </maps:mapView>
             <Button *ngIf=markerSelected width="95%" height="100" [text]=bottomButtonText (tap)="getDirections()"></Button>
-            <StackLayout *ngFor="let step of turnByList" class="direction-info-line" height="100">
-                <Label [text]="step" height="50"></Label>
+            <StackLayout *ngFor="let step of turnByList" class="direction-info-line" height="75">
+                <Label [text]="step[0]" height="40" textWrap="true"></Label>
+                <Label [text]="step[1]" height="20" textWrap="true"></Label>
             </StackLayout>
         </StackLayout>
     </Page>
