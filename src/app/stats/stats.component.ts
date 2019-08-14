@@ -17,7 +17,7 @@ export class StatsComponent implements OnInit {
     moneySaved = 90000;
     stationaryTime = 5;
     holder;
-    readonly ROOT_URL = "https://09b0a776.ngrok.io";
+    readonly ROOT_URL = "https://a5589e8b.ngrok.io";
 
     storedStats: Observable<Array<storedStats>>;
 
