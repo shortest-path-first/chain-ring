@@ -9,6 +9,7 @@ import { Router, NavigationExtras } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
 
 let encodedPolyLine;
+const user = "francoappss@gmail.com";
 
 @Component({
     selector: "Commute",
@@ -22,24 +23,28 @@ export class CommuteComponent implements OnInit {
 
     locationList: Array<object> = [];
 
-    homeLat = 29.854655;
-    homeLng = -90.055455;
+    homeLat;
+    homeLng;
 
-    workLat = 29.951965;
-    workLng = -90.070227;
+    workLat;
+    workLng;
 
-    readonly ROOT_URL = "https://a3a3288b.ngrok.io";
+    readonly ROOT_URL = "https://d8345d7c.ngrok.io";
 
     // tslint:disable-next-line: max-line-length
-    locations = [{lat: 29.955727, lng: -90.120515, label: "Cane's Chicken Fingers"}, {lat: 29.9624226, lng: -90.042877, label: "Pizza Delicious"}];
 
     constructor(private http: HttpClient, private routerExtensions: RouterExtensions) {
         // Use the component constructor to inject providers.
-        this.locationList = this.locations;
+        // this.locationList = this.locations;
     }
 
     ngOnInit(): void {
         // Init your component properties here.
+        this.getUserLoc();
+        this.getLocations(user);
+    }
+
+    getUserLoc() {
         geolocation.enableLocationRequest();
         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
@@ -55,7 +60,6 @@ export class CommuteComponent implements OnInit {
     }
 
     routeToRide(lat, lng) {
-        console.log("cowabunga");
         console.log(lat, lng);
             // tslint:disable-next-line: max-line-length
         const params = new HttpParams().set("place", `${lat},${lng}`).set("userLoc", `${this.latitude},${this.longitude}`);
@@ -76,5 +80,29 @@ export class CommuteComponent implements OnInit {
             }, () => {
                 console.log("completed");
             });
+    }
+
+    getLocations(userEmail) {
+        // tslint:disable-next-line: max-line-length
+        const params = new HttpParams().set("userEmail", `${userEmail}`);
+        // http request to get directions between user point and marker selected
+        this.http.get<Array<Commute>>(this.ROOT_URL + "/locations", { params }).subscribe((response) => {
+            // reassigns response to variable to avoid dealing with "<Place[]>"
+            console.log(response);
+            this.locationList = response;
+        }, (err) => {
+            console.log("error", err.message);
+        }, () => {
+            console.log("completed");
+        });
+    }
+
+    addLocation() {
+        const param: NavigationExtras = {
+            queryParams: {
+                user
+            }
+        };
+        this.routerExtensions.navigate(["/locationAdd"], param);
     }
 }

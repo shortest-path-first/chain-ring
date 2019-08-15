@@ -18,12 +18,10 @@
     <StackLayout>
         <Label width="95%" height="10%" class="commute-header" text="Select Destination Below" font></Label>
         <StackLayout width="95%" height="95%">
-            <Label #homeLoc [lat]=homeLat [lng]=homeLng class="commute-info-line" text="Home" height="10%" (tap)="routeToRide(homeLoc.lat, homeLoc.lng)"></Label>
-            <Label #workLoc [lat]=workLat [lng]=workLng class="commute-info-line" text="Work" height="10%" (tap)="routeToRide(workLoc.lat, workLoc.lng)"></Label>
             <StackLayout *ngFor="let loc of locationList; let i = index" class="commute-info-line" height="10%" [attr.data-index]="i">
                 <Label #index [text]="loc.label" [lat]=loc.lat [lng]=loc.lng height="100" (tap)="routeToRide(index.lat, index.lng)"></Label>
-                
             </StackLayout>
+            <Label width="95%" height="10%" class="commute-header" text="+" (tap)="addLocation()"></Label>
         </StackLayout>
     </StackLayout>
 </Page>

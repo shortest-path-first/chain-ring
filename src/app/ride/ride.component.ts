@@ -231,7 +231,7 @@ export class RideComponent implements OnInit {
                     ]
     
 
-    readonly ROOT_URL = "https://a3a3288b.ngrok.io";
+    readonly ROOT_URL = "https://d8345d7c.ngrok.io";
 
     // tslint:disable-next-line: max-line-length
     constructor(private http: HttpClient, private router: Router,
