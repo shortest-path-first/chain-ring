@@ -96,4 +96,13 @@ export class CommuteComponent implements OnInit {
             console.log("completed");
         });
     }
+
+    addLocation(){
+        const param: NavigationExtras = {
+            queryParams: {
+                user
+            }
+        };
+        this.routerExtensions.navigate(["/locationAdd"], param);
+    };
 }
