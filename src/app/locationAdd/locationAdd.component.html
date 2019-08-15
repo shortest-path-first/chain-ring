@@ -25,7 +25,9 @@
                 (mapReady)="onMapReady($event)" (markerSelect)="onMarkerPick($event)"
                 (coordinateTapped)="removeGetDirections()">
             </maps:mapView>
+            <TextField #location *ngIf=markerSelected id="searchBox" text="" backgroundColor="white" width="95%" height="50"
+                hint="Name Your Custom Location" [(ngModel)]=locName></TextField>
             <Button *ngIf=markerSelected width="95%" height="80" [text]=bottomButtonText
-                (tap)="getDirections()"></Button>
+                (tap)="saveLocation()"></Button>
         </StackLayout>
     </Page>

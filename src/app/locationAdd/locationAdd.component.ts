@@ -35,8 +35,9 @@ export class LocationAddComponent implements OnInit {
     markers = [];
     markerSelected = false;
     bottomButtonText = "Save Location";
+    locName = "";
     
-    readonly ROOT_URL = "https://d8345d7c.ngrok.io";
+    readonly ROOT_URL = "https://1161b504.ngrok.io";
 
     places: Observable<Array<Place>>;
 
@@ -131,8 +132,8 @@ export class LocationAddComponent implements OnInit {
         markers = [];
     }
 
-    getDirections() {
+    saveLocation() {
         console.log("button press");
-        console.log(markerLat, markerLng);
+        console.log(markerLat, markerLng, this.locName);
     }
 }
