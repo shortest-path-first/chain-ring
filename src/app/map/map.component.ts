@@ -11,6 +11,8 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { Router, NavigationExtras } from "@angular/router";
 const mapsModule = require("nativescript-google-maps-sdk");
 const decodePolyline = require("decode-google-map-polyline");
+import { Image } from "tns-core-modules/ui/image";
+import { ImageSource } from "tns-core-modules/image-source";
 
 declare var com: any;
 
@@ -29,7 +31,9 @@ registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView
     templateUrl: "./map.component.html"
 })
 export class MapComponent implements OnInit {
-
+    
+    showDirections = false;
+    compPoly;
     latitude = 30;
     longitude = -90.15;
     zoom = 13;
@@ -39,7 +43,7 @@ export class MapComponent implements OnInit {
     readyToRide = false;
     turnByList: Array<object> = [];
 
-    readonly ROOT_URL = "https://5836c5a9.ngrok.io";
+    readonly ROOT_URL = "https://de2ce626.ngrok.io";
 
     places: Observable<Array<Place>>;
 
@@ -67,7 +71,7 @@ export class MapComponent implements OnInit {
         // search params from search bar
         this.readyToRide = false;
         const params = new HttpParams().set("place", text).set("userLoc", `${this.latitude},${this.longitude}`);
-        this.markers.forEach((marker) => {marker.visible = false;});
+        this.markers.forEach((marker) => {marker.visible = false; });
         this.markers = [];
         markers = [];
 
@@ -115,6 +119,11 @@ export class MapComponent implements OnInit {
         this.markers.forEach((marker) => { marker.visible = false; });
         this.markers = [];
         markers = [];
+        this.showDirections = false;
+        if (this.compPoly) {
+            this.compPoly.visible = false;
+        }
+        this.turnByList = [];
     }
 
     onMapReady(args) {
@@ -133,11 +142,12 @@ export class MapComponent implements OnInit {
 
     getDirections() {
         if (this.readyToRide === false) {
-            this.markers.forEach((marker) => {
-                marker.visible = false;
-            });
-            this.markers = [];
-            markers = [];
+            // this.markers.forEach((marker) => {
+            //     marker.visible = false;
+            // });
+            this.removeGetDirections();
+            // this.markers = [];
+            // markers = [];
 
             // params are set to the marker selected, info coming from component
             // tslint:disable-next-line: max-line-length
@@ -151,6 +161,7 @@ export class MapComponent implements OnInit {
                 this.turnByList = turnBy;
                 const bikePath = decodePolyline(polyLine);
                 const path = new mapsModule.Polyline();
+                this.compPoly = path;
                 // tslint:disable-next-line: prefer-for-of
                 for (let i = 0; i < bikePath.length; i++) {
                     const coord = bikePath[i];
@@ -160,6 +171,7 @@ export class MapComponent implements OnInit {
                 path.width = 10;
                 path.geodesic = false;
                 const padding = 150;
+
                 const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
                 const start = new mapsModule.Marker({});
                 // tslint:disable-next-line: max-line-length
@@ -167,7 +179,6 @@ export class MapComponent implements OnInit {
                 start.title = "Start";
                 start.snippet = "3, 2, 1, GO";
                 start.color = "green";
-                
                 this.markers.push(start);
                 builder.include(start.android.getPosition());
                 actualMap.addMarker(start);
