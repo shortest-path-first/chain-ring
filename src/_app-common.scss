@@ -17,8 +17,9 @@
 
 .fas {
     font-family: Font Awesome 5 Free, fa-solid-900;
-    font-weight: 900; 
+    font-weight: 900;    
 }
+
 
 // Common page class
 .page-content {
@@ -69,13 +70,21 @@ $sidedrawer-list-icon-size: 20;
 
 .speed {
     font-family: Orbitron-Black;
-    color: black;
-    opacity: 1 !important;
+    color: white;
+    opacity: .8 !important;
+}
+
+.direction {
+    opacity: .55;
+    font-size: 200em;
+    margin-left: -10px;
+    margin-right: -10px;
 }
 
 .test {
-    background-color: rgb(172, 168, 168);
-    opacity: .6;
+    //background-color: rgb(172, 168, 168);
+    background-image: linear-gradient(to bottom left, #393ef9, #9c27b0,);
+    opacity: .55;
     margin-top: 65%;
     margin-left: 5%;
     margin-bottom: 5%;
