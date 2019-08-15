@@ -3,11 +3,14 @@ import { NativeScriptCommonModule } from "nativescript-angular/common";
 
 import { LocationAddRoutingModule } from "./locationAdd-routing.module";
 import { LocationAddComponent } from "./locationAdd.component";
+import { HttpClientModule } from "@angular/common/http";
+
 
 @NgModule({
     imports: [
         NativeScriptCommonModule,
-        LocationAddRoutingModule
+        LocationAddRoutingModule,
+        HttpClientModule
     ],
     declarations: [
         LocationAddComponent

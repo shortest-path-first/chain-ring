@@ -9,7 +9,7 @@ import { Router, NavigationExtras } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
 
 let encodedPolyLine;
-let user = "francoappss@gmail.com";
+const user = "francoappss@gmail.com";
 
 @Component({
     selector: "Commute",
@@ -97,12 +97,12 @@ export class CommuteComponent implements OnInit {
         });
     }
 
-    addLocation(){
+    addLocation() {
         const param: NavigationExtras = {
             queryParams: {
                 user
             }
         };
         this.routerExtensions.navigate(["/locationAdd"], param);
-    };
+    }
 }
