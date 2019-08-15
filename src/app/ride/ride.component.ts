@@ -33,6 +33,7 @@ export class RideComponent implements OnInit {
     mapView;
     watchId;
     show;
+    pinClicked = false;
     listen = true;
     speed = 0; 
     topSpeed = 0;
@@ -255,7 +256,20 @@ export class RideComponent implements OnInit {
     }
 
     onPinTap(): void {    
+        this.pinClicked = !this.pinClicked;
         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
+            .then((result) => {
+                const marker = new mapsModule.Marker();
+                marker.position = mapsModule.Position.positionFromLatLng(result.latitude, result.longitude);
+                this.mapView.addMarker(marker);
+                rideMarkers.markers.push({markerLat: result.latitude, markerLon: result.longitude});
+            });
+    }
+
+    onPinSelect(pinType): void {
+        this.pinClicked = false;
+        console.log(pinType);
+         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
                 const marker = new mapsModule.Marker();
                 marker.position = mapsModule.Position.positionFromLatLng(result.latitude, result.longitude);
@@ -359,11 +373,16 @@ export class RideComponent implements OnInit {
     onStopTap(): void {
         
         geolocation.clearWatch(this.watchId);
-        clearTimeout(this.timeoutId);
+        //clearTimeout(this.timeoutId);
         this.listen = false;
         this.left = false;
         this.right = false;
         this.straight = false;
+        if(this.speechRecognition !== null){
+            setTimeout(()=>{
+            this.speechRecognition.stopListening();
+            },1000);
+        }
         //this.speechRecognition.stopListening()
         // .then(()=>{
         //     console.log('stopped listening')
@@ -470,7 +489,13 @@ export class RideComponent implements OnInit {
         
         this.watchId = geolocation.watchLocation((loc) => {
                 const newPath = new mapsModule.Polyline();
-            if (loc) {
+            if (loc && this.mapView !== null) {
+                    if(this.listen === false){
+                        this.speechRecognition.stopListening();
+                    } else {
+                            this.handleSpeech();
+                    }
+                this.handleSpeech();
                 this.currentSpeed = loc.speed * 2.23694;
                 this.speedString = this.currentSpeed.toFixed(1).slice(0, -2);
                 this.speedStringDecimal = this.currentSpeed.toFixed(1).slice(-1);
@@ -518,8 +543,7 @@ export class RideComponent implements OnInit {
                     this.mapView.latitude = lat;
                     this.mapView.longitude = long;
                     this.mapView.bearing = loc.direction;
-                    this.mapView.zoom = 18;
-                   
+                    this.mapView.zoom = 18;   
                 }
             }
         }, (e) => {
@@ -534,7 +558,8 @@ export class RideComponent implements OnInit {
 
 
     handleSpeech(){
-        //console.log('SPEAK!', new Date())
+        //console.log('SPEAK!', new Date()
+        if(this.speechRecognition !== null){
         this.speechRecognition.startListening(
             {
                 // optional, uses the device locale by default
@@ -548,21 +573,29 @@ export class RideComponent implements OnInit {
                     if (transcription.text.includes("speedometer")) {
                     this.onSpeedTap();
                     } else if(transcription.text.includes("pothole")){
-                        this.onPinTap();
-                    } else if(transcription.text.includes("end ride")){
-                        this.onStopTap();
+                    
+                        this.onPinSelect('pothole');
+                    } else if(transcription.text.includes("avoid road")){
+                        
+                        this.onPinSelect('avoid');
+                    } else if(transcription.text.includes("close call")){
+                        this.onPinSelect('close');
+                    } else if(transcription.text.includes("zoom in")){
+                        this.mapView.zoom = 10;
+                    } else if(transcription.text.includes("zoom out")){
+                        this.mapView.zoom = 20;
                     }
-                    if(this.listen === false){
-                        this.speechRecognition.stopListening();
+                    if(this.listen === false && this.speechRecognition !== null){
+                        //this.speechRecognition.stopListening();
                     } else {
-                            this.handleSpeech();
+                        //this.handleSpeech();
                     }
                 },
                 onError: (error) => {
-                    if(this.listen === false){
-                        this.speechRecognition.stopListening();
+                    if(this.listen === false && this.speechRecognition !== null){
+                       //this.speechRecognition.stopListening();
                     } else {
-                        this.handleSpeech();
+                      //this.handleSpeech();
                     }
                 
                     // - iOS: A 'string', describing the issue. 
@@ -574,10 +607,10 @@ export class RideComponent implements OnInit {
             (started) => { console.log(`started listening`) },
             (errorMessage) => { 
                 //console.log(`Listen Error: ${errorMessage}`);
-             if(this.listen === false){
-                        this.speechRecognition.stopListening();
+             if(this.listen === false && this.speechRecognition !== null){
+                     //this.speechRecognition.stopListening();
                     } else {
-                            this.handleSpeech();
+                    //this.handleSpeech();
                 }
              }
         )
@@ -586,6 +619,7 @@ export class RideComponent implements OnInit {
                 // hence the' onError' handler was created.
                 console.error("Where's the error",error);
             });
+        }
 }
     
     onMapReady(args){
@@ -595,10 +629,10 @@ export class RideComponent implements OnInit {
             (available: boolean) => console.log(available ? "YES!" : "NO"),
             (err: string) => console.log(err)
         ); 
-        //this.handleSpeech();
+   
         this.listen = true;
         this.directionsParser();
-        
+        console.log(this.mapView);
         // const line = polylineHolder;
         const line = "a`~uDhyxdPr@TxAaC~CeFhD}FtDcGdGyJbA_Bl@s@b@u@~@aB|DoGbJiOBEzAeC~BqDhFyI~DoG~DuGZk@|AgCWUwBmBCKIoD[gMO_HuJ`@}FT{AAiACs@eYC}@AWgDLoFPqHV";
         if(line !== undefined){
