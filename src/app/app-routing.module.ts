@@ -10,7 +10,8 @@ const routes: Routes = [
     { path: "map", loadChildren: "~/app/map/map.module#MapModule" },
     { path: "ride", loadChildren: "../app/ride/ride.module#RideModule"},
     { path: "settings", loadChildren: "~/app/settings/settings.module#SettingsModule" },
-    { path: "stats", loadChildren: "~/app/stats/stats.module#StatsModule" }
+    { path: "stats", loadChildren: "~/app/stats/stats.module#StatsModule" },
+    { path: "locationAdd", loadChildren: "~/app/locationAdd/locationAdd.module#LocationAddModule" }
 ];
 
 @NgModule({

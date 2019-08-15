@@ -43,7 +43,7 @@ export class MapComponent implements OnInit {
     readyToRide = false;
     turnByList: Array<object> = [];
 
-    readonly ROOT_URL = "https://de2ce626.ngrok.io";
+    readonly ROOT_URL = "https://d8345d7c.ngrok.io";
 
     places: Observable<Array<Place>>;
 
@@ -142,12 +142,7 @@ export class MapComponent implements OnInit {
 
     getDirections() {
         if (this.readyToRide === false) {
-            // this.markers.forEach((marker) => {
-            //     marker.visible = false;
-            // });
             this.removeGetDirections();
-            // this.markers = [];
-            // markers = [];
 
             // params are set to the marker selected, info coming from component
             // tslint:disable-next-line: max-line-length
