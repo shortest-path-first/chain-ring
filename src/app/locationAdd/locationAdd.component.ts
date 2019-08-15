@@ -133,5 +133,6 @@ export class LocationAddComponent implements OnInit {
 
     getDirections() {
         console.log("button press");
+        console.log(markerLat, markerLng);
     }
 }

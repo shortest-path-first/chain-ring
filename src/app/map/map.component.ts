@@ -142,12 +142,7 @@ export class MapComponent implements OnInit {
 
     getDirections() {
         if (this.readyToRide === false) {
-            // this.markers.forEach((marker) => {
-            //     marker.visible = false;
-            // });
             this.removeGetDirections();
-            // this.markers = [];
-            // markers = [];
 
             // params are set to the marker selected, info coming from component
             // tslint:disable-next-line: max-line-length
