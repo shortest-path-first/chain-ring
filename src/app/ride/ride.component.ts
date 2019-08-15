@@ -228,7 +228,7 @@ export class RideComponent implements OnInit {
                             "travel_mode": "BICYCLING"
                         }
                     ]
-
+    
 
     readonly ROOT_URL = "https://a3a3288b.ngrok.io";
 
@@ -340,6 +340,7 @@ export class RideComponent implements OnInit {
     }
 
     directionsParser(): void{
+        this.steps = this.steps.reverse();
         this.steps.forEach((step)=>{
         this.directionDistances.push(step.distance.text);
         this.directionWords.push(step['html_instructions'].replace(/<\/?[^>]+(>|$)/g, ""));
@@ -414,7 +415,7 @@ export class RideComponent implements OnInit {
     }
 
     onSpeedTap(): void {
-        console.log("called", new Date());
+       
         if(this.show === undefined){
             this.show = true;
         } else{
@@ -424,8 +425,8 @@ export class RideComponent implements OnInit {
 
     checkForManeuver(lat, long){
         if(this.turnPoints.length){
-        if(lat > this.turnPoints[0].lat - .001 || lat < this.turnPoints[0].lat + .001
-            && long > this.turnPoints[0].lng - .001 || long < this.turnPoints[0].lng + .001){
+        if(lat >= this.turnPoints[0].lat - .001 && lat <= this.turnPoints[0].lat + .001
+            && long >= this.turnPoints[0].lng - .001 && long <= this.turnPoints[0].lng + .001){
         
            if(this.directionWords[0].indexOf("left") !== -1){
                 this.left = true;
@@ -447,8 +448,8 @@ export class RideComponent implements OnInit {
                 this.straight = false;
             }
         }
-        if(lat > this.turnPoints[0].lat - .0001 || lat < this.turnPoints[0].lat + .0001
-            && long > this.turnPoints[0].lng - .0001 || long < this.turnPoints[0].lng + .0001){
+        if(lat >= this.turnPoints[0].lat - .0001 && lat <= this.turnPoints[0].lat + .0001
+            && long >= this.turnPoints[0].lng - .0001 && long <= this.turnPoints[0].lng + .0001){
                 this.directionWords.unshift();
                 this.directionDistances.unshift();
                 this.turnPoints.unshift();
@@ -502,19 +503,18 @@ export class RideComponent implements OnInit {
                     newPath.geodesic = false;
                     if(this.colorCount <= this.colorArray.length - 1 ){
                         newPath.color = new Color(this.colorArray[this.colorCount])
+                        this.colorCount++;
                     } else if(this.colorCount > this.colorArray.length -1){
                         this.colorCount = 0;
-                        //newPath.color = new Color(this.colorArray[this.colorCount]);
+                        newPath.color = new Color(this.colorArray[this.colorCount]);
                     }
-                    newPath.color = new Color("red");
+                    //newPath.color = new Color("red");
                     this.mapView.addPolyline(newPath);
                     this.mapView.latitude = lat;
                     this.mapView.longitude = long;
                     this.mapView.bearing = loc.direction;
                     this.mapView.zoom = 18;
-                    //const builder = new com.google.android.gms.maps.model.LatLng.Builder();
-                    //const newLatLng = com.google.android.gms.maps.CameraUpdateFactory.newLatLng({lat, long});
-                    //this.mapView.gMap.animateCamera();
+                   
                 }
             }
         }, (e) => {

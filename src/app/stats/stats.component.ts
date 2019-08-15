@@ -16,6 +16,7 @@ export class StatsComponent implements OnInit {
     duration;
     averageSpeed;
     totalDistance;
+    speedBreakdown;
     moneySaved = 90000;
     stationaryTime = 5;
     holder;
@@ -31,10 +32,15 @@ export class StatsComponent implements OnInit {
 
         this.userTotalInfo();
          this.route.queryParams.subscribe((params) => {
-           console.log(params);
+         
             this.averageSpeed = params.average;
-            this.totalDistance = params.totalDistance.toFixed(1);
-            this.duration = params.duration;
+            this.totalDistance = params.totalDistance;
+            if(this.totalDistance.indexOf('.') !== -1){
+                let decimalIndex = this.totalDistance.indexOf('.');
+                this.totalDistance.slice(0, decimalIndex + 1);
+            }
+            this.duration = this.durationParser(Number(params.duration));
+            this.speedBreakdown = params.speedBreakdown;
         });
     }
     ngOnInit(): void {
@@ -44,6 +50,36 @@ export class StatsComponent implements OnInit {
     onDrawerButtonTap(): void {
         const sideDrawer = <RadSideDrawer>app.getRootView();
         sideDrawer.showDrawer();
+    }
+
+    durationParser(duration): string {
+        let hours;
+        let minutes;
+        let seconds;
+        let time = "";
+        if(duration >= 3600){
+            hours = Math.floor(duration/ 3600);
+            seconds = duration % 3600
+            if(seconds >= 60){
+              minutes = Math.floor(seconds/60);
+              seconds = seconds % 60;
+            }
+        } else if(duration >= 60){
+          minutes = Math.floor(duration/ 60);
+          seconds = duration % 60;
+        } else {
+          seconds = duration;
+        }
+
+        if(minutes < 10){
+            minutes = `0${minutes}`
+        }
+        if(seconds < 10){
+            seconds = `0${seconds}`
+        }
+        time = `${hours}:${minutes}:${seconds}`;
+        console.log(time);
+        return time;
     }
 
     userTotalInfo() {
