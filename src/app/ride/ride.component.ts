@@ -37,6 +37,7 @@ export class RideComponent implements OnInit {
     speed = 0; 
     topSpeed = 0;
     allSpeeds = [];
+    callCount = 0;
     currentSpeed = 0;
     speedString = '0';
     speedStringDecimal = '0';
@@ -51,6 +52,7 @@ export class RideComponent implements OnInit {
     right;
     straight;
     colorCount = 0;
+    vibrator = new Vibrate();
     colorArray = ['#393ef9', '#4638f1', '#6036ea', '#7335e2', '#8533da', '#9532d2', '#9330ca', '#b02fc3',
     '#bb2dbb', '#b32ca2', '#ab2a8a', '#a42974', '#9c2760', '#a42974', '#ab2a8a', '#b32ca2', '#bb2dbb', 
     '#b02fc3', '#9330ca', '#9532d2', '#8533da', '#7335e2', '#6036ea', '#4638f1'];
@@ -84,21 +86,21 @@ export class RideComponent implements OnInit {
                         },
                         {
                             "distance": {
-                                "text": "0.9 mi",
-                                "value": 1478
+                                "text": "1.4 mi",
+                                "value": 2306
                             },
                             "duration": {
-                                "text": "7 mins",
-                                "value": 396
+                                "text": "10 mins",
+                                "value": 583
                             },
                             "end_location": {
-                                "lat": 29.9692147,
-                                "lng": -90.0684981
+                                "lat": 29.9645726,
+                                "lng": -90.0617776
                             },
                             "html_instructions": "Turn <b>left</b> onto <b>Esplanade Ave</b>",
                             "maneuver": "turn-left",
                             "polyline": {
-                                "points": "m~}uD~yxdPf@w@p@iAT_@T_@dAcBl@aAl@_AN[h@aA`A_Bx@qARYt@oAp@gA|@uAbAaBr@kAnAuBf@y@Ze@TWV[@CNWLQBGLUp@kA`AaBzBmDvBmDtBoDhB}CJM?A@A@AFK@AFI?ALQ"
+                                "points": "m~}uD~yxdPf@w@p@iAT_@T_@dAcBl@aAl@_AN[h@aA`A_Bx@qARYt@oAp@gA|@uAbAaBr@kAnAuBf@y@Ze@TWV[@CNWLQBGLUp@kA`AaBzBmDvBmDtBoDhB}CJM?A@A@AFK@AFI?ALQz@yAT_@T_@p@cA`@m@Xc@jBaDXc@hAoB|AcCT_@j@_A^k@p@gANWd@u@vA_CJUNU|AgC"
                             },
                             "start_location": {
                                 "lat": 29.9775096,
@@ -109,82 +111,106 @@ export class RideComponent implements OnInit {
                         {
                             "distance": {
                                 "text": "0.3 mi",
-                                "value": 563
+                                "value": 552
                             },
                             "duration": {
                                 "text": "2 mins",
-                                "value": 140
+                                "value": 125
                             },
                             "end_location": {
-                                "lat": 29.9728401,
-                                "lng": -90.06463289999999
+                                "lat": 29.9655835,
+                                "lng": -90.0564631
                             },
-                            "html_instructions": "Turn <b>left</b> onto <b>N Claiborne Ave</b>",
+                            "html_instructions": "Turn <b>left</b> onto <b>Dauphine St</b>",
                             "maneuver": "turn-left",
                             "polyline": {
-                                "points": "qj|uDbovdPYWuAkA]Wg@e@aDmC_DoC}CqCMMGIIMUk@CMAQAYAg@"
+                                "points": "qm{uDbeudPWUuBiBACACAGAIGeDKcFOcFMeFAy@"
                             },
                             "start_location": {
-                                "lat": 29.9692147,
-                                "lng": -90.0684981
+                                "lat": 29.9645726,
+                                "lng": -90.0617776
                             },
                             "travel_mode": "BICYCLING"
                         },
                         {
                             "distance": {
-                                "text": "0.5 mi",
-                                "value": 850
+                                "text": "0.1 mi",
+                                "value": 208
                             },
                             "duration": {
-                                "text": "4 mins",
-                                "value": 244
+                                "text": "1 min",
+                                "value": 68
                             },
                             "end_location": {
-                                "lat": 29.972658,
-                                "lng": -90.05600269999999
+                                "lat": 29.9674466,
+                                "lng": -90.0566286
                             },
-                            "html_instructions": "Continue straight to stay on <b>N Claiborne Ave</b>",
-                            "maneuver": "straight",
+                            "html_instructions": "Turn <b>left</b> onto <b>Elysian Fields Ave</b><div style=\"font-size:0.9em\">Destination will be on the right</div>",
+                            "maneuver": "turn-left",
                             "polyline": {
-                                "points": "ga}uD|vudPCuACaBG}BC{BEmBK{DEe@K_FMeFE{BGkBPeAHYP]T_@NYHS@CBIRs@"
+                                "points": "{s{uDzctdPeERoDL"
                             },
                             "start_location": {
-                                "lat": 29.9728401,
-                                "lng": -90.06463289999999
+                                "lat": 29.9655835,
+                                "lng": -90.0564631
+                            },
+                            "travel_mode": "BICYCLING"
+                        },
+                        {
+                            "distance": {
+                                "text": "0.1 mi",
+                                "value": 235
+                            },
+                            "duration": {
+                                "text": "1 min",
+                                "value": 83
+                            },
+                            "end_location": {
+                                "lat": 29.9695523,
+                                "lng": -90.05670889999999
+                            },
+                            "html_instructions": "Head <b>north</b> on <b>Elysian Fields Ave</b> toward <b>N Rampart St</b>",
+                            "polyline": {
+                                "points": "q_|uD|dtdPS@o@ByCJ_@BeA?UAk@C]?"
+                            },
+                            "start_location": {
+                                "lat": 29.9674466,
+                                "lng": -90.0566286
+                            },
+                            "travel_mode": "BICYCLING"
+                        },
+                        {
+                            "distance": {
+                                "text": "0.3 mi",
+                                "value": 446
+                            },
+                            "duration": {
+                                "text": "1 min",
+                                "value": 78
+                            },
+                            "end_location": {
+                                "lat": 29.9698407,
+                                "lng": -90.0520937
+                            },
+                            "html_instructions": "Turn <b>right</b> onto <b>Marais St</b>",
+                            "maneuver": "turn-right",
+                            "polyline": {
+                                "points": "ul|uDletdPO}EKaFK_FKeDCc@?YAW"
+                            },
+                            "start_location": {
+                                "lat": 29.9695523,
+                                "lng": -90.05670889999999
                             },
                             "travel_mode": "BICYCLING"
                         },
                         {
                             "distance": {
                                 "text": "0.2 mi",
-                                "value": 354
+                                "value": 398
                             },
                             "duration": {
-                                "text": "1 min",
-                                "value": 63
-                            },
-                            "end_location": {
-                                "lat": 29.9728897,
-                                "lng": -90.0523341
-                            },
-                            "html_instructions": "Continue onto <b>LA-39 S</b>",
-                            "polyline": {
-                                "points": "c`}uD~`tdPA_@MaFMaFIeDAc@A]AQ"
-                            },
-                            "start_location": {
-                                "lat": 29.972658,
-                                "lng": -90.05600269999999
-                            },
-                            "travel_mode": "BICYCLING"
-                        },
-                        {
-                            "distance": {
-                                "text": "190 ft",
-                                "value": 58
-                            },
-                            "duration": {
-                                "text": "1 min",
-                                "value": 51
+                                "text": "2 mins",
+                                "value": 125
                             },
                             "end_location": {
                                 "lat": 29.9734092,
@@ -193,18 +219,18 @@ export class RideComponent implements OnInit {
                             "html_instructions": "Turn <b>left</b> onto <b>St Roch Ave</b><div style=\"font-size:0.9em\">Destination will be on the right</div>",
                             "maneuver": "turn-left",
                             "polyline": {
-                                "points": "qa}uD`jsdPgBF"
+                                "points": "on|uDphsdPgDLa@BmELiENgBF"
                             },
                             "start_location": {
-                                "lat": 29.9728897,
-                                "lng": -90.0523341
+                                "lat": 29.9698407,
+                                "lng": -90.0520937
                             },
                             "travel_mode": "BICYCLING"
                         }
                     ]
 
 
-    readonly ROOT_URL = "https://09b0a776.ngrok.io";
+    readonly ROOT_URL = "https://a3a3288b.ngrok.io";
 
     // tslint:disable-next-line: max-line-length
     constructor(private http: HttpClient, private router: Router,
@@ -239,8 +265,11 @@ export class RideComponent implements OnInit {
     }
 
     onHomeTap(): void {
+        
         geolocation.clearWatch(this.watchId);
-    
+        this.left = false;
+        this.right = false;
+        this.straight = false;
         this.listen = false;
         this.routerExtensions.navigate(["/home"], {
             transition: {
@@ -319,17 +348,21 @@ export class RideComponent implements OnInit {
     }
 
     onDirectionsTap(): void{
-            console.log("hit");
+            
             this.directionWords = this.directionWords.slice(1);
             this.directionDistances = this.directionDistances.slice(1);
             this.turnPoints = this.turnPoints.slice(1);
             this.checkForManeuver(10, 10);
     }
 
-    onStopTap(): void {left
+    onStopTap(): void {
+        
         geolocation.clearWatch(this.watchId);
         clearTimeout(this.timeoutId);
         this.listen = false;
+        this.left = false;
+        this.right = false;
+        this.straight = false;
         //this.speechRecognition.stopListening()
         // .then(()=>{
         //     console.log('stopped listening')
@@ -390,29 +423,20 @@ export class RideComponent implements OnInit {
     } 
 
     checkForManeuver(lat, long){
-        if(this.turPoints.length){
+        if(this.turnPoints.length){
         if(lat > this.turnPoints[0].lat - .001 || lat < this.turnPoints[0].lat + .001
             && long > this.turnPoints[0].lng - .001 || long < this.turnPoints[0].lng + .001){
-        // check maneuver direction
-            // if(this.directionWords[0].indexOf("left") !== -1){
-            //     this.left = true;
-            //     this.right = false;
-            // } else if (this.directionWords[0].indexOf("right") !== -1){
-            //     this.right = true;
-            //     this.left = false;
-            // } else {
-            //     this.left = false;
-            //     this.right = false;
-            // }
-        }
+        
            if(this.directionWords[0].indexOf("left") !== -1){
                 this.left = true;
                 this.right = false;
                 this.straight = false;
+                this.vibrator.vibrate([3000, 2000, 1000]);
             } else if (this.directionWords[0].indexOf("right") !== -1){
                 this.right = true;
                 this.left = false;
                 this.straight = false;
+                this.vibrator.vibrate([1000, 2000, 3000]);
             } else if (this.directionWords[0].indexOf("straight") !== -1){
                 this.straight = true;
                 this.right = false;
@@ -422,15 +446,13 @@ export class RideComponent implements OnInit {
                 this.right = false;
                 this.straight = false;
             }
-
+        }
         if(lat > this.turnPoints[0].lat - .0001 || lat < this.turnPoints[0].lat + .0001
             && long > this.turnPoints[0].lng - .0001 || long < this.turnPoints[0].lng + .0001){
                 this.directionWords.unshift();
                 this.directionDistances.unshift();
                 this.turnPoints.unshift();
-             
             }
-
         }
         // check if position is within a block of turn
     }
@@ -439,7 +461,7 @@ export class RideComponent implements OnInit {
         insomnia.keepAwake().then(function() {
         console.log("Insomnia is active");
         })
-
+        
         this.watchId = geolocation.watchLocation((loc) => {
                 const newPath = new mapsModule.Polyline();
             if (loc) {
@@ -537,7 +559,7 @@ export class RideComponent implements OnInit {
                     } else {
                         this.handleSpeech();
                     }
-                    
+                
                     // - iOS: A 'string', describing the issue. 
                     // - Android: A 'number', referencing an 'ERROR_*' constant from https://developer.android.com/reference/android/speech/SpeechRecognizer.
                     //            If that code is either 6 or 7 you may want to restart listening.
@@ -563,6 +585,7 @@ export class RideComponent implements OnInit {
     
     onMapReady(args){
         this.mapView = args.object; 
+        this.callCount++;
         this.speechRecognition.available().then(
             (available: boolean) => console.log(available ? "YES!" : "NO"),
             (err: string) => console.log(err)
@@ -571,7 +594,8 @@ export class RideComponent implements OnInit {
         this.listen = true;
         this.directionsParser();
         
-        const line = polylineHolder;
+        // const line = polylineHolder;
+        const line = "a`~uDhyxdPr@TxAaC~CeFhD}FtDcGdGyJbA_Bl@s@b@u@~@aB|DoGbJiOBEzAeC~BqDhFyI~DoG~DuGZk@|AgCWUwBmBCKIoD[gMO_HuJ`@}FT{AAiACs@eYC}@AWgDLoFPqHV";
         if(line !== undefined){
             this.directedRide = true;
             this.directionsParser();
