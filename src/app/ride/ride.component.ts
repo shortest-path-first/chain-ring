@@ -447,7 +447,12 @@ export class RideComponent implements OnInit {
                 this.right = false;
                 this.straight = false;
             }
+        } else {
+                this.left = false;
+                this.right = false;
+                this.straight = false;
         }
+
         if(lat >= this.turnPoints[0].lat - .0001 && lat <= this.turnPoints[0].lat + .0001
             && long >= this.turnPoints[0].lng - .0001 && long <= this.turnPoints[0].lng + .0001){
                 this.directionWords.unshift();

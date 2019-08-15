@@ -70,12 +70,19 @@ export class StatsComponent implements OnInit {
         } else {
           seconds = duration;
         }
-
+        if(hours === undefined){
+            hours = "0";
+        }
+        if(minutes === undefined){
+            minutes = "0";
+        }
         if(minutes < 10){
             minutes = `0${minutes}`
         }
         if(seconds < 10){
-            seconds = `0${seconds}`
+            seconds = `0${Math.floor(seconds)}`
+        } else {
+            seconds = seconds.toFixed(0);
         }
         time = `${hours}:${minutes}:${seconds}`;
         console.log(time);
