@@ -20,7 +20,7 @@ export class StatsComponent implements OnInit {
     stationaryTime = 5;
     holder;
 
-    readonly ROOT_URL = process.env.ROOT_URL;
+    readonly ROOT_URL = "https://5161accf.ngrok.io";
 
     storedStats: Observable<Array<storedStats>>;
 

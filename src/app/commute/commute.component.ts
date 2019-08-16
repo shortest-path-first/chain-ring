@@ -29,7 +29,7 @@ export class CommuteComponent implements OnInit {
     workLat;
     workLng;
 
-    readonly ROOT_URL = process.env.ROOT_URL;
+    readonly ROOT_URL = "https://5161accf.ngrok.io";
 
     // tslint:disable-next-line: max-line-length
 
