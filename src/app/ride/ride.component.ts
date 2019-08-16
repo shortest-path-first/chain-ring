@@ -438,7 +438,7 @@ export class RideComponent implements OnInit {
         if(lat >= this.turnPoints[0].lat - .001 && lat <= this.turnPoints[0].lat + .001
             && long >= this.turnPoints[0].lng - .001 && long <= this.turnPoints[0].lng + .001){
         
-           if(this.directionWords[0].indexOf("left") !== -1){
+        if(this.directionWords[0].indexOf("left") !== -1){
                 this.left = true;
                 this.right = false;
                 this.straight = false;
@@ -551,7 +551,7 @@ export class RideComponent implements OnInit {
 
 
     handleSpeech(){
-       this.callCount++;
+        this.callCount++;
         console.log("speech:", this.callCount, new Date());
             if(this.speechRecognition !== null){
             this.speechRecognition.startListening(

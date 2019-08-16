@@ -5,6 +5,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { storedStats } from "./stats";
 import { Observable } from "rxjs";
 import { ActivatedRoute, Router, NavigationExtras } from "@angular/router";
+import { RouterExtensions } from "nativescript-angular/router";
 import * as geolocation from "nativescript-geolocation";
 
 
