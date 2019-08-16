@@ -7,7 +7,6 @@ import { Observable } from "rxjs";
 import { ActivatedRoute, Router, NavigationExtras } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
 
-
 @Component({
     selector: "Stats",
     moduleId: module.id,
@@ -21,6 +20,15 @@ export class StatsComponent implements OnInit {
     moneySaved = 90000;
     stationaryTime = 5;
     holder;
+
+    pieSource: { Speed: string, Amount: number }[] = [
+        { Speed: "< 25%", Amount: 20 },
+        { Speed: "25% - 50%", Amount: 40 },
+        { Speed: "50% - 75%", Amount: 50 },
+        { Speed: "> 75%", Amount: 10 }
+    ];
+
+
 
     readonly ROOT_URL = "https://5161accf.ngrok.io";
 
