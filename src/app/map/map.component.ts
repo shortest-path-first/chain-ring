@@ -43,7 +43,7 @@ export class MapComponent implements OnInit {
     readyToRide = false;
     turnByList: Array<object> = [];
 
-    readonly ROOT_URL = "https://d8345d7c.ngrok.io";
+    readonly ROOT_URL = "https://5161accf.ngrok.io";
 
     places: Observable<Array<Place>>;
 
@@ -206,5 +206,13 @@ export class MapComponent implements OnInit {
             };
             this.routerExtensions.navigate(["/ride"], params);
     }
+    }
+
+    homeTap(navItemRoute: string): void {
+        this.routerExtensions.navigate([navItemRoute], {
+            transition: {
+                name: "fade"
+            }
+        });
     }
 }

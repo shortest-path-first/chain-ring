@@ -29,7 +29,7 @@ export class CommuteComponent implements OnInit {
     workLat;
     workLng;
 
-    readonly ROOT_URL = "https://d8345d7c.ngrok.io";
+    readonly ROOT_URL = "https://5161accf.ngrok.io";
 
     // tslint:disable-next-line: max-line-length
 
@@ -104,5 +104,13 @@ export class CommuteComponent implements OnInit {
             }
         };
         this.routerExtensions.navigate(["/locationAdd"], param);
+    }
+
+    homeTap(navItemRoute: string): void {
+        this.routerExtensions.navigate([navItemRoute], {
+            transition: {
+                name: "fade"
+            }
+        });
     }
 }
