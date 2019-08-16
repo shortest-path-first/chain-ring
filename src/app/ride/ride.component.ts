@@ -32,6 +32,7 @@ registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView
 })
 export class RideComponent implements OnInit {
 
+    
     mapView;
     watchId;
     show;
@@ -47,15 +48,15 @@ export class RideComponent implements OnInit {
     newPathCoords = [];
     totalDistance = 0.0;
     recognizedText;
-    distanceString = "0"
+    distanceString = "0";
+    listenIntervalId;
     distanceStringDecimal = "0";
     speechRecognition = new SpeechRecognition();
-    timeoutId;
     left;
     right;
     straight;
-    colorCount = 0;
     vibrator = new Vibrate();
+    colorCount = 0;
     colorArray = ['#393ef9', '#4638f1', '#6036ea', '#7335e2', '#8533da', '#9532d2', '#9330ca', '#b02fc3',
     '#bb2dbb', '#b32ca2', '#ab2a8a', '#a42974', '#9c2760', '#a42974', '#ab2a8a', '#b32ca2', '#bb2dbb', 
     '#b02fc3', '#9330ca', '#9532d2', '#8533da', '#7335e2', '#6036ea', '#4638f1'];
@@ -299,6 +300,7 @@ export class RideComponent implements OnInit {
     onHomeTap(): void {
         
         geolocation.clearWatch(this.watchId);
+        clearInterval(this.listenIntervalId);
         this.left = false;
         this.right = false;
         this.straight = false;
@@ -328,7 +330,7 @@ export class RideComponent implements OnInit {
             dist = Math.acos(dist);
             dist = dist * 180 / Math.PI;
             dist = dist * 60 * 1.1515;
-            console.log("dist", dist);
+            console.log("dist", dist, new Date());
         return Number(dist.toFixed(2));
     }
 }
@@ -388,18 +390,16 @@ export class RideComponent implements OnInit {
     }
 
     onStopTap(): void {
-        
+        console.log("stop:", this.watchId)
         geolocation.clearWatch(this.watchId);
-        //clearTimeout(this.timeoutId);
+        this.speechRecognition.stopListening();
+        clearInterval(this.listenIntervalId);
         this.listen = false;
         this.left = false;
         this.right = false;
         this.straight = false;
-        if(this.speechRecognition !== null){
-            setTimeout(()=>{
-            this.speechRecognition.stopListening();
-            },1000);
-        }
+       
+          
         //this.speechRecognition.stopListening()
         // .then(()=>{
         //     console.log('stopped listening')
@@ -504,152 +504,168 @@ export class RideComponent implements OnInit {
         console.log("Insomnia is active");
         })
         
-        this.watchId = geolocation.watchLocation((loc) => {
-                const newPath = new mapsModule.Polyline();
-            if (loc && this.mapView !== null || loc && this.mapView !== undefined) {
-                    if(this.listen === false){
-                        this.speechRecognition.stopListening();
-                    } else {
-                    this.handleSpeech();
+            this.watchId = geolocation.watchLocation((loc) => {
+                    const newPath = new mapsModule.Polyline();
+                    this.callCount = this.callCount + 1;
+                 
+                if (loc && this.mapView !== null || loc && this.mapView !== undefined) {
+                        if(this.listen === false){
+                            this.speechRecognition.stopListening();
+                        } else {
+                       // this.handleSpeech();
+                        }
+                    //this.handleSpeech();
+                    this.currentSpeed = loc.speed * 2.23694;
+                    this.speedString = this.currentSpeed.toFixed(1).slice(0, -2);
+                    this.speedStringDecimal = this.currentSpeed.toFixed(1).slice(-1);
+                   
+                    if(this.currentSpeed > this.topSpeed){
+                        this.topSpeed = this.currentSpeed;
                     }
-                //this.handleSpeech();
-                this.currentSpeed = loc.speed * 2.23694;
-                this.speedString = this.currentSpeed.toFixed(1).slice(0, -2);
-                this.speedStringDecimal = this.currentSpeed.toFixed(1).slice(-1);
-               
-                if(this.currentSpeed > this.topSpeed){
-                    this.topSpeed = this.currentSpeed;
-                }
-                this.allSpeeds.push(this.currentSpeed);
-                this.speed += loc.speed;
-                const lat = loc.latitude;
-                const long = loc.longitude;
-                const time = loc.timestamp;
-                this.checkForManeuver(lat, long);
-
-                if (this.newPathCoords.length === 0) {
-                    this.newPathCoords.push({ lat, long, time });
-                    this.mapView.latitude = lat;
-                    this.mapView.longitude = long;
-                    this.mapView.bearing = loc.direction;
-                // tslint:disable-next-line: max-line-length
-                } else if (this.newPathCoords[this.newPathCoords.length - 1].lat !== lat && this.newPathCoords[this.newPathCoords.length - 1].long !== long) {
-                    const lastLat = this.newPathCoords[this.newPathCoords.length - 1].lat;
-                    const lastLng = this.newPathCoords[this.newPathCoords.length - 1].long;
-                    if(this.newPathCoords.length > 2){
-                    this.totalDistance += this.calculateDistance(lat, long, lastLat, lastLng);
+                    this.allSpeeds.push(this.currentSpeed);
+                    this.speed += loc.speed;
+                    const lat = loc.latitude;
+                    const long = loc.longitude;
+                    const time = loc.timestamp;
+                    this.checkForManeuver(lat, long);
+    
+                    if (this.newPathCoords.length === 0) {
+                        this.newPathCoords.push({ lat, long, time });
+                        this.mapView.latitude = lat;
+                        this.mapView.longitude = long;
+                        this.mapView.bearing = loc.direction;
+                    // tslint:disable-next-line: max-line-length
+                    } else if (this.newPathCoords[this.newPathCoords.length - 1].lat !== lat && this.newPathCoords[this.newPathCoords.length - 1].long !== long) {
+                        const lastLat = this.newPathCoords[this.newPathCoords.length - 1].lat;
+                        const lastLng = this.newPathCoords[this.newPathCoords.length - 1].long;
+                        if(this.newPathCoords.length > 2){
+                        this.totalDistance += this.calculateDistance(lat, long, lastLat, lastLng);
+                        }
+                        this.distanceString = this.totalDistance.toFixed(1).slice(0, -2);
+                        this.distanceStringDecimal = this.totalDistance.toFixed(1).slice(-1);
+                        
+                        this.newPathCoords.push({ lat, long, time });
+                        newPath.addPoint(mapsModule.Position.positionFromLatLng(lastLat, lastLng));
+                        newPath.addPoint(mapsModule.Position.positionFromLatLng(lat, long));
+                        newPath.visible = true;
+                        newPath.width = 10;
+                        newPath.geodesic = false;
+                        if(this.colorCount <= this.colorArray.length - 1 ){
+                            newPath.color = new Color(this.colorArray[this.colorCount])
+                            this.colorCount++;
+                        } else if(this.colorCount > this.colorArray.length -1){
+                            this.colorCount = 0;
+                            newPath.color = new Color(this.colorArray[this.colorCount]);
+                        }
+                        //newPath.color = new Color("red");
+                        if(this.mapView){
+                        this.mapView.addPolyline(newPath);
+                        }
+                        this.mapView.latitude = lat;
+                        this.mapView.longitude = long;
+                        this.mapView.bearing = loc.direction;      
                     }
-                    this.distanceString = this.totalDistance.toFixed(1).slice(0, -2);
-                    this.distanceStringDecimal = this.totalDistance.toFixed(1).slice(-1);
-                    
-                    this.newPathCoords.push({ lat, long, time });
-                    newPath.addPoint(mapsModule.Position.positionFromLatLng(lastLat, lastLng));
-                    newPath.addPoint(mapsModule.Position.positionFromLatLng(lat, long));
-                    newPath.visible = true;
-                    newPath.width = 10;
-                    newPath.geodesic = false;
-                    if(this.colorCount <= this.colorArray.length - 1 ){
-                        newPath.color = new Color(this.colorArray[this.colorCount])
-                        this.colorCount++;
-                    } else if(this.colorCount > this.colorArray.length -1){
-                        this.colorCount = 0;
-                        newPath.color = new Color(this.colorArray[this.colorCount]);
-                    }
-                    //newPath.color = new Color("red");
-                    if(this.mapView){
-                    //this.mapView.addPolyline(newPath);
-                    }
-                    this.mapView.latitude = lat;
-                    this.mapView.longitude = long;
-                    this.mapView.bearing = loc.direction;
-                    this.mapView.zoom = 18;   
-                }
-            }
-        }, (e) => {
-            console.log("Error: " + e.message);
-        }, {
-                desiredAccuracy: Accuracy.high,
-                updateTime: 3000,
-                updateDistance: 0.1,
-                minimumUpdateTime: 100
-            });
+        }
+            }, (e) => {
+                console.log("Error: " + e.message);
+            }, {
+                    desiredAccuracy: Accuracy.high,
+                    updateTime: 3000,
+                    updateDistance: 0.1,
+                    minimumUpdateTime: 1000
+                });
+            console.log("start", this.watchId, typeof this.watchId);
     }
 
 
     handleSpeech(){
-        //console.log('SPEAK!', new Date()
-        if(this.speechRecognition !== null){
-        this.speechRecognition.startListening(
-            {
-                // optional, uses the device locale by default
-                locale: "en-US",
-                // set to true to get results back continuously
-                returnPartialResults: true,
-                // this callback will be invoked repeatedly during recognition
-                onResult: (transcription: SpeechRecognitionTranscription) => {
-                    console.log('Getting results');
-                    this.zone.run(() => this.recognizedText = transcription.text);
-                    if (transcription.text.includes("speedometer")) {
-                    this.onSpeedTap();
-                    } else if(transcription.text.includes("pothole")){
-                    
-                        this.onPinSelect('pothole');
-                    } else if(transcription.text.includes("avoid road")){
+       this.callCount++;
+        console.log("speech:", this.callCount, new Date());
+            if(this.speechRecognition !== null){
+            this.speechRecognition.startListening(
+                {
+                    // optional, uses the device locale by default
+                    locale: "en-US",
+                    // set to true to get results back continuously
+                    returnPartialResults: true,
+                    // this callback will be invoked repeatedly during recognition
+                    onResult: (transcription: SpeechRecognitionTranscription) => {
+                        console.log('Getting results');
+                        this.zone.run(() => this.recognizedText = transcription.text);
+                        if (transcription.text.includes("speedometer")) {
+                        this.onSpeedTap();
+                        } else if(transcription.text.includes("pothole")){
                         
-                        this.onPinSelect('avoid');
-                    } else if(transcription.text.includes("close call")){
-                        this.onPinSelect('close');
-                    } else if(transcription.text.includes("zoom in")){
-                        this.mapView.zoom = 10;
-                    } else if(transcription.text.includes("zoom out")){
-                        this.mapView.zoom = 20;
+                            this.onPinSelect('pothole');
+                        } else if(transcription.text.includes("avoid road")){
+                            
+                            this.onPinSelect('avoid');
+                        } else if(transcription.text.includes("close call")){
+                            this.onPinSelect('close');
+                        } else if(transcription.text.includes("zoom in")){
+                            this.mapView.zoom = 10;
+                        } else if(transcription.text.includes("zoom out")){
+                            this.mapView.zoom = 20;
+                        } else if(transcription.text.includes("end ride")){
+                            this.zone.run(()=>{
+                                this.onHomeTap();
+                            })
+                        }
+                        if(this.listen === false && this.speechRecognition !== null){
+                        //    this.speechRecognition.stopListening();
+                        } else {
+                        //    this.handleSpeech();
+                        }
+                    },
+                    onError: (error) => {
+                        if(this.listen === false && this.speechRecognition !== null){
+                        //   this.speechRecognition.stopListening();
+                        } else {
+                        //  this.handleSpeech();
+                        }
+                    
+                        // - iOS: A 'string', describing the issue. 
+                        // - Android: A 'number', referencing an 'ERROR_*' constant from https://developer.android.com/reference/android/speech/SpeechRecognizer.
+                        //            If that code is either 6 or 7 you may want to restart listening.
                     }
-                    if(this.listen === false && this.speechRecognition !== null){
-                        //this.speechRecognition.stopListening();
-                    } else {
+                }
+            ).then(
+                (started) => { console.log(`started listening`) },
+                (errorMessage) => { 
+                    //console.log(`Listen Error: ${errorMessage}`);
+                 if(this.listen === false && this.speechRecognition !== null){
+                         //this.speechRecognition.stopListening();
+                        } else {
                         //this.handleSpeech();
                     }
-                },
-                onError: (error) => {
-                    if(this.listen === false && this.speechRecognition !== null){
-                       //this.speechRecognition.stopListening();
-                    } else {
-                      //this.handleSpeech();
-                    }
-                
-                    // - iOS: A 'string', describing the issue. 
-                    // - Android: A 'number', referencing an 'ERROR_*' constant from https://developer.android.com/reference/android/speech/SpeechRecognizer.
-                    //            If that code is either 6 or 7 you may want to restart listening.
-                }
+                 }
+            )
+                .catch((error) => {
+                    // same as the 'onError' handler, but this may not return if the error occurs after listening has successfully started (because that resolves the promise,
+                    // hence the' onError' handler was created.
+                    console.error("Where's the error",error);
+                });
             }
-        ).then(
-            (started) => { console.log(`started listening`) },
-            (errorMessage) => { 
-                //console.log(`Listen Error: ${errorMessage}`);
-             if(this.listen === false && this.speechRecognition !== null){
-                     //this.speechRecognition.stopListening();
-                    } else {
-                    //this.handleSpeech();
-                }
-             }
-        )
-            .catch((error) => {
-                // same as the 'onError' handler, but this may not return if the error occurs after listening has successfully started (because that resolves the promise,
-                // hence the' onError' handler was created.
-                console.error("Where's the error",error);
-            });
-        }
+     
 }
     
     onMapReady(args){
         this.mapView = args.object; 
-        this.callCount++;
         this.speechRecognition.available().then(
             (available: boolean) => console.log(available ? "YES!" : "NO"),
             (err: string) => console.log(err)
         ); 
-   
+        for(let i = 0; i < 50; i++){
+            clearInterval(i);
+            geolocation.clearWatch(i);
+        }
         this.listen = true;
+        this.zone.runOutsideAngular(()=>{
+            this.listenIntervalId = setInterval(()=>{
+                this.handleSpeech();
+            }, 3000);
+        })
+        console.log('interval id:', this.listenIntervalId);
         this.directionsParser();
         console.log(this.mapView);
         // const line = polylineHolder;

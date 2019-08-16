@@ -24,7 +24,10 @@ export class HomeComponent implements OnInit {
             .then((result) => {
                 console.log(result);
             });
-        
+        for(let i = 0; i < 50; i++){
+            geolocation.clearWatch(i);
+            clearInterval(i);
+        }
     }
 
     onDrawerButtonTap(): void {

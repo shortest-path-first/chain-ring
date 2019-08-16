@@ -5,6 +5,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { storedStats } from "./stats";
 import { Observable } from "rxjs";
 import { ActivatedRoute, Router, NavigationExtras } from "@angular/router";
+import * as geolocation from "nativescript-geolocation";
 
 
 @Component({
@@ -45,7 +46,9 @@ export class StatsComponent implements OnInit {
     }
     ngOnInit(): void {
         // Init your component properties here.
-
+        for(let i = 0; i < 25; i++){
+            geolocation.clearWatch(i);
+        }
     }
     onDrawerButtonTap(): void {
         const sideDrawer = <RadSideDrawer>app.getRootView();
