@@ -11,6 +11,8 @@ import { Accuracy } from "tns-core-modules/ui/enums";
 import { Color } from "tns-core-modules/color/color";
 import { SpeechRecognition, SpeechRecognitionTranscription } from "nativescript-speech-recognition";
 import { Vibrate } from 'nativescript-vibrate';
+import { Image } from "tns-core-modules/ui/image";
+import { ImageSource } from "tns-core-modules/image-source";
 
 //const style = require("../../../App_Resources/style.json")
 var insomnia = require("nativescript-insomnia");
@@ -257,24 +259,40 @@ export class RideComponent implements OnInit {
 
     onPinTap(): void {    
         this.pinClicked = !this.pinClicked;
-        geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
-            .then((result) => {
-                const marker = new mapsModule.Marker();
-                marker.position = mapsModule.Position.positionFromLatLng(result.latitude, result.longitude);
-                this.mapView.addMarker(marker);
-                rideMarkers.markers.push({markerLat: result.latitude, markerLon: result.longitude});
-            });
+        // geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
+        //     .then((result) => {
+        //         const marker = new mapsModule.Marker();
+        //         marker.position = mapsModule.Position.positionFromLatLng(result.latitude, result.longitude);
+        //         this.mapView.addMarker(marker);
+        //         rideMarkers.markers.push({markerLat: result.latitude, markerLon: result.longitude});
+        //     });
     }
 
     onPinSelect(pinType): void {
         this.pinClicked = false;
         console.log(pinType);
+
          geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
                 const marker = new mapsModule.Marker();
+                 const imageSource = new ImageSource();
+                 if(pinType === "pothole"){
+                    imageSource.loadFromFile("~/app/images/mapPotHole.png");
+                 } else if (pinType === "close"){
+                    imageSource.loadFromFile("~/app/images/mapNearMiss.png");
+                 } else if (pinType === "avoid"){
+                     imageSource.loadFromFile("~/app/images/mapAvoid.png");
+                 } else if (pinType === "crash"){
+                     imageSource.loadFromFile("~/app/images/mapHit.png");
+                 } else if (pinType === "stolen"){
+                     imageSource.loadFromFile("~/app/images/mapStolen.png");
+                 }
+                const icon = new Image();
+                icon.imageSource = imageSource;
+                marker.icon = icon;
                 marker.position = mapsModule.Position.positionFromLatLng(result.latitude, result.longitude);
                 this.mapView.addMarker(marker);
-                rideMarkers.markers.push({markerLat: result.latitude, markerLon: result.longitude});
+                rideMarkers.markers.push({markerLat: result.latitude, markerLon: result.longitude, type: pinType});
             });
     }
 
@@ -354,7 +372,6 @@ export class RideComponent implements OnInit {
     }
 
     directionsParser(): void{
-        this.steps = this.steps.reverse();
         this.steps.forEach((step)=>{
         this.directionDistances.push(step.distance.text);
         this.directionWords.push(step['html_instructions'].replace(/<\/?[^>]+(>|$)/g, ""));
@@ -489,13 +506,13 @@ export class RideComponent implements OnInit {
         
         this.watchId = geolocation.watchLocation((loc) => {
                 const newPath = new mapsModule.Polyline();
-            if (loc && this.mapView !== null) {
+            if (loc && this.mapView !== null || loc && this.mapView !== undefined) {
                     if(this.listen === false){
                         this.speechRecognition.stopListening();
                     } else {
-                            this.handleSpeech();
+                    this.handleSpeech();
                     }
-                this.handleSpeech();
+                //this.handleSpeech();
                 this.currentSpeed = loc.speed * 2.23694;
                 this.speedString = this.currentSpeed.toFixed(1).slice(0, -2);
                 this.speedStringDecimal = this.currentSpeed.toFixed(1).slice(-1);
@@ -539,7 +556,9 @@ export class RideComponent implements OnInit {
                         newPath.color = new Color(this.colorArray[this.colorCount]);
                     }
                     //newPath.color = new Color("red");
-                    this.mapView.addPolyline(newPath);
+                    if(this.mapView){
+                    //this.mapView.addPolyline(newPath);
+                    }
                     this.mapView.latitude = lat;
                     this.mapView.longitude = long;
                     this.mapView.bearing = loc.direction;
