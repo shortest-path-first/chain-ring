@@ -14,12 +14,14 @@ import { Vibrate } from 'nativescript-vibrate';
 import { Image } from "tns-core-modules/ui/image";
 import { ImageSource } from "tns-core-modules/image-source";
 
+
 //const style = require("../../../App_Resources/style.json")
 var insomnia = require("nativescript-insomnia");
 var mapsModule = require("nativescript-google-maps-sdk");
 const decodePolyline = require('decode-google-map-polyline');
 const polylineEncoder = require('google-polyline')
 const rideMarkers = {markers: []};
+var flashlight = require("nativescript-flashlight");
 let polylineHolder;
 
 
@@ -50,6 +52,8 @@ export class RideComponent implements OnInit {
     recognizedText;
     distanceString = "0";
     listenIntervalId;
+    lightIntervalId;
+    light = false;
     distanceStringDecimal = "0";
     speechRecognition = new SpeechRecognition();
     left;
@@ -65,173 +69,124 @@ export class RideComponent implements OnInit {
     directionWords = [];
     turnPoints = [];
     steps = [
-                        {
-                            "distance": {
-                                "text": "102 ft",
-                                "value": 31
-                            },
-                            "duration": {
-                                "text": "1 min",
-                                "value": 5
-                            },
-                            "end_location": {
-                                "lat": 29.9775096,
-                                "lng": -90.08047979999999
-                            },
-                            "html_instructions": "Head <b>south</b> on <b>N White St</b> toward <b>Esplanade Ave</b>",
-                            "polyline": {
-                                "points": "a`~uDhyxdP`@JPH"
-                            },
-                            "start_location": {
-                                "lat": 29.977767,
-                                "lng": -90.08036919999999
-                            },
-                            "travel_mode": "BICYCLING"
-                        },
-                        {
-                            "distance": {
-                                "text": "1.4 mi",
-                                "value": 2306
-                            },
-                            "duration": {
-                                "text": "10 mins",
-                                "value": 583
-                            },
-                            "end_location": {
-                                "lat": 29.9645726,
-                                "lng": -90.0617776
-                            },
-                            "html_instructions": "Turn <b>left</b> onto <b>Esplanade Ave</b>",
-                            "maneuver": "turn-left",
-                            "polyline": {
-                                "points": "m~}uD~yxdPf@w@p@iAT_@T_@dAcBl@aAl@_AN[h@aA`A_Bx@qARYt@oAp@gA|@uAbAaBr@kAnAuBf@y@Ze@TWV[@CNWLQBGLUp@kA`AaBzBmDvBmDtBoDhB}CJM?A@A@AFK@AFI?ALQz@yAT_@T_@p@cA`@m@Xc@jBaDXc@hAoB|AcCT_@j@_A^k@p@gANWd@u@vA_CJUNU|AgC"
-                            },
-                            "start_location": {
-                                "lat": 29.9775096,
-                                "lng": -90.08047979999999
-                            },
-                            "travel_mode": "BICYCLING"
-                        },
-                        {
-                            "distance": {
-                                "text": "0.3 mi",
-                                "value": 552
-                            },
-                            "duration": {
-                                "text": "2 mins",
-                                "value": 125
-                            },
-                            "end_location": {
-                                "lat": 29.9655835,
-                                "lng": -90.0564631
-                            },
-                            "html_instructions": "Turn <b>left</b> onto <b>Dauphine St</b>",
-                            "maneuver": "turn-left",
-                            "polyline": {
-                                "points": "qm{uDbeudPWUuBiBACACAGAIGeDKcFOcFMeFAy@"
-                            },
-                            "start_location": {
-                                "lat": 29.9645726,
-                                "lng": -90.0617776
-                            },
-                            "travel_mode": "BICYCLING"
-                        },
-                        {
-                            "distance": {
-                                "text": "0.1 mi",
-                                "value": 208
-                            },
-                            "duration": {
-                                "text": "1 min",
-                                "value": 68
-                            },
-                            "end_location": {
-                                "lat": 29.9674466,
-                                "lng": -90.0566286
-                            },
-                            "html_instructions": "Turn <b>left</b> onto <b>Elysian Fields Ave</b><div style=\"font-size:0.9em\">Destination will be on the right</div>",
-                            "maneuver": "turn-left",
-                            "polyline": {
-                                "points": "{s{uDzctdPeERoDL"
-                            },
-                            "start_location": {
-                                "lat": 29.9655835,
-                                "lng": -90.0564631
-                            },
-                            "travel_mode": "BICYCLING"
-                        },
-                        {
-                            "distance": {
-                                "text": "0.1 mi",
-                                "value": 235
-                            },
-                            "duration": {
-                                "text": "1 min",
-                                "value": 83
-                            },
-                            "end_location": {
-                                "lat": 29.9695523,
-                                "lng": -90.05670889999999
-                            },
-                            "html_instructions": "Head <b>north</b> on <b>Elysian Fields Ave</b> toward <b>N Rampart St</b>",
-                            "polyline": {
-                                "points": "q_|uD|dtdPS@o@ByCJ_@BeA?UAk@C]?"
-                            },
-                            "start_location": {
-                                "lat": 29.9674466,
-                                "lng": -90.0566286
-                            },
-                            "travel_mode": "BICYCLING"
-                        },
-                        {
-                            "distance": {
-                                "text": "0.3 mi",
-                                "value": 446
-                            },
-                            "duration": {
-                                "text": "1 min",
-                                "value": 78
-                            },
-                            "end_location": {
-                                "lat": 29.9698407,
-                                "lng": -90.0520937
-                            },
-                            "html_instructions": "Turn <b>right</b> onto <b>Marais St</b>",
-                            "maneuver": "turn-right",
-                            "polyline": {
-                                "points": "ul|uDletdPO}EKaFK_FKeDCc@?YAW"
-                            },
-                            "start_location": {
-                                "lat": 29.9695523,
-                                "lng": -90.05670889999999
-                            },
-                            "travel_mode": "BICYCLING"
-                        },
-                        {
-                            "distance": {
-                                "text": "0.2 mi",
-                                "value": 398
-                            },
-                            "duration": {
-                                "text": "2 mins",
-                                "value": 125
-                            },
-                            "end_location": {
-                                "lat": 29.9734092,
-                                "lng": -90.0523748
-                            },
-                            "html_instructions": "Turn <b>left</b> onto <b>St Roch Ave</b><div style=\"font-size:0.9em\">Destination will be on the right</div>",
-                            "maneuver": "turn-left",
-                            "polyline": {
-                                "points": "on|uDphsdPgDLa@BmELiENgBF"
-                            },
-                            "start_location": {
-                                "lat": 29.9698407,
-                                "lng": -90.0520937
-                            },
-                            "travel_mode": "BICYCLING"
-                        }
-                    ]
+        {
+            "distance": {
+                "text": "66 ft",
+                "value": 20
+            },
+            "duration": {
+                "text": "1 min",
+                "value": 3
+            },
+            "end_location": {
+                "lat": 29.9776004,
+                "lng": -90.0804337
+            },
+            "html_instructions": "Head <b>south</b> on <b>N White St</b> toward <b>Esplanade Ave</b>",
+            "polyline": {
+                "points": "a`~uDhyxdP`@J"
+            },
+            "start_location": {
+                "lat": 29.977767,
+                "lng": -90.08036919999999
+            },
+            "travel_mode": "BICYCLING"
+        },
+        {
+            "distance": {
+                "text": "0.2 mi",
+                "value": 353
+            },
+            "duration": {
+                "text": "1 min",
+                "value": 89
+            },
+            "end_location": {
+                "lat": 29.9795782,
+                "lng": -90.0832971
+            },
+            "html_instructions": "Turn <b>right</b> onto <b>Esplanade Ave</b>",
+            "maneuver": "turn-right",
+            "polyline": {
+                "points": "__~uDtyxdPeCdEiCbEe@x@uAxB"
+            },
+            "start_location": {
+                "lat": 29.9776004,
+                "lng": -90.0804337
+            },
+            "travel_mode": "BICYCLING"
+        },
+        {
+            "distance": {
+                "text": "262 ft",
+                "value": 80
+            },
+            "duration": {
+                "text": "1 min",
+                "value": 13
+            },
+            "end_location": {
+                "lat": 29.9803009,
+                "lng": -90.08325839999999
+            },
+            "html_instructions": "Turn <b>right</b> onto <b>N Lopez St</b><div style=\"font-size:0.9em\">Destination will be on the right</div>",
+            "maneuver": "turn-right",
+            "polyline": {
+                "points": "kk~uDrkydPq@C}AC"
+            },
+            "start_location": {
+                "lat": 29.9795782,
+                "lng": -90.0832971
+            },
+        },
+        {
+            "distance": {
+            "text": "39 ft",
+            "value": 12
+            },
+            "duration": {
+                "text": "1 min",
+                "value": 2
+            },
+            "end_location": {
+                "lat": 29.980411,
+                "lng": -90.0832537
+            },
+            "html_instructions": "Head <b>north</b> on <b>N Lopez St</b> toward <b>Ponce De Leon St</b>",
+            "polyline": {
+                "points": "{o~uDjkydPUA"
+            },
+            "start_location": {
+                "lat": 29.9803009,
+                "lng": -90.08325839999999
+            },
+            "travel_mode": "BICYCLING"
+        },
+        {
+            "distance": {
+                "text": "384 ft",
+                "value": 117
+            },
+            "duration": {
+                "text": "1 min",
+                "value": 21
+            },
+            "end_location": {
+                "lat": 29.9804536,
+                "lng": -90.08447059999999
+            },
+            "html_instructions": "Turn <b>left</b> onto <b>Ponce De Leon St</b><div style=\"font-size:0.9em\">Destination will be on the right</div>",
+            "maneuver": "turn-left",
+            "polyline": {
+                "points": "qp~uDhkydPGhF?H"
+            },
+            "start_location": {
+                "lat": 29.980411,
+                "lng": -90.0832537
+            },
+            "travel_mode": "BICYCLING"
+        }
+    ]
     
 
     readonly ROOT_URL = "https://d8345d7c.ngrok.io";
@@ -273,21 +228,21 @@ export class RideComponent implements OnInit {
         this.pinClicked = false;
         console.log(pinType);
 
-         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
+        geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
                 const marker = new mapsModule.Marker();
-                 const imageSource = new ImageSource();
-                 if(pinType === "pothole"){
+                const imageSource = new ImageSource();
+                if(pinType === "pothole"){
                     imageSource.loadFromFile("~/app/images/mapPotHole.png");
-                 } else if (pinType === "close"){
+                } else if (pinType === "close"){
                     imageSource.loadFromFile("~/app/images/mapNearMiss.png");
-                 } else if (pinType === "avoid"){
-                     imageSource.loadFromFile("~/app/images/mapAvoid.png");
-                 } else if (pinType === "crash"){
-                     imageSource.loadFromFile("~/app/images/mapHit.png");
-                 } else if (pinType === "stolen"){
-                     imageSource.loadFromFile("~/app/images/mapStolen.png");
-                 }
+                } else if (pinType === "avoid"){
+                    imageSource.loadFromFile("~/app/images/mapAvoid.png");
+                } else if (pinType === "crash"){
+                    imageSource.loadFromFile("~/app/images/mapHit.png");
+                } else if (pinType === "stolen"){
+                    imageSource.loadFromFile("~/app/images/mapStolen.png");
+                }
                 const icon = new Image();
                 icon.imageSource = imageSource;
                 marker.icon = icon;
@@ -297,10 +252,32 @@ export class RideComponent implements OnInit {
             });
     }
 
+    onLightTap(): void {
+        this.light = this.light!;
+        this.vibrator.vibrate([3000, 2000, 1000]);
+        console.log(flashlight);
+        if(this.light){
+            if (flashlight.isAvailable()) {
+                // this.zone.runOutsideAngular(()=>{
+                //     this.lightIntervalId = setInterval(()=>{
+                //         flashlight.toggle();
+                //     }, 500);
+                // })
+               // flashlight.on();
+              console.log("Flashlight Available")
+            }
+
+        } else {
+          //  flashlight.off();
+            clearInterval(this.lightIntervalId);
+        }
+    }
+
     onHomeTap(): void {
         
         geolocation.clearWatch(this.watchId);
         clearInterval(this.listenIntervalId);
+        clearInterval(this.lightIntervalId);
         this.left = false;
         this.right = false;
         this.straight = false;
@@ -311,7 +288,7 @@ export class RideComponent implements OnInit {
             }
     });
 }
-   
+
     calculateDistance(lat1, lon1, lat2, lon2): number {
         if ((lat1 == lat2) && (lon1 == lon2)) {
             var dist = 0;
@@ -386,7 +363,7 @@ export class RideComponent implements OnInit {
             this.directionWords = this.directionWords.slice(1);
             this.directionDistances = this.directionDistances.slice(1);
             this.turnPoints = this.turnPoints.slice(1);
-            this.checkForManeuver(10, 10);
+            this.checkForManeuver(29.9778246, -90.0801914);
     }
 
     onStopTap(): void {
@@ -394,19 +371,20 @@ export class RideComponent implements OnInit {
         geolocation.clearWatch(this.watchId);
         this.speechRecognition.stopListening();
         clearInterval(this.listenIntervalId);
+        clearInterval(this.lightIntervalId);
         this.listen = false;
         this.left = false;
         this.right = false;
         this.straight = false;
-       
-          
+
+
         //this.speechRecognition.stopListening()
         // .then(()=>{
         //     console.log('stopped listening')
         // }).catch((err)=>{
         //     console.error('Error stop listen:', err)
         // })
-          insomnia.allowSleepAgain().then(function() {
+        insomnia.allowSleepAgain().then(function() {
         console.log("Insomnia is inactive, good night!");
         });
         let avgSpeed = (this.speed * 2.23694)/ this.allSpeeds.length;
@@ -437,7 +415,7 @@ export class RideComponent implements OnInit {
         .subscribe(() => {
             console.log("ride");
         });
-          const params: NavigationExtras = {
+        const params: NavigationExtras = {
                 queryParams: {
                     polyLine: pathPolyline,
                     average: avgSpeed,
@@ -447,11 +425,12 @@ export class RideComponent implements OnInit {
                     topSpeed: this.topSpeed,
                 }
             };
-      this.routerExtensions.navigate(["/stats"], params);
+    this.routerExtensions.navigate(["/stats"], params);
     }
 
     onSpeedTap(): void {
-       
+        
+    console.log("Speed Called")
         if(this.show === undefined){
             this.show = true;
         } else{
@@ -460,7 +439,9 @@ export class RideComponent implements OnInit {
     } 
 
     checkForManeuver(lat, long){
+        // check to make sure there are turnPoints
         if(this.turnPoints.length){
+        // if the user's position is within .0001 latitude or longitude show signal
         if(lat >= this.turnPoints[0].lat - .001 && lat <= this.turnPoints[0].lat + .001
             && long >= this.turnPoints[0].lng - .001 && long <= this.turnPoints[0].lng + .001){
         
@@ -489,6 +470,7 @@ export class RideComponent implements OnInit {
                 this.straight = false;
         }
 
+        // if the user location is within .0001 degrees show next direction
         if(lat >= this.turnPoints[0].lat - .0001 && lat <= this.turnPoints[0].lat + .0001
             && long >= this.turnPoints[0].lng - .0001 && long <= this.turnPoints[0].lng + .0001){
                 this.directionWords.unshift();
@@ -496,7 +478,6 @@ export class RideComponent implements OnInit {
                 this.turnPoints.unshift();
             }
         }
-        // check if position is within a block of turn
     }
 
     drawUserPath(): void {
@@ -507,9 +488,9 @@ export class RideComponent implements OnInit {
             this.watchId = geolocation.watchLocation((loc) => {
                     const newPath = new mapsModule.Polyline();
                     this.callCount = this.callCount + 1;
-                 
+                
                 if (loc && this.mapView !== null || loc && this.mapView !== undefined) {
-                        if(this.listen === false){
+                        if(this.listen === false && this.speechRecognition !== null){
                             this.speechRecognition.stopListening();
                         } else {
                        // this.handleSpeech();
@@ -518,7 +499,7 @@ export class RideComponent implements OnInit {
                     this.currentSpeed = loc.speed * 2.23694;
                     this.speedString = this.currentSpeed.toFixed(1).slice(0, -2);
                     this.speedStringDecimal = this.currentSpeed.toFixed(1).slice(-1);
-                   
+                
                     if(this.currentSpeed > this.topSpeed){
                         this.topSpeed = this.currentSpeed;
                     }
@@ -597,18 +578,18 @@ export class RideComponent implements OnInit {
                         } else if(transcription.text.includes("pothole")){
                         
                             this.onPinSelect('pothole');
-                        } else if(transcription.text.includes("avoid road")){
+                        } else if(transcription.text.includes("avoid")){
                             
                             this.onPinSelect('avoid');
                         } else if(transcription.text.includes("close call")){
                             this.onPinSelect('close');
                         } else if(transcription.text.includes("zoom in")){
-                            this.mapView.zoom = 10;
+                            this.mapView.zoom = 18;
                         } else if(transcription.text.includes("zoom out")){
-                            this.mapView.zoom = 20;
-                        } else if(transcription.text.includes("end ride")){
+                            this.mapView.zoom = 10;
+                        } else if(transcription.text.includes("stop ride")){
                             this.zone.run(()=>{
-                                this.onHomeTap();
+                                this.onStopTap();
                             })
                         }
                         if(this.listen === false && this.speechRecognition !== null){
@@ -655,7 +636,7 @@ export class RideComponent implements OnInit {
             (available: boolean) => console.log(available ? "YES!" : "NO"),
             (err: string) => console.log(err)
         ); 
-        for(let i = 0; i < 50; i++){
+        for(let i = 0; i < 100; i++){
             clearInterval(i);
             geolocation.clearWatch(i);
         }
@@ -669,7 +650,7 @@ export class RideComponent implements OnInit {
         this.directionsParser();
         console.log(this.mapView);
         // const line = polylineHolder;
-        const line = "a`~uDhyxdPr@TxAaC~CeFhD}FtDcGdGyJbA_Bl@s@b@u@~@aB|DoGbJiOBEzAeC~BqDhFyI~DoG~DuGZk@|AgCWUwBmBCKIoD[gMO_HuJ`@}FT{AAiACs@eYC}@AWgDLoFPqHV";
+        const line = "a`~uDhyxdP`@JeCdEoD|FuAxBq@CsBEGrF"
         if(line !== undefined){
             this.directedRide = true;
             this.directionsParser();
