@@ -1,18 +1,9 @@
 <ActionBar class="action-bar">
-    <!-- 
-    Use the NavigationButton as a side-drawer button in Android
-    because ActionItems are shown on the right side of the ActionBar
-    -->
     <NavigationButton ios:visibility="collapsed" icon="res://menu" (tap)="onDrawerButtonTap()"></NavigationButton>
-    <!-- 
-    Use the ActionItem for IOS with position set to left. Using the
-    NavigationButton as a side-drawer button in iOS is not possible,
-    because its function is to always navigate back in the application.
-    -->
-    <ActionItem icon="res://navigation/menu" android:visibility="collapsed" (tap)="onDrawerButtonTap()"
-        ios.position="left">
-    </ActionItem>
-    <Label class="action-bar-title" text="Add Location"></Label>
+    <Label class="header" text="Chainring"></Label>
+    <ActionItem icon="~/app/images/home.png" ios.position="right" (tap)="homeTap('/home')"></ActionItem>
+
+
 </ActionBar>
 <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY">
 </script>
@@ -25,7 +16,9 @@
                 (mapReady)="onMapReady($event)" (markerSelect)="onMarkerPick($event)"
                 (coordinateTapped)="removeGetDirections()">
             </maps:mapView>
+            <TextField #location *ngIf=markerSelected id="searchBox" text="" backgroundColor="white" width="95%" height="50"
+                hint="Name Your Custom Location" [(ngModel)]=locName></TextField>
             <Button *ngIf=markerSelected width="95%" height="80" [text]=bottomButtonText
-                (tap)="getDirections()"></Button>
+                (tap)="saveLocation()"></Button>
         </StackLayout>
     </Page>

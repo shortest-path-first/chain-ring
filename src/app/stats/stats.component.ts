@@ -5,6 +5,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { storedStats } from "./stats";
 import { Observable } from "rxjs";
 import { ActivatedRoute, Router, NavigationExtras } from "@angular/router";
+import { RouterExtensions } from "nativescript-angular/router";
 
 
 @Component({
@@ -21,22 +22,21 @@ export class StatsComponent implements OnInit {
     stationaryTime = 5;
     holder;
 
-
-    readonly ROOT_URL = "https://09b0a776.ngrok.io";
-
+    readonly ROOT_URL = "https://5161accf.ngrok.io";
 
     storedStats: Observable<Array<storedStats>>;
 
-    constructor(private http: HttpClient, private router: Router, private route: ActivatedRoute) {
+    // tslint:disable-next-line: max-line-length
+    constructor(private http: HttpClient, private router: Router, private route: ActivatedRoute, private routerExtensions: RouterExtensions) {
         // Use the component constructor to inject providers.
 
         this.userTotalInfo();
-         this.route.queryParams.subscribe((params) => {
+        this.route.queryParams.subscribe((params) => {
          
             this.averageSpeed = params.average;
             this.totalDistance = params.totalDistance;
-            if(this.totalDistance.indexOf('.') !== -1){
-                let decimalIndex = this.totalDistance.indexOf('.');
+            if (this.totalDistance.indexOf(".") !== -1) {
+                const decimalIndex = this.totalDistance.indexOf(".");
                 this.totalDistance.slice(0, decimalIndex + 1);
             }
             this.duration = this.durationParser(Number(params.duration));
@@ -57,30 +57,30 @@ export class StatsComponent implements OnInit {
         let minutes;
         let seconds;
         let time = "";
-        if(duration >= 3600){
-            hours = Math.floor(duration/ 3600);
-            seconds = duration % 3600
-            if(seconds >= 60){
-              minutes = Math.floor(seconds/60);
+        if (duration >= 3600) {
+            hours = Math.floor(duration / 3600);
+            seconds = duration % 3600;
+            if (seconds >= 60) {
+              minutes = Math.floor(seconds / 60);
               seconds = seconds % 60;
             }
-        } else if(duration >= 60){
-          minutes = Math.floor(duration/ 60);
+        } else if (duration >= 60) {
+          minutes = Math.floor(duration / 60);
           seconds = duration % 60;
         } else {
           seconds = duration;
         }
-        if(hours === undefined){
+        if (hours === undefined) {
             hours = "0";
         }
-        if(minutes === undefined){
+        if (minutes === undefined) {
             minutes = "0";
         }
-        if(minutes < 10){
-            minutes = `0${minutes}`
+        if (minutes < 10) {
+            minutes = `0${minutes}`;
         }
-        if(seconds < 10){
-            seconds = `0${Math.floor(seconds)}`
+        if (seconds < 10) {
+            seconds = `0${Math.floor(seconds)}`;
         } else {
             seconds = seconds.toFixed(0);
         }
@@ -104,6 +104,14 @@ export class StatsComponent implements OnInit {
             console.log(err.message);
         }, () => {
             console.log("completed");
+        });
+    }
+
+    homeTap(navItemRoute: string): void {
+        this.routerExtensions.navigate([navItemRoute], {
+            transition: {
+                name: "fade"
+            }
         });
     }
 }

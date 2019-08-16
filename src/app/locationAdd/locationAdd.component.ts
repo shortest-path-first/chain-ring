@@ -8,6 +8,8 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import * as geolocation from "nativescript-geolocation";
 import { Accuracy } from "tns-core-modules/ui/enums";
 import { ActivatedRoute } from "@angular/router";
+import { RouterExtensions } from "nativescript-angular/router";
+
 
 declare var com: any;
 
@@ -35,12 +37,13 @@ export class LocationAddComponent implements OnInit {
     markers = [];
     markerSelected = false;
     bottomButtonText = "Save Location";
+    locName = "";
     
-    readonly ROOT_URL = "https://d8345d7c.ngrok.io";
+    readonly ROOT_URL = "https://5161accf.ngrok.io";
 
     places: Observable<Array<Place>>;
 
-    constructor(private http: HttpClient, private route: ActivatedRoute) {
+    constructor(private http: HttpClient, private route: ActivatedRoute, private routerExtensions: RouterExtensions) {
         // Use the component constructor to inject providers.
         this.route.queryParams.subscribe((params) => {
             const { user } = params;
@@ -131,8 +134,16 @@ export class LocationAddComponent implements OnInit {
         markers = [];
     }
 
-    getDirections() {
+    saveLocation() {
         console.log("button press");
-        console.log(markerLat, markerLng);
+        console.log(markerLat, markerLng, this.locName);
+    }
+
+    homeTap(navItemRoute: string): void {
+        this.routerExtensions.navigate([navItemRoute], {
+            transition: {
+                name: "fade"
+            }
+        });
     }
 }
