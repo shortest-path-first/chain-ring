@@ -443,12 +443,12 @@ export class RideComponent implements OnInit {
                 this.left = true;
                 this.right = false;
                 this.straight = false;
-                this.vibrator.vibrate([3000, 2000, 1000]);
+                this.vibrator.vibrate(5000);
             } else if (this.directionWords[0].indexOf("right") !== -1){
                 this.right = true;
                 this.left = false;
                 this.straight = false;
-                this.vibrator.vibrate([1000, 2000, 3000]);
+                this.vibrator.vibrate(5000);
             } else if (this.directionWords[0].indexOf("straight") !== -1){
                 this.straight = true;
                 this.right = false;
