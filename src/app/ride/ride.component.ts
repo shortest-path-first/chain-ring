@@ -55,6 +55,7 @@ export class RideComponent implements OnInit {
     lightIntervalId;
     light = false;
     distanceStringDecimal = "0";
+    startZoom;
     speechRecognition = new SpeechRecognition();
     left;
     right;
@@ -559,7 +560,7 @@ export class RideComponent implements OnInit {
                     // optional, uses the device locale by default
                     locale: "en-US",
                     // set to true to get results back continuously
-                    returnPartialResults: true,
+                    returnPartialResults: false,
                     // this callback will be invoked repeatedly during recognition
                     onResult: (transcription: SpeechRecognitionTranscription) => {
                         console.log('Getting results');
@@ -575,9 +576,11 @@ export class RideComponent implements OnInit {
                         } else if(transcription.text.includes("close call")){
                             this.onPinSelect('close');
                         } else if(transcription.text.includes("zoom in")){
-                            this.mapView.zoom = 18;
+                            this.startZoom += 1;
+                            this.mapView.zoom = this.startZoom;
                         } else if(transcription.text.includes("zoom out")){
-                            this.mapView.zoom = 10;
+                            this.startZoom -= 1;
+                            this.mapView.zoom = this.startZoom;
                         } else if(transcription.text.includes("stop ride")){
                             this.zone.run(()=>{
                                 this.onStopTap();
@@ -654,6 +657,7 @@ export class RideComponent implements OnInit {
         } 
 
         this.mapView.mapAnimationsEnabled = true;
+        this.startZoom = 18;
         this.mapView.zoom = 18;
         
         this.mapView.tilt = 10;
