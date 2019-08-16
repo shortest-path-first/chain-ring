@@ -39,7 +39,7 @@ export class RideComponent implements OnInit {
     watchId;
     show;
     pinClicked = false;
-    listen = true;
+    listen;
     speed = 0; 
     topSpeed = 0;
     allSpeeds = [];
@@ -215,13 +215,6 @@ export class RideComponent implements OnInit {
 
     onPinTap(): void {    
         this.pinClicked = !this.pinClicked;
-        // geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
-        //     .then((result) => {
-        //         const marker = new mapsModule.Marker();
-        //         marker.position = mapsModule.Position.positionFromLatLng(result.latitude, result.longitude);
-        //         this.mapView.addMarker(marker);
-        //         rideMarkers.markers.push({markerLat: result.latitude, markerLon: result.longitude});
-        //     });
     }
 
     onPinSelect(pinType): void {
@@ -254,7 +247,7 @@ export class RideComponent implements OnInit {
 
     onLightTap(): void {
         this.light = this.light!;
-        this.vibrator.vibrate([3000, 2000, 1000]);
+    
         console.log(flashlight);
         if(this.light){
             if (flashlight.isAvailable()) {
@@ -263,12 +256,12 @@ export class RideComponent implements OnInit {
                 //         flashlight.toggle();
                 //     }, 500);
                 // })
-               // flashlight.on();
+                flashlight.on();
               console.log("Flashlight Available")
             }
 
         } else {
-          //  flashlight.off();
+            flashlight.off();
             clearInterval(this.lightIntervalId);
         }
     }
@@ -487,8 +480,6 @@ export class RideComponent implements OnInit {
         
             this.watchId = geolocation.watchLocation((loc) => {
                     const newPath = new mapsModule.Polyline();
-                    this.callCount = this.callCount + 1;
-                
                 if (loc && this.mapView !== null || loc && this.mapView !== undefined) {
                         if(this.listen === false && this.speechRecognition !== null){
                             this.speechRecognition.stopListening();
@@ -591,35 +582,25 @@ export class RideComponent implements OnInit {
                             this.zone.run(()=>{
                                 this.onStopTap();
                             })
+
                         }
-                        if(this.listen === false && this.speechRecognition !== null){
-                        //    this.speechRecognition.stopListening();
-                        } else {
-                        //    this.handleSpeech();
-                        }
+                            this.listen = false;
                     },
                     onError: (error) => {
-                        if(this.listen === false && this.speechRecognition !== null){
-                        //   this.speechRecognition.stopListening();
-                        } else {
-                        //  this.handleSpeech();
-                        }
-                    
+                        this.listen = false;
                         // - iOS: A 'string', describing the issue. 
                         // - Android: A 'number', referencing an 'ERROR_*' constant from https://developer.android.com/reference/android/speech/SpeechRecognizer.
                         //            If that code is either 6 or 7 you may want to restart listening.
                     }
                 }
             ).then(
-                (started) => { console.log(`started listening`) },
+                (started) => { console.log(`started listening`) 
+                this.listen = false;
+            },
                 (errorMessage) => { 
                     //console.log(`Listen Error: ${errorMessage}`);
-                 if(this.listen === false && this.speechRecognition !== null){
-                         //this.speechRecognition.stopListening();
-                        } else {
-                        //this.handleSpeech();
-                    }
-                 }
+                        this.listen = false;
+                }
             )
                 .catch((error) => {
                     // same as the 'onError' handler, but this may not return if the error occurs after listening has successfully started (because that resolves the promise,
@@ -640,15 +621,18 @@ export class RideComponent implements OnInit {
             clearInterval(i);
             geolocation.clearWatch(i);
         }
-        this.listen = true;
+        this.listen = false;
         this.zone.runOutsideAngular(()=>{
             this.listenIntervalId = setInterval(()=>{
-                this.handleSpeech();
+                if(this.listen === false){
+                    this.listen = true;
+                    this.handleSpeech();
+                }
             }, 3000);
         })
         console.log('interval id:', this.listenIntervalId);
-        this.directionsParser();
-        console.log(this.mapView);
+   
+     
         // const line = polylineHolder;
         const line = "a`~uDhyxdP`@JeCdEoD|FuAxBq@CsBEGrF"
         if(line !== undefined){
