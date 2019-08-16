@@ -207,4 +207,12 @@ export class MapComponent implements OnInit {
             this.routerExtensions.navigate(["/ride"], params);
     }
     }
+
+    homeTap(navItemRoute: string): void {
+        this.routerExtensions.navigate([navItemRoute], {
+            transition: {
+                name: "fade"
+            }
+        });
+    }
 }

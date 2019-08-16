@@ -105,4 +105,12 @@ export class CommuteComponent implements OnInit {
         };
         this.routerExtensions.navigate(["/locationAdd"], param);
     }
+
+    homeTap(navItemRoute: string): void {
+        this.routerExtensions.navigate([navItemRoute], {
+            transition: {
+                name: "fade"
+            }
+        });
+    }
 }

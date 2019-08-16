@@ -5,6 +5,8 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { storedStats } from "./stats";
 import { Observable } from "rxjs";
 import { ActivatedRoute, Router, NavigationExtras } from "@angular/router";
+import { RouterExtensions } from "nativescript-angular/router";
+
 
 @Component({
     selector: "Stats",
@@ -24,7 +26,8 @@ export class StatsComponent implements OnInit {
 
     storedStats: Observable<Array<storedStats>>;
 
-    constructor(private http: HttpClient, private router: Router, private route: ActivatedRoute) {
+    // tslint:disable-next-line: max-line-length
+    constructor(private http: HttpClient, private router: Router, private route: ActivatedRoute, private routerExtensions: RouterExtensions) {
         // Use the component constructor to inject providers.
 
         this.userTotalInfo();
@@ -101,6 +104,14 @@ export class StatsComponent implements OnInit {
             console.log(err.message);
         }, () => {
             console.log("completed");
+        });
+    }
+
+    homeTap(navItemRoute: string): void {
+        this.routerExtensions.navigate([navItemRoute], {
+            transition: {
+                name: "fade"
+            }
         });
     }
 }

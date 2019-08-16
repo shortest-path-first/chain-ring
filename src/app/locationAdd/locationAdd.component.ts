@@ -8,6 +8,8 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import * as geolocation from "nativescript-geolocation";
 import { Accuracy } from "tns-core-modules/ui/enums";
 import { ActivatedRoute } from "@angular/router";
+import { RouterExtensions } from "nativescript-angular/router";
+
 
 declare var com: any;
 
@@ -41,7 +43,7 @@ export class LocationAddComponent implements OnInit {
 
     places: Observable<Array<Place>>;
 
-    constructor(private http: HttpClient, private route: ActivatedRoute) {
+    constructor(private http: HttpClient, private route: ActivatedRoute, private routerExtensions: RouterExtensions) {
         // Use the component constructor to inject providers.
         this.route.queryParams.subscribe((params) => {
             const { user } = params;
@@ -135,5 +137,13 @@ export class LocationAddComponent implements OnInit {
     saveLocation() {
         console.log("button press");
         console.log(markerLat, markerLng, this.locName);
+    }
+
+    homeTap(navItemRoute: string): void {
+        this.routerExtensions.navigate([navItemRoute], {
+            transition: {
+                name: "fade"
+            }
+        });
     }
 }
