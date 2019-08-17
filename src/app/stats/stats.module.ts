@@ -5,11 +5,14 @@ import { HttpClientModule } from "@angular/common/http";
 
 import { StatsRoutingModule } from "./stats-routing.module";
 import { StatsComponent } from "./stats.component";
+import { NativeScriptUIChartModule } from "nativescript-ui-chart/angular";
+
 
 @NgModule({
     imports: [
         NativeScriptCommonModule,
         StatsRoutingModule,
+        NativeScriptUIChartModule,
         HttpClientModule
     ],
     declarations: [
