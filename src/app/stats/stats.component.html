@@ -5,21 +5,33 @@
 </ActionBar>
 
 <Page xmlns="http://schemas.nativescript.org/tns.xsd" class="body">
-    <GridLayout columns="*, *, *, *, *, *, *, *, *, *, *, *" rows="*, *, *, *, *, *, *, *, *, *" width="95%" height="95%">
-        <Label row="0" col="0" rowSpan="1" colSpan="4" class="stats-header" text="Last Ride"></Label>
-        <Label row="0" col="4" rowSpan="1" colSpan="4" class="stats-header" text="Recent"></Label>
-        <Label row="0" col="8" rowSpan="1" colSpan="4" class="stats-header" text="Total"></Label>
-        <Label row="2" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Average Speed"></Label>
-        <Label row="2" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{averageSpeed}} mph"></Label>
-        <Label row="4" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Total Distance"></Label>
-        <Label row="4" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{totalDistance}} miles"></Label>
-        <Label row="6" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Duration"></Label>
-        <Label row="6" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{duration}}"></Label>
-        <GridLayout row="8" col="0" colSpan="12" rowSpan="2" height="100%" width="100%" class="stats-info-line">
+    <GridLayout columns="*, *, *, *, *, *, *, *, *, *, *, *" rows="*, *, *, *, *, *, *, *, *, *" width="95%" height="95%" *ngIf=notRecentView>
+        <Label row="0" col="0" rowSpan="1" colSpan="4" class="stats-header" (tap)="lastRideTap()" text="Last Ride"></Label>
+        <Label row="0" col="4" rowSpan="1" colSpan="4" class="stats-header" (tap)="recentRideTap()" text="Recent"></Label>
+        <Label row="0" col="8" rowSpan="1" colSpan="4" class="stats-header" (tap)="totalRideTap()" text="Total"></Label>
+        <Label *ngIf=notRecentView row="1" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Average Speed"></Label>
+        <Label *ngIf=notRecentView row="1" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{displayedAverageSpeed}} mph"></Label>
+        <Label *ngIf=notRecentView row="3" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Total Distance"></Label>
+        <Label *ngIf=notRecentView row="3" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{displayedTotalDistance}} miles"></Label>
+        <Label *ngIf=notRecentView row="5" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Duration"></Label>
+        <Label *ngIf=notRecentView row="5" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{displayedDuration}}"></Label>
+        <GridLayout *ngIf=notRecentView row="7" col="0" colSpan="12" rowSpan="3" height="100%" width="100%" class="stats-info-line">
             <RadPieChart allowAnimation="true" row="0">
                 <PieSeries tkPieSeries selectionMode="DataPoint" [items]="pieSource" valueProperty="Amount" legendLabel="Speed"></PieSeries>
-                <RadLegendView tkPieLegend position="Right" title="Speeds" offsetOrigin="TopRight" width="150" enableSelection="true"></RadLegendView>
+                <RadLegendView tkPieLegend position="Right" title="Speeds (based on max speed)" offsetOrigin="TopRight" width="150" enableSelection="true"></RadLegendView>
             </RadPieChart>
         </GridLayout>
     </GridLayout>
+
+    <GridLayout columns="*, *, *, *, *, *, *, *, *, *, *, *" rows="*, *, *, *, *, *, *, *, *, *" width="95%" height="95%" *ngIf=recentView>
+        <Label row="0" col="0" rowSpan="1" colSpan="4" class="stats-header" (tap)="lastRideTap()" text="Last Ride"></Label>
+        <Label row="0" col="4" rowSpan="1" colSpan="4" class="stats-header" (tap)="recentRideTap()" text="Recent"></Label>
+        <Label row="0" col="8" rowSpan="1" colSpan="4" class="stats-header" (tap)="totalRideTap()" text="Total"></Label>
+        <StackLayout row="1" col="0" rowSpan="10" colSpan="12"  class="direction-info-line" height="100%">
+            <Label  *ngFor="let ride of statHolder; let i = index" text="REPLACE WITH TIME AND/IF ROUTE NAME" height="20%" textWrap="true"></Label>
+        </StackLayout>
+    </GridLayout>
 </Page>
+
+
+
