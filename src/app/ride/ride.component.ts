@@ -1,6 +1,6 @@
 import { ActivatedRoute, Router, NavigationExtras } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { Component, OnInit,  NgZone } from "@angular/core";
 import { RadSideDrawer } from "nativescript-ui-sidedrawer";
@@ -13,6 +13,7 @@ import { SpeechRecognition, SpeechRecognitionTranscription } from "nativescript-
 import { Vibrate } from 'nativescript-vibrate';
 import { Image } from "tns-core-modules/ui/image";
 import { ImageSource } from "tns-core-modules/image-source";
+import { Place } from "../map/map";
 
 
 //const style = require("../../../App_Resources/style.json")
@@ -38,6 +39,7 @@ export class RideComponent implements OnInit {
     watchId;
     show;
     pinClicked = false;
+    directionsResponse;
     listen;
     speed = 0; 
     topSpeed = 0;
@@ -54,11 +56,14 @@ export class RideComponent implements OnInit {
     lightIntervalId;
     light = false;
     distanceStringDecimal = "0";
+    polyline;
     startZoom;
     speechRecognition = new SpeechRecognition();
+    startTime;
+    stopTime;
     left;
     right;
-    recognized;
+    recognized; 
     recognizedTimeoutId;
     straight;
     vibrator = new Vibrate();
@@ -67,26 +72,28 @@ export class RideComponent implements OnInit {
     '#bb2dbb', '#b32ca2', '#ab2a8a', '#a42974', '#9c2760', '#a42974', '#ab2a8a', '#b32ca2', '#bb2dbb', 
     '#b02fc3', '#9330ca', '#9532d2', '#8533da', '#7335e2', '#6036ea', '#4638f1'];
     directedRide = false;
+    destLat;
+    destLng;
     directionDistances = [];
     directionWords = [];
     turnPoints = [];
     steps = [
         {
             "distance": {
-                "text": "66 ft",
-                "value": 20
+                "text": "102 ft",
+                "value": 31
             },
             "duration": {
                 "text": "1 min",
-                "value": 3
+                "value": 5
             },
             "end_location": {
-                "lat": 29.9776004,
-                "lng": -90.0804337
+                "lat": 29.9775096,
+                "lng": -90.08047979999999
             },
             "html_instructions": "Head <b>south</b> on <b>N White St</b> toward <b>Esplanade Ave</b>",
             "polyline": {
-                "points": "a`~uDhyxdP`@J"
+                "points": "a`~uDhyxdP`@JPH"
             },
             "start_location": {
                 "lat": 29.977767,
@@ -96,102 +103,128 @@ export class RideComponent implements OnInit {
         },
         {
             "distance": {
-                "text": "0.2 mi",
-                "value": 353
+                "text": "0.9 mi",
+                "value": 1478
             },
             "duration": {
-                "text": "1 min",
-                "value": 89
+                "text": "7 mins",
+                "value": 396
             },
             "end_location": {
-                "lat": 29.9795782,
-                "lng": -90.0832971
+                "lat": 29.9692147,
+                "lng": -90.0684981
             },
-            "html_instructions": "Turn <b>right</b> onto <b>Esplanade Ave</b>",
-            "maneuver": "turn-right",
-            "polyline": {
-                "points": "__~uDtyxdPeCdEiCbEe@x@uAxB"
-            },
-            "start_location": {
-                "lat": 29.9776004,
-                "lng": -90.0804337
-            },
-            "travel_mode": "BICYCLING"
-        },
-        {
-            "distance": {
-                "text": "262 ft",
-                "value": 80
-            },
-            "duration": {
-                "text": "1 min",
-                "value": 13
-            },
-            "end_location": {
-                "lat": 29.9803009,
-                "lng": -90.08325839999999
-            },
-            "html_instructions": "Turn <b>right</b> onto <b>N Lopez St</b><div style=\"font-size:0.9em\">Destination will be on the right</div>",
-            "maneuver": "turn-right",
-            "polyline": {
-                "points": "kk~uDrkydPq@C}AC"
-            },
-            "start_location": {
-                "lat": 29.9795782,
-                "lng": -90.0832971
-            },
-        },
-        {
-            "distance": {
-            "text": "39 ft",
-            "value": 12
-            },
-            "duration": {
-                "text": "1 min",
-                "value": 2
-            },
-            "end_location": {
-                "lat": 29.980411,
-                "lng": -90.0832537
-            },
-            "html_instructions": "Head <b>north</b> on <b>N Lopez St</b> toward <b>Ponce De Leon St</b>",
-            "polyline": {
-                "points": "{o~uDjkydPUA"
-            },
-            "start_location": {
-                "lat": 29.9803009,
-                "lng": -90.08325839999999
-            },
-            "travel_mode": "BICYCLING"
-        },
-        {
-            "distance": {
-                "text": "384 ft",
-                "value": 117
-            },
-            "duration": {
-                "text": "1 min",
-                "value": 21
-            },
-            "end_location": {
-                "lat": 29.9804536,
-                "lng": -90.08447059999999
-            },
-            "html_instructions": "Turn <b>left</b> onto <b>Ponce De Leon St</b><div style=\"font-size:0.9em\">Destination will be on the right</div>",
+            "html_instructions": "Turn <b>left</b> onto <b>Esplanade Ave</b>",
             "maneuver": "turn-left",
             "polyline": {
-                "points": "qp~uDhkydPGhF?H"
+                "points": "m~}uD~yxdPf@w@p@iAT_@T_@dAcBl@aAl@_AN[h@aA`A_Bx@qARYt@oAp@gA|@uAbAaBr@kAnAuBf@y@Ze@TWV[@CNWLQBGLUp@kA`AaBzBmDvBmDtBoDhB}CJM?A@A@AFK@AFI?ALQ"
             },
             "start_location": {
-                "lat": 29.980411,
-                "lng": -90.0832537
+                "lat": 29.9775096,
+                "lng": -90.08047979999999
+            },
+            "travel_mode": "BICYCLING"
+        },
+        {
+            "distance": {
+                "text": "0.3 mi",
+                "value": 563
+            },
+            "duration": {
+                "text": "2 mins",
+                "value": 140
+            },
+            "end_location": {
+                "lat": 29.9728401,
+                "lng": -90.06463289999999
+            },
+            "html_instructions": "Turn <b>left</b> onto <b>N Claiborne Ave</b>",
+            "maneuver": "turn-left",
+            "polyline": {
+                "points": "qj|uDbovdPYWuAkA]Wg@e@aDmC_DoC}CqCMMGIIMUk@CMAQAYAg@"
+            },
+            "start_location": {
+                "lat": 29.9692147,
+                "lng": -90.0684981
+            },
+            "travel_mode": "BICYCLING"
+        },
+        {
+            "distance": {
+                "text": "0.5 mi",
+                "value": 850
+            },
+            "duration": {
+                "text": "4 mins",
+                "value": 244
+            },
+            "end_location": {
+                "lat": 29.972658,
+                "lng": -90.05600269999999
+            },
+            "html_instructions": "Continue straight to stay on <b>N Claiborne Ave</b>",
+            "maneuver": "straight",
+            "polyline": {
+                "points": "ga}uD|vudPCuACaBG}BC{BEmBK{DEe@K_FMeFE{BGkBPeAHYP]T_@NYHS@CBIRs@"
+            },
+            "start_location": {
+                "lat": 29.9728401,
+                "lng": -90.06463289999999
+            },
+            "travel_mode": "BICYCLING"
+        },
+        {
+            "distance": {
+                "text": "0.2 mi",
+                "value": 354
+            },
+            "duration": {
+                "text": "1 min",
+                "value": 63
+            },
+            "end_location": {
+                "lat": 29.9728897,
+                "lng": -90.0523341
+            },
+            "html_instructions": "Continue onto <b>LA-39 S</b>",
+            "polyline": {
+                "points": "c`}uD~`tdPA_@MaFMaFIeDAc@A]AQ"
+            },
+            "start_location": {
+                "lat": 29.972658,
+                "lng": -90.05600269999999
+            },
+            "travel_mode": "BICYCLING"
+        },
+        {
+            "distance": {
+                "text": "190 ft",
+                "value": 58
+            },
+            "duration": {
+                "text": "1 min",
+                "value": 51
+            },
+            "end_location": {
+                "lat": 29.9734092,
+                "lng": -90.0523748
+            },
+            "html_instructions": "Turn <b>left</b> onto <b>St Roch Ave</b><div style=\"font-size:0.9em\">Destination will be on the right</div>",
+            "maneuver": "turn-left",
+            "polyline": {
+                "points": "qa}uD`jsdPgBF"
+            },
+            "start_location": {
+                "lat": 29.9728897,
+                "lng": -90.0523341
             },
             "travel_mode": "BICYCLING"
         }
     ]
     
 
-    readonly ROOT_URL = "https://5161accf.ngrok.io";
+    readonly ROOT_URL = "https://250e7b76.ngrok.io";
+    places: Observable<Array<Place>>;
 
     // tslint:disable-next-line: max-line-length
     constructor(private http: HttpClient, private router: Router,
@@ -248,7 +281,7 @@ export class RideComponent implements OnInit {
     }
 
     onHomeTap(): void {
-        
+    
         geolocation.clearWatch(this.watchId);
         clearInterval(this.listenIntervalId);
         clearInterval(this.lightIntervalId);
@@ -332,6 +365,35 @@ export class RideComponent implements OnInit {
     })
     }
 
+    onReroute(): void{
+    
+        const lastLat = this.newPathCoords[this.newPathCoords.length - 1].lat;
+        const lastLng = this.newPathCoords[this.newPathCoords.length - 1].long;
+        const params = new HttpParams().set("place", `${this.destLat},${this.destLng}`).set("userLoc", `${lastLat},${lastLng}`);
+        this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
+            // reassigns response to variable to avoid dealing with "<Place[]>"
+            this.directionsResponse = response;
+            let { rerouteHTML, rerouteEndLoc, rerouteDistance, polyLine } = this.directionsResponse;
+            this.turnPoints = rerouteEndLoc;
+            this.directionDistances = rerouteDistance;
+            this.directionWords = rerouteHTML;
+            let newRoute = decodePolyline(polyLine);
+            const reroutePolyline = new mapsModule.Polyline();
+            for (let i = 0; i < newRoute.length; i++) {
+                let coord = newRoute[i];
+                reroutePolyline.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
+            }
+            reroutePolyline.visible = true;
+            reroutePolyline.width = 10;
+            reroutePolyline.geodesic = false;
+            reroutePolyline.color = new Color("#393ef9");
+            this.mapView.removeAllPolylines();
+            this.mapView.latitude = newRoute[0].lat;
+            this.mapView.longitude = newRoute[0].lng;
+            this.mapView.addPolyline(reroutePolyline);
+        });
+    }
+
     onDirectionsTap(): void{
             
             this.directionWords = this.directionWords.slice(1);
@@ -342,6 +404,7 @@ export class RideComponent implements OnInit {
 
     onStopTap(): void {
         console.log("stop:", this.watchId)
+        this.stopTime = new Date();
         geolocation.clearWatch(this.watchId);
         this.speechRecognition.stopListening();
         clearInterval(this.listenIntervalId);
@@ -366,10 +429,9 @@ export class RideComponent implements OnInit {
         let pathPolyline = polylineEncoder.encode(this.newPathCoords);
         let first = this.newPathCoords[0];
         let last = this.newPathCoords[this.newPathCoords.length - 1];
-        let start = first.time.getTime();
-        let stop = last.time.getTime();
-    
-        let duration = stop - start;
+        
+        
+        let duration = this.stopTime.getTime() - this.startTime.getTime();
         duration = duration / 10000;
         console.log("duration", duration);
         this.http.post(this.ROOT_URL + "/marker", rideMarkers, {
@@ -462,11 +524,11 @@ export class RideComponent implements OnInit {
             this.watchId = geolocation.watchLocation((loc) => {
                     const newPath = new mapsModule.Polyline();
                 if (loc && this.mapView !== null || loc && this.mapView !== undefined) {
-                        if(this.listen === false && this.speechRecognition !== null){
-                            this.speechRecognition.stopListening();
-                        } else {
-                       // this.handleSpeech();
-                        }
+                    //     if(this.listen === false && this.speechRecognition !== null){
+                    //         this.speechRecognition.stopListening();
+                    //     } else {
+                    //    // this.handleSpeech();
+                    //     }
                     //this.handleSpeech();
                     this.currentSpeed = loc.speed * 2.23694;
                     this.speedString = this.currentSpeed.toFixed(1).slice(0, -2);
@@ -479,11 +541,11 @@ export class RideComponent implements OnInit {
                     this.speed += loc.speed;
                     const lat = loc.latitude;
                     const long = loc.longitude;
-                    const time = loc.timestamp;
+                    //const time = loc.timestamp;
                     this.checkForManeuver(lat, long);
     
                     if (this.newPathCoords.length === 0) {
-                        this.newPathCoords.push({ lat, long, time });
+                        this.newPathCoords.push({ lat, long});
                         this.mapView.latitude = lat;
                         this.mapView.longitude = long;
                         this.mapView.bearing = loc.direction;
@@ -497,7 +559,7 @@ export class RideComponent implements OnInit {
                         this.distanceString = this.totalDistance.toFixed(1).slice(0, -2);
                         this.distanceStringDecimal = this.totalDistance.toFixed(1).slice(-1);
                         
-                        this.newPathCoords.push({ lat, long, time });
+                        this.newPathCoords.push({ lat, long});
                         newPath.addPoint(mapsModule.Position.positionFromLatLng(lastLat, lastLng));
                         newPath.addPoint(mapsModule.Position.positionFromLatLng(lat, long));
                         newPath.visible = true;
@@ -630,10 +692,7 @@ export class RideComponent implements OnInit {
     
     onMapReady(args){
         this.mapView = args.object; 
-        this.speechRecognition.available().then(
-            (available: boolean) => console.log(available ? "YES!" : "NO"),
-            (err: string) => console.log(err)
-        ); 
+        this.startTime = new Date();
         for(let i = 0; i < 100; i++){
             clearInterval(i);
             geolocation.clearWatch(i);
@@ -644,9 +703,15 @@ export class RideComponent implements OnInit {
             this.listenIntervalId = setInterval(()=>{
                 if(this.listen === false){
                     this.listen = true;
-                    this.handleSpeech();
+                    
+                    this.speechRecognition.available().then(
+                        (available: boolean) => {
+                           // this.handleSpeech();
+                            console.log(available ? "YES!" : "NO")},
+                        (err: string) => console.log(err)
+                    ) 
                 }
-            }, 4500);
+            }, 5000);
         })
         console.log('interval id:', this.listenIntervalId);
    
@@ -656,19 +721,21 @@ export class RideComponent implements OnInit {
         if(line !== undefined){
             this.directedRide = true;
             this.directionsParser();
-        var flightPlanCoordinates = decodePolyline(line);
-            const polyline = new mapsModule.Polyline();
+            var flightPlanCoordinates = decodePolyline(line);
+             this.polyline = new mapsModule.Polyline();
             for (let i = 0; i < flightPlanCoordinates.length; i++){
                 let coord = flightPlanCoordinates[i];
-                polyline.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
+                this.polyline.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
             }
-            polyline.visible = true;
-            polyline.width = 10;
-            polyline.geodesic = false;
-            polyline.color = new Color("#393ef9");
+            this.destLat = flightPlanCoordinates[flightPlanCoordinates.length - 1].lat;
+            this.destLng = flightPlanCoordinates[flightPlanCoordinates.length - 1].lng;
+            this.polyline.visible = true;
+            this.polyline.width = 10;
+            this.polyline.geodesic = false;
+            this.polyline.color = new Color("#393ef9");
             this.mapView.latitude = flightPlanCoordinates[0].lat;
             this.mapView.longitude = flightPlanCoordinates[0].lng;        
-            this.mapView.addPolyline(polyline);
+            this.mapView.addPolyline(this.polyline);
         } 
 
         this.mapView.mapAnimationsEnabled = true;
