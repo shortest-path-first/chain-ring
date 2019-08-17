@@ -21,7 +21,6 @@ var mapsModule = require("nativescript-google-maps-sdk");
 const decodePolyline = require('decode-google-map-polyline');
 const polylineEncoder = require('google-polyline')
 const rideMarkers = {markers: []};
-var flashlight = require("nativescript-flashlight");
 let polylineHolder;
 
 
@@ -59,6 +58,8 @@ export class RideComponent implements OnInit {
     speechRecognition = new SpeechRecognition();
     left;
     right;
+    recognized;
+    recognizedTimeoutId;
     straight;
     vibrator = new Vibrate();
     colorCount = 0;
@@ -244,27 +245,6 @@ export class RideComponent implements OnInit {
                 this.mapView.addMarker(marker);
                 rideMarkers.markers.push({markerLat: result.latitude, markerLon: result.longitude, type: pinType});
             });
-    }
-
-    onLightTap(): void {
-        this.light = this.light!;
-    
-        console.log(flashlight);
-        if(this.light){
-            if (flashlight.isAvailable()) {
-                // this.zone.runOutsideAngular(()=>{
-                //     this.lightIntervalId = setInterval(()=>{
-                //         flashlight.toggle();
-                //     }, 500);
-                // })
-                flashlight.on();
-              console.log("Flashlight Available")
-            }
-
-        } else {
-            flashlight.off();
-            clearInterval(this.lightIntervalId);
-        }
     }
 
     onHomeTap(): void {
@@ -565,27 +545,61 @@ export class RideComponent implements OnInit {
                     onResult: (transcription: SpeechRecognitionTranscription) => {
                         console.log('Getting results');
                         this.zone.run(() => this.recognizedText = transcription.text);
-                        if (transcription.text.includes("speedometer")) {
-                        this.onSpeedTap();
-                        } else if(transcription.text.includes("pothole")){
-                        
+                        if (transcription.text.includes("speedometer") && this.recognized === false) {
+                                this.recognized = true;
+                                this.zone.run(()=>{
+                                    this.onSpeedTap();
+                                })
+                                this.recognizedTimeoutId = setTimeout(() => {
+                                    this.recognized = false;
+                                    clearTimeout(this.recognizedTimeoutId);
+                                }, 5000);
+                        } else if (transcription.text.includes("pothole") && this.recognized === false){
+                            this.recognized = true;
                             this.onPinSelect('pothole');
-                        } else if(transcription.text.includes("avoid")){
-                            
+                            this.recognizedTimeoutId = setTimeout(() => {
+                                this.recognized = false;
+                                clearTimeout(this.recognizedTimeoutId);
+                            }, 5000);
+                        } else if (transcription.text.includes("avoid") && this.recognized === false){
+                            this.recognized = true;
                             this.onPinSelect('avoid');
-                        } else if(transcription.text.includes("close call")){
+                            this.recognizedTimeoutId = setTimeout(() => {
+                                this.recognized = false;
+                                clearTimeout(this.recognizedTimeoutId);
+                            }, 5000);
+                        } else if (transcription.text.includes("close call") && this.recognized === false){
+                            this.recognized = true;
                             this.onPinSelect('close');
-                        } else if(transcription.text.includes("zoom in")){
+                            this.recognizedTimeoutId = setTimeout(() => {
+                                this.recognized = false;
+                                clearTimeout(this.recognizedTimeoutId);
+                            }, 5000);
+                        } else if (transcription.text.includes("zoom in") && this.recognized === false){
+                            this.recognized = true;
                             this.startZoom += 1;
                             this.mapView.zoom = this.startZoom;
-                        } else if(transcription.text.includes("zoom out")){
+                            this.recognizedTimeoutId = setTimeout(() => {
+                                this.recognized = false;
+                                clearTimeout(this.recognizedTimeoutId);
+                            }, 3000);
+                        } else if (transcription.text.includes("zoom out") && this.recognized === false){
+                            this.recognized = true;
                             this.startZoom -= 1;
                             this.mapView.zoom = this.startZoom;
-                        } else if(transcription.text.includes("stop ride")){
+                            this.recognizedTimeoutId = setTimeout(() => {
+                                this.recognized = false;
+                                clearTimeout(this.recognizedTimeoutId);
+                            }, 3000);
+                        } else if (transcription.text.includes("stop ride") && this.recognized === false){
+                            this.recognized = true;
                             this.zone.run(()=>{
                                 this.onStopTap();
                             })
-
+                            this.recognizedTimeoutId = setTimeout(() => {
+                                this.recognized = false;
+                                clearTimeout(this.recognizedTimeoutId);
+                            }, 5000);
                         }
                             this.listen = false;
                     },
@@ -625,13 +639,14 @@ export class RideComponent implements OnInit {
             geolocation.clearWatch(i);
         }
         this.listen = false;
+        this.recognized = false;
         this.zone.runOutsideAngular(()=>{
             this.listenIntervalId = setInterval(()=>{
                 if(this.listen === false){
                     this.listen = true;
                     this.handleSpeech();
                 }
-            }, 3000);
+            }, 4500);
         })
         console.log('interval id:', this.listenIntervalId);
    
