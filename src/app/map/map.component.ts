@@ -43,7 +43,7 @@ export class MapComponent implements OnInit {
     readyToRide = false;
     turnByList: Array<object> = [];
 
-    readonly ROOT_URL = "https://5161accf.ngrok.io";
+    readonly ROOT_URL = "https://250e7b76.ngrok.io";
 
     places: Observable<Array<Place>>;
 
