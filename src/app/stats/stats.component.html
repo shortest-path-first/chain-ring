@@ -15,7 +15,11 @@
         <Label row="4" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{totalDistance}} miles"></Label>
         <Label row="6" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Duration"></Label>
         <Label row="6" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{duration}}"></Label>
-        <Label row="8" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="A Pie chart"></Label>
-        <Label row="8" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{speedBreakdown}}"></Label>
+        <GridLayout row="8" col="0" colSpan="12" rowSpan="2" height="100%" width="100%" class="stats-info-line">
+            <RadPieChart allowAnimation="true" row="0">
+                <PieSeries tkPieSeries selectionMode="DataPoint" [items]="pieSource" valueProperty="Amount" legendLabel="Speed"></PieSeries>
+                <RadLegendView tkPieLegend position="Right" title="Speeds" offsetOrigin="TopRight" width="150" enableSelection="true"></RadLegendView>
+            </RadPieChart>
+        </GridLayout>
     </GridLayout>
 </Page>
