@@ -14,24 +14,22 @@ import * as geolocation from "nativescript-geolocation";
     templateUrl: "./stats.component.html"
 })
 export class StatsComponent implements OnInit {
-    duration;
-    averageSpeed;
-    totalDistance;
+    displayedDuration;
+    displayedAverageSpeed;
+    displayedTotalDistance;
     speedBreakdown;
     moneySaved = 90000;
     stationaryTime = 5;
-    holder;
+    statTotalHolder;
+    // tslint:disable-next-line: max-line-length
+    statRecentHolder;
+    statHolder: Array<object> = [];
+    notRecentView = true;
+    recentView = false;
 
-    pieSource: { Speed: string, Amount: number }[] = [
-        { Speed: "< 25%", Amount: 20 },
-        { Speed: "25% - 50%", Amount: 40 },
-        { Speed: "50% - 75%", Amount: 50 },
-        { Speed: "> 75%", Amount: 10 }
-    ];
+    pieSource: Array<{ Speed: string, Amount: number }> = [];
 
-
-
-    readonly ROOT_URL = "https://5161accf.ngrok.io";
+    readonly ROOT_URL = "https://79dd5357.ngrok.io";
 
     storedStats: Observable<Array<storedStats>>;
 
@@ -39,16 +37,17 @@ export class StatsComponent implements OnInit {
     constructor(private http: HttpClient, private router: Router, private route: ActivatedRoute, private routerExtensions: RouterExtensions) {
         // Use the component constructor to inject providers.
 
-        this.userTotalInfo();
+        this.userTotalStats();
+        this.userRecentStats();
         this.route.queryParams.subscribe((params) => {
          
-            this.averageSpeed = params.average;
-            this.totalDistance = params.totalDistance;
-            if (this.totalDistance.indexOf(".") !== -1) {
-                const decimalIndex = this.totalDistance.indexOf(".");
-                this.totalDistance.slice(0, decimalIndex + 1);
+            this.displayedAverageSpeed = params.average;
+            this.displayedTotalDistance = params.totalDistance;
+            if (this.displayedTotalDistance.indexOf(".") !== -1) {
+                const decimalIndex = this.displayedTotalDistance.indexOf(".");
+                this.displayedTotalDistance.slice(0, decimalIndex + 1);
             }
-            this.duration = this.durationParser(Number(params.duration));
+            this.displayedDuration = this.durationParser(Number(params.duration));
             this.speedBreakdown = params.speedBreakdown;
         });
     }
@@ -73,14 +72,14 @@ export class StatsComponent implements OnInit {
             hours = Math.floor(duration / 3600);
             seconds = duration % 3600;
             if (seconds >= 60) {
-              minutes = Math.floor(seconds / 60);
-              seconds = seconds % 60;
+                minutes = Math.floor(seconds / 60);
+                seconds = seconds % 60;
             }
         } else if (duration >= 60) {
-          minutes = Math.floor(duration / 60);
-          seconds = duration % 60;
+            minutes = Math.floor(duration / 60);
+            seconds = duration % 60;
         } else {
-          seconds = duration;
+            seconds = duration;
         }
         if (hours === undefined) {
             hours = "0";
@@ -101,17 +100,30 @@ export class StatsComponent implements OnInit {
         return time;
     }
 
-    userTotalInfo() {
+    userTotalStats() {
         const name = "Franco";
         const params = new HttpParams().set("name", name);
         this.http.get<Array<storedStats>>(this.ROOT_URL + "/userTotals", { params }).subscribe((response) => {
-            console.log(response);
-            this.holder = response;
-            const { avgSpeed, totalDistance, costSavings, stationaryTime } = this.holder;
-            this.averageSpeed = avgSpeed;
-            this.totalDistance = totalDistance;
+            this.statTotalHolder = response;
+            const { avgSpeed, totalDistance, costSavings, stationaryTime, pieChart } = this.statTotalHolder;
+            this.displayedAverageSpeed = avgSpeed;
+            this.displayedTotalDistance = totalDistance;
             this.moneySaved = costSavings;
             this.stationaryTime = stationaryTime;
+            this.pieSource = pieChart;
+        }, (err) => {
+            console.log(err.message);
+        }, () => {
+            console.log("completed");
+        });
+    }
+
+    userRecentStats() {
+        const name = "Franco";
+        const params = new HttpParams().set("name", name);
+        this.http.get<Array<storedStats>>(this.ROOT_URL + "/userStats", { params }).subscribe((response) => {
+            this.statRecentHolder = response;
+            this.statHolder = response;
         }, (err) => {
             console.log(err.message);
         }, () => {
@@ -125,5 +137,33 @@ export class StatsComponent implements OnInit {
                 name: "fade"
             }
         });
+    }
+
+    lastRideTap() {
+        console.log("get last ride stats");
+        this.notRecentView = true;
+        this.recentView = false;
+        this.displayedAverageSpeed = this.statRecentHolder[0].avgSpeed || null;
+        this.displayedTotalDistance = this.statRecentHolder[0].totalDistance;
+        this.moneySaved = this.statRecentHolder[0].costSavings;
+        this.stationaryTime = this.statRecentHolder[0].stationaryTime;
+        this.pieSource = this.statRecentHolder[0].pieChart;
+    }
+
+    recentRideTap() {
+        console.log("get recent ride stats");
+        this.notRecentView = false;
+        this.recentView = true;
+    }
+
+    totalRideTap() {
+        console.log("get total ride stats");
+        this.notRecentView = true;
+        this.recentView = false;
+        this.displayedAverageSpeed = this.statTotalHolder.avgSpeed;
+        this.displayedTotalDistance = this.statTotalHolder.totalDistance;
+        this.moneySaved = this.statTotalHolder.costSavings;
+        this.stationaryTime = this.statTotalHolder.stationaryTime;
+        this.pieSource = this.statTotalHolder.pieChart;
     }
 }

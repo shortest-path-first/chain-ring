@@ -222,8 +222,7 @@ export class RideComponent implements OnInit {
     ]
     
 
-    readonly ROOT_URL = "https://250e7b76.ngrok.io";
-    places: Observable<Array<Place>>;
+    readonly ROOT_URL = "https://79dd5357.ngrok.io";
 
     // tslint:disable-next-line: max-line-length
     constructor(private http: HttpClient, private router: Router,
