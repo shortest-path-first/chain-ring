@@ -53,7 +53,6 @@ export class RideComponent implements OnInit {
     recognizedText;
     distanceString = "0";
     listenIntervalId;
-    lightIntervalId;
     light = false;
     distanceStringDecimal = "0";
     polyline;
@@ -284,7 +283,6 @@ export class RideComponent implements OnInit {
     
         geolocation.clearWatch(this.watchId);
         clearInterval(this.listenIntervalId);
-        clearInterval(this.lightIntervalId);
         this.left = false;
         this.right = false;
         this.straight = false;
@@ -348,13 +346,13 @@ export class RideComponent implements OnInit {
             }
             return tally;
         }, {});
-        const portions = [];
-        if(breakdown){
-            for (let key in breakdown) {
-                portions.push((breakdown[key] / speeds.length * 100).toFixed(1));
-            }
-        }
-        return portions;
+        //const portions = [];
+        // if(breakdown){
+        //     for (let key in breakdown) {
+        //         portions.push((breakdown[key] / speeds.length * 100).toFixed(1));
+        //     }
+        // }
+        return breakdown;
     }
 
     directionsParser(): void{
@@ -408,7 +406,7 @@ export class RideComponent implements OnInit {
         geolocation.clearWatch(this.watchId);
         this.speechRecognition.stopListening();
         clearInterval(this.listenIntervalId);
-        clearInterval(this.lightIntervalId);
+      
         this.listen = false;
         this.left = false;
         this.right = false;
@@ -524,12 +522,7 @@ export class RideComponent implements OnInit {
             this.watchId = geolocation.watchLocation((loc) => {
                     const newPath = new mapsModule.Polyline();
                 if (loc && this.mapView !== null || loc && this.mapView !== undefined) {
-                    //     if(this.listen === false && this.speechRecognition !== null){
-                    //         this.speechRecognition.stopListening();
-                    //     } else {
-                    //    // this.handleSpeech();
-                    //     }
-                    //this.handleSpeech();
+                 
                     this.currentSpeed = loc.speed * 2.23694;
                     this.speedString = this.currentSpeed.toFixed(1).slice(0, -2);
                     this.speedStringDecimal = this.currentSpeed.toFixed(1).slice(-1);
@@ -537,11 +530,14 @@ export class RideComponent implements OnInit {
                     if(this.currentSpeed > this.topSpeed){
                         this.topSpeed = this.currentSpeed;
                     }
+                    if(this.currentSpeed < this.allSpeeds[this.allSpeeds.length - 1] - 8){
+                        this.onPinSelect('close');
+                    }
                     this.allSpeeds.push(this.currentSpeed);
                     this.speed += loc.speed;
                     const lat = loc.latitude;
                     const long = loc.longitude;
-                    //const time = loc.timestamp;
+                    
                     this.checkForManeuver(lat, long);
     
                     if (this.newPathCoords.length === 0) {
@@ -662,6 +658,15 @@ export class RideComponent implements OnInit {
                                 this.recognized = false;
                                 clearTimeout(this.recognizedTimeoutId);
                             }, 5000);
+                        } else if (transcription.text.includes("lost") && this.recognized === false) {
+                            this.recognized = true;
+                            this.zone.run(() => {
+                                this.onReroute();
+                            })
+                            this.recognizedTimeoutId = setTimeout(() => {
+                                this.recognized = false;
+                                clearTimeout(this.recognizedTimeoutId);
+                            }, 5000);
                         }
                             this.listen = false;
                     },
@@ -706,12 +711,12 @@ export class RideComponent implements OnInit {
                     
                     this.speechRecognition.available().then(
                         (available: boolean) => {
-                           // this.handleSpeech();
+                           this.handleSpeech();
                             console.log(available ? "YES!" : "NO")},
                         (err: string) => console.log(err)
                     ) 
                 }
-            }, 5000);
+        }, 4000);
         })
         console.log('interval id:', this.listenIntervalId);
    
@@ -732,7 +737,7 @@ export class RideComponent implements OnInit {
             this.polyline.visible = true;
             this.polyline.width = 10;
             this.polyline.geodesic = false;
-            this.polyline.color = new Color("#393ef9");
+            
             this.mapView.latitude = flightPlanCoordinates[0].lat;
             this.mapView.longitude = flightPlanCoordinates[0].lng;        
             this.mapView.addPolyline(this.polyline);
