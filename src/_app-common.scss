@@ -178,6 +178,8 @@ $sidedrawer-list-icon-size: 20;
     height: 100%;
     font-size: 22%;
     text-align: center;
+    font-family: Roboto-Regular;
+
 }
 .stats-info-line{
     height: 100%;
@@ -189,8 +191,9 @@ $sidedrawer-list-icon-size: 20;
     border-radius: 20px;
     border-style: solid;
     border-color: black;
-    border-width: 10px;
+    border-width: 5px 10px 10px 5px;
     text-align: center;
+    font-family: Roboto-Regular;
 }
 .commute-header{
     background-color: black;

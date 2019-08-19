@@ -40,6 +40,7 @@ export class RideComponent implements OnInit {
     show;
     pinClicked = false;
     directionsResponse;
+    maneuvers = [];
     listen;
     speed = 0; 
     topSpeed = 0;
@@ -73,128 +74,12 @@ export class RideComponent implements OnInit {
     directedRide = false;
     destLat;
     destLng;
+    turnPolyline;
+    turnPolylines = [];
     directionDistances = [];
     directionWords = [];
     turnPoints = [];
     steps = [
-        {
-            "distance": {
-                "text": "102 ft",
-                "value": 31
-            },
-            "duration": {
-                "text": "1 min",
-                "value": 5
-            },
-            "end_location": {
-                "lat": 29.9775096,
-                "lng": -90.08047979999999
-            },
-            "html_instructions": "Head <b>south</b> on <b>N White St</b> toward <b>Esplanade Ave</b>",
-            "polyline": {
-                "points": "a`~uDhyxdP`@JPH"
-            },
-            "start_location": {
-                "lat": 29.977767,
-                "lng": -90.08036919999999
-            },
-            "travel_mode": "BICYCLING"
-        },
-        {
-            "distance": {
-                "text": "0.9 mi",
-                "value": 1478
-            },
-            "duration": {
-                "text": "7 mins",
-                "value": 396
-            },
-            "end_location": {
-                "lat": 29.9692147,
-                "lng": -90.0684981
-            },
-            "html_instructions": "Turn <b>left</b> onto <b>Esplanade Ave</b>",
-            "maneuver": "turn-left",
-            "polyline": {
-                "points": "m~}uD~yxdPf@w@p@iAT_@T_@dAcBl@aAl@_AN[h@aA`A_Bx@qARYt@oAp@gA|@uAbAaBr@kAnAuBf@y@Ze@TWV[@CNWLQBGLUp@kA`AaBzBmDvBmDtBoDhB}CJM?A@A@AFK@AFI?ALQ"
-            },
-            "start_location": {
-                "lat": 29.9775096,
-                "lng": -90.08047979999999
-            },
-            "travel_mode": "BICYCLING"
-        },
-        {
-            "distance": {
-                "text": "0.3 mi",
-                "value": 563
-            },
-            "duration": {
-                "text": "2 mins",
-                "value": 140
-            },
-            "end_location": {
-                "lat": 29.9728401,
-                "lng": -90.06463289999999
-            },
-            "html_instructions": "Turn <b>left</b> onto <b>N Claiborne Ave</b>",
-            "maneuver": "turn-left",
-            "polyline": {
-                "points": "qj|uDbovdPYWuAkA]Wg@e@aDmC_DoC}CqCMMGIIMUk@CMAQAYAg@"
-            },
-            "start_location": {
-                "lat": 29.9692147,
-                "lng": -90.0684981
-            },
-            "travel_mode": "BICYCLING"
-        },
-        {
-            "distance": {
-                "text": "0.5 mi",
-                "value": 850
-            },
-            "duration": {
-                "text": "4 mins",
-                "value": 244
-            },
-            "end_location": {
-                "lat": 29.972658,
-                "lng": -90.05600269999999
-            },
-            "html_instructions": "Continue straight to stay on <b>N Claiborne Ave</b>",
-            "maneuver": "straight",
-            "polyline": {
-                "points": "ga}uD|vudPCuACaBG}BC{BEmBK{DEe@K_FMeFE{BGkBPeAHYP]T_@NYHS@CBIRs@"
-            },
-            "start_location": {
-                "lat": 29.9728401,
-                "lng": -90.06463289999999
-            },
-            "travel_mode": "BICYCLING"
-        },
-        {
-            "distance": {
-                "text": "0.2 mi",
-                "value": 354
-            },
-            "duration": {
-                "text": "1 min",
-                "value": 63
-            },
-            "end_location": {
-                "lat": 29.9728897,
-                "lng": -90.0523341
-            },
-            "html_instructions": "Continue onto <b>LA-39 S</b>",
-            "polyline": {
-                "points": "c`}uD~`tdPA_@MaFMaFIeDAc@A]AQ"
-            },
-            "start_location": {
-                "lat": 29.972658,
-                "lng": -90.05600269999999
-            },
-            "travel_mode": "BICYCLING"
-        },
         {
             "distance": {
                 "text": "190 ft",
@@ -202,20 +87,187 @@ export class RideComponent implements OnInit {
             },
             "duration": {
                 "text": "1 min",
-                "value": 51
+                "value": 52
             },
             "end_location": {
+                "lat": 29.9728897,
+                "lng": -90.0523341
+            },
+            "html_instructions": "Head <b>south</b> on <b>St Roch Ave</b> toward <b>N Robertson St</b><div style=\"font-size:0.9em\">Walk your bicycle</div>",
+            "polyline": {
+                "points": "yd}uDhjsdPfBG"
+            },
+            "start_location": {
                 "lat": 29.9734092,
                 "lng": -90.0523748
             },
-            "html_instructions": "Turn <b>left</b> onto <b>St Roch Ave</b><div style=\"font-size:0.9em\">Destination will be on the right</div>",
-            "maneuver": "turn-left",
+            "travel_mode": "BICYCLING"
+        },
+        {
+            "distance": {
+                "text": "75 ft",
+                "value": 23
+            },
+            "duration": {
+                "text": "1 min",
+                "value": 47
+            },
+            "end_location": {
+                "lat": 29.9728692,
+                "lng": -90.0525686
+            },
+            "html_instructions": "Turn <b>right</b> onto <b>N Robertson St</b><div style=\"font-size:0.9em\">Walk your bicycle</div>",
+            "maneuver": "turn-right",
             "polyline": {
-                "points": "qa}uD`jsdPgBF"
+                "points": "qa}uD`jsdP@P@\\"
             },
             "start_location": {
                 "lat": 29.9728897,
                 "lng": -90.0523341
+            },
+            "travel_mode": "BICYCLING"
+        },
+        {
+            "distance": {
+                "text": "0.3 mi",
+                "value": 432
+            },
+            "duration": {
+                "text": "2 mins",
+                "value": 133
+            },
+            "end_location": {
+                "lat": 29.9689907,
+                "lng": -90.0522691
+            },
+            "html_instructions": "Turn <b>left</b> onto <b>St Roch Ave</b>",
+            "maneuver": "turn-left",
+            "polyline": {
+                "points": "ma}uDpksdP`CIfAEfAEbCKjBE|AEvAEb@Cj@C"
+            },
+            "start_location": {
+                "lat": 29.9728692,
+                "lng": -90.0525686
+            },
+            "travel_mode": "BICYCLING"
+        },
+        {
+            "distance": {
+                "text": "36 ft",
+                "value": 11
+            },
+            "duration": {
+                "text": "1 min",
+                "value": 25
+            },
+            "end_location": {
+                "lat": 29.9689983,
+                "lng": -90.05215219999999
+            },
+            "html_instructions": "Turn <b>left</b> onto <b>St Claude Ave</b><div style=\"font-size:0.9em\">Walk your bicycle</div><div style=\"font-size:0.9em\">Destination will be on the left</div>",
+            "maneuver": "turn-left",
+            "polyline": {
+                "points": "ei|uDtisdPAW"
+            },
+            "start_location": {
+                "lat": 29.9689907,
+                "lng": -90.0522691
+            },
+            "travel_mode": "BICYCLING"
+        },
+
+        {
+            "distance": {
+                "text": "0.1 mi",
+                "value": 218
+            },
+            "duration": {
+                "text": "1 min",
+                "value": 38
+            },
+            "end_location": {
+                "lat": 29.9688625,
+                "lng": -90.0544055
+            },
+            "html_instructions": "Head <b>west</b> on <b>St Claude Ave</b> toward <b>St Roch Ave</b>",
+            "polyline": {
+                "points": "gi|uD|hsdP@VB`AFfCL`F"
+            },
+            "start_location": {
+                "lat": 29.9689983,
+                "lng": -90.05215219999999
+            },
+            "travel_mode": "BICYCLING"
+        },
+        {
+            "distance": {
+                "text": "0.2 mi",
+                "value": 319
+            },
+            "duration": {
+                "text": "1 min",
+                "value": 55
+            },
+            "end_location": {
+                "lat": 29.9717233,
+                "lng": -90.05463039999999
+            },
+            "html_instructions": "Turn <b>right</b> onto <b>Mandeville St</b>",
+            "maneuver": "turn-right",
+            "polyline": {
+                "points": "kh|uD`wsdPy@Bc@@gADkENiEN"
+            },
+            "start_location": {
+                "lat": 29.9688625,
+                "lng": -90.0544055
+            },
+            "travel_mode": "BICYCLING"
+        },
+        {
+            "distance": {
+                "text": "358 ft",
+                "value": 109
+            },
+            "duration": {
+                "text": "1 min",
+                "value": 20
+            },
+            "end_location": {
+                "lat": 29.971666,
+                "lng": -90.055762
+            },
+            "html_instructions": "Turn <b>left</b> onto <b>N Villere St</b>",
+            "maneuver": "turn-left",
+            "polyline": {
+                "points": "gz|uDlxsdPH`F"
+            },
+            "start_location": {
+                "lat": 29.9717233,
+                "lng": -90.05463039999999
+            },
+            "travel_mode": "BICYCLING"
+        },
+        {
+            "distance": {
+                "text": "331 ft",
+                "value": 101
+            },
+            "duration": {
+                "text": "1 min",
+                "value": 19
+            },
+            "end_location": {
+                "lat": 29.9707555,
+                "lng": -90.0556912
+            },
+            "html_instructions": "Turn <b>left</b> onto <b>Marigny St</b><div style=\"font-size:0.9em\">Destination will be on the right</div>",
+            "maneuver": "turn-left",
+            "polyline": {
+                "points": "}y|uDn_tdPtDM"
+            },
+            "start_location": {
+                "lat": 29.971666,
+                "lng": -90.055762
             },
             "travel_mode": "BICYCLING"
         }
@@ -237,6 +289,27 @@ export class RideComponent implements OnInit {
     
     ngOnInit(): void {
         // Init your component properties here.
+        this.startTime = new Date();
+        for (let i = 0; i < 100; i++) {
+            clearInterval(i);
+            geolocation.clearWatch(i);
+        }
+        this.listen = false;
+        this.recognized = false;
+        this.zone.runOutsideAngular(() => {
+            this.listenIntervalId = setInterval(() => {
+                if (this.listen === false) {
+                    this.listen = true;
+                    this.speechRecognition.available().then(
+                        (available: boolean) => {
+                            this.handleSpeech();
+                            console.log(available ? "YES!" : "NO")
+                        },
+                        (err: string) => console.log(err)
+                    )
+                }
+             }, 2000);
+        })
         
     }
 
@@ -248,6 +321,23 @@ export class RideComponent implements OnInit {
 
     onPinTap(): void {    
         this.pinClicked = !this.pinClicked;
+    }
+
+    maneuverParser(str){
+        let tempManeuvers = [];
+    
+       function parser(str){
+            if (str.length < 34) {
+                tempManeuvers.push(str);
+                return;
+            }
+            let index = str.slice(0, 34).lastIndexOf(" ");
+            let maneuver = str.slice(0, index);
+            tempManeuvers.push(maneuver.trim());
+            parser(str.slice(index));
+        }
+        parser(str);
+        this.maneuvers = tempManeuvers;
     }
 
     onPinSelect(pinType): void {
@@ -357,9 +447,10 @@ export class RideComponent implements OnInit {
     directionsParser(): void{
         this.steps.forEach((step)=>{
         this.directionDistances.push(step.distance.text);
-        this.directionWords.push(step['html_instructions'].replace(/<\/?[^>]+(>|$)/g, ""));
+        this.directionWords.push(step['html_instructions'].replace(/<\/?[^>]+(>|$)/g, " "));
         this.turnPoints.push(step['end_location']);
-    })
+        });
+        this.maneuverParser(this.directionWords[0]);
     }
 
     onReroute(): void{
@@ -396,6 +487,7 @@ export class RideComponent implements OnInit {
             this.directionWords = this.directionWords.slice(1);
             this.directionDistances = this.directionDistances.slice(1);
             this.turnPoints = this.turnPoints.slice(1);
+            this.maneuverParser(this.directionWords[0]);
             this.checkForManeuver(29.9778246, -90.0801914);
     }
 
@@ -411,13 +503,6 @@ export class RideComponent implements OnInit {
         this.right = false;
         this.straight = false;
 
-
-        //this.speechRecognition.stopListening()
-        // .then(()=>{
-        //     console.log('stopped listening')
-        // }).catch((err)=>{
-        //     console.error('Error stop listen:', err)
-        // })
         insomnia.allowSleepAgain().then(function() {
         console.log("Insomnia is inactive, good night!");
         });
@@ -477,17 +562,17 @@ export class RideComponent implements OnInit {
         // if the user's position is within .0001 latitude or longitude show signal
         if(lat >= this.turnPoints[0].lat - .001 && lat <= this.turnPoints[0].lat + .001
             && long >= this.turnPoints[0].lng - .001 && long <= this.turnPoints[0].lng + .001){
-        
+
         if(this.directionWords[0].indexOf("left") !== -1){
                 this.left = true;
                 this.right = false;
                 this.straight = false;
-                this.vibrator.vibrate(5000);
+                this.vibrator.vibrate(3000);
             } else if (this.directionWords[0].indexOf("right") !== -1){
                 this.right = true;
                 this.left = false;
                 this.straight = false;
-                this.vibrator.vibrate(5000);
+                this.vibrator.vibrate(3000);
             } else if (this.directionWords[0].indexOf("straight") !== -1){
                 this.straight = true;
                 this.right = false;
@@ -504,14 +589,56 @@ export class RideComponent implements OnInit {
         }
 
         // if the user location is within .0001 degrees show next direction
-        if(lat >= this.turnPoints[0].lat - .0001 && lat <= this.turnPoints[0].lat + .0001
-            && long >= this.turnPoints[0].lng - .0001 && long <= this.turnPoints[0].lng + .0001){
-                this.directionWords.unshift();
-                this.directionDistances.unshift();
-                this.turnPoints.unshift();
+        if(lat >= this.turnPoints[0].lat - .0003 && lat <= this.turnPoints[0].lat + .0003
+            && long >= this.turnPoints[0].lng - .0003 && long <= this.turnPoints[0].lng + .0003){
+                this.directionWords.shift();
+                this.directionDistances.shift();
+                this.turnPoints.shift();
+                this.maneuverParser(this.directionWords[0]);
+            }
+        }
+        // fail safe for two consecutive turns
+        if (this.turnPoints.length) {
+            // if the user's position is within .0001 latitude or longitude show signal
+            if (lat >= this.turnPoints[1].lat - .001 && lat <= this.turnPoints[1].lat + .001
+                && long >= this.turnPoints[1].lng - .001 && long <= this.turnPoints[1].lng + .001) {
+
+                if (this.directionWords[1].indexOf("left") !== -1) {
+                    this.left = true;
+                    this.right = false;
+                    this.straight = false;
+                    this.vibrator.vibrate(3000);
+                } else if (this.directionWords[1].indexOf("right") !== -1) {
+                    this.right = true;
+                    this.left = false;
+                    this.straight = false;
+                    this.vibrator.vibrate(3000);
+                } else if (this.directionWords[1].indexOf("straight") !== -1) {
+                    this.straight = true;
+                    this.right = false;
+                    this.left = false;
+                } else {
+                    this.left = false;
+                    this.right = false;
+                    this.straight = false;
+                }
+            } else {
+                this.left = false;
+                this.right = false;
+                this.straight = false;
+            }
+
+            // if the user location is within .0001 degrees show next direction
+            if (lat >= this.turnPoints[1].lat - .0003 && lat <= this.turnPoints[1].lat + .0003
+                && long >= this.turnPoints[1].lng - .0003 && long <= this.turnPoints[1].lng + .0003) {
+                this.directionWords = this.directionWords.slice(2);
+                this.directionDistances = this.directionWords.slice(2);
+                this.turnPoints = this.turnPoints.slice(2);
+                this.maneuverParser(this.directionWords[0]);
             }
         }
     }
+
 
     drawUserPath(): void {
         insomnia.keepAwake().then(function() {
@@ -529,14 +656,13 @@ export class RideComponent implements OnInit {
                     if(this.currentSpeed > this.topSpeed){
                         this.topSpeed = this.currentSpeed;
                     }
-                    if(this.currentSpeed < this.allSpeeds[this.allSpeeds.length - 1] - 8){
+                    if(this.currentSpeed < 4 && this.allSpeeds[this.allSpeeds.length - 1] > 10){
                         this.onPinSelect('close');
                     }
                     this.allSpeeds.push(this.currentSpeed);
                     this.speed += loc.speed;
                     const lat = loc.latitude;
                     const long = loc.longitude;
-                    
                     this.checkForManeuver(lat, long);
     
                     if (this.newPathCoords.length === 0) {
@@ -696,32 +822,9 @@ export class RideComponent implements OnInit {
     
     onMapReady(args){
         this.mapView = args.object; 
-        this.startTime = new Date();
-        for(let i = 0; i < 100; i++){
-            clearInterval(i);
-            geolocation.clearWatch(i);
-        }
-        this.listen = false;
-        this.recognized = false;
-        this.zone.runOutsideAngular(()=>{
-            this.listenIntervalId = setInterval(()=>{
-                if(this.listen === false){
-                    this.listen = true;
-                    
-                    this.speechRecognition.available().then(
-                        (available: boolean) => {
-                           this.handleSpeech();
-                            console.log(available ? "YES!" : "NO")},
-                        (err: string) => console.log(err)
-                    ) 
-                }
-        }, 4000);
-        })
-        console.log('interval id:', this.listenIntervalId);
-   
-     
+
         // const line = polylineHolder;
-        const line = "a`~uDhyxdP`@JeCdEoD|FuAxBq@CsBEGrF"
+        const line = "yd}uDhjsdPfBG@P@\\`CInCKnFQdGSAW@VJhEL`Fy@BkBFuK^H`FtDM"
         if(line !== undefined){
             this.directedRide = true;
             this.directionsParser();
