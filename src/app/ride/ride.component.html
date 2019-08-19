@@ -4,22 +4,22 @@
     because ActionItems are shown on the right side of the ActionBar
     -->
     <NavigationButton ios:visibility="collapsed" icon="res://menu" (tap)="onDrawerButtonTap()"></NavigationButton>
-    <!-- 
-    Use the ActionItem for IOS with position set to left. Using the
+    
+    <!-- Use the ActionItem for IOS with position set to left. Using the
     NavigationButton as a side-drawer button in iOS is not possible,
-    because its function is to always navigate back in the application.
-    -->
+    because its function is to always navigate back in the application. -->
+   
     <ActionItem icon="res://navigation/menu" android:visibility="collapsed" (tap)="onDrawerButtonTap()"
         ios.position="left">
     </ActionItem>
-    <Label class="action-bar-title" text="Ride"></Label>
+    <Label class="action-bar-title" text="{{directionWords[0]}}"></Label>
 </ActionBar>
 <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY">
 </script>
     <Page xmlns:maps="nativescript-google-maps-sdk"> 
     </Page>
 <FlexboxLayout class="page page-content" align-items="stretch" flexDirection="column">
-    <AbsoluteLayout>
+<AbsoluteLayout>
         <maps:mapView width="100%" height="100%" latitude="{{ latitude }}" longitude="{{ longitude }}"
         mapAnimationsEnabled="{{ mapAnimationsEnabled }}" zoom="{{ zoom }}" bearing="{{ bearing }}"
         padding="{{ padding }}" (mapReady)="onMapReady($event)" setMyLocationEnabled="true"
@@ -27,23 +27,52 @@
         markerEndDragging="onMarkerEndDragging" markerDrag="onMarkerDrag" cameraChanged="onCameraChanged"
         cameraMove="onCameraMove">
     </maps:mapView>
-    <AbsoluteLayout *ngIf="show" text="margin='30'" class="test">
-        <Label text="SPD" class="speed" style="font-size: 20em;" left="1%"></Label>
-        <Label style="background-color: black; width: 100%; height: 1%;" top="77%"></Label>
-        <Label text="{{speedString[0]}}" class="speed" bottom="45%" top="6%" left="53%" right="35%" style="font-size: 68em;"></Label>
-        <Label text="{{speedString[2]}}" class="speed" top="15%" left="107.5%" style="font-size: 45em; text-align: center;"></Label>
+    <AbsoluteLayout class="direction">
+        <Label *ngIf="right" class="fas" text="&#xf35a;" left="50%" top="85%"style="font-size: 250%; opacity: .3; color: black;"></Label>
+        <Label *ngIf="left" class="fas" text="&#xf359;" left="50%" top="85%"style="font-size: 250%; opacity: .3; color: black;"></Label>
+        <Label *ngIf="straight" class="fas" text="&#xf35b;" left="50%" top="85%"style="font-size: 250%; opacity: .3; color: black;"></Label>
+    </AbsoluteLayout>
+  <AbsoluteLayout *ngIf="show" text="margin='30'" class="test">
+        <Label text="SPD" class="speed" style="font-size: 20em;" left="2px"></Label>
+        <Label text="{{speedString}}" class="speed" bottom="45%" top="6%" left="30%" right="45%" style="font-size: 68em;"></Label>
+        <Label text="{{speedStringDecimal}}" class="speed" top="15%" left="107.5%" style="font-size: 45em; text-align: center;"></Label>
+        <Label style="background-color: black; width: 100%; height: 1%;" top="155px"></Label>
         <Label text="MPH" class="speed" top="60%" left="109%" style="font-size: 13em"></Label>
         <Label text="DIST" class="speed" style="font-size: 20em;" left="1%" top="77%"></Label>
-        <Label text="{{distanceString}}" class="speed" style="font-size: 60em; letter-spacing: -5px" left="30%" right="10%" top="87%"></Label>
+        <Label text="{{distanceString}}.{{distanceStringDecimal}}" class="speed" style="font-size: 60em; letter-spacing: -5px;" left="10%" right="5px" top="87%"></Label>
+        </AbsoluteLayout>
     </AbsoluteLayout>
-</AbsoluteLayout>
-    <FlexboxLayout class="body" align-items="stretch" height="25%" flexDirection="row" justifyContent="space-around">
-        <Label class="fas" text="&#xf04d;" style="font-size: 50em; color: white;" (tap)="onStopTap()"></Label>
-        <Label class="fas" text="&#xf3fd;" style="font-size: 50em; color: white;" (tap)="onSpeedTap()"></Label>
-        <Label class="fas" text="&#xf276;" style="font-size: 50em; color: white;" (tap)="onPinTap()"></Label>
-        <Label class="fas" text="&#xf015;" style="font-size: 50em; color: white" (tap)="onHomeTap()"></Label>
+    <FlexboxLayout *ngIf="!pinClicked" class="body" align-items="stretch" height="25%" flexDirection="row" justifyContent="space-around">
+        <Label class="fas" text="&#xf015;" style="font-size: 50em; color: white; margin-top: 15%" (tap)="onHomeTap()"></Label>
+        <Label class="fas" text="&#xf04d;" style="font-size: 50em; color: white; margin-top: 15%" (tap)="onStopTap()"></Label>
+        <Label class="fas" text="&#xf3fd;" style="font-size: 50em; color: white; margin-top: 15%" (tap)="onSpeedTap()"></Label>
+        <Label class="fas" text="&#xf276;" style="font-size: 50em; color: white; margin-top: 15%" (tap)="onPinTap()"></Label>
+        <Label class="fas" text="&#xf277;" style="font-size: 50em; color: white; margin-top: 15%" (tap)="onReroute()"></Label>
+    </FlexboxLayout>
+      <FlexboxLayout *ngIf="pinClicked" class="body" align-items="stretch" height="25%" flexDirection="row" justifyContent="space-between">
+      <FlexboxLayout justifyContent="center" flexDirection="column" align-items="stretch"> 
+        <Image src="~/app/images/iconHit.png" style="width: 86%; margin-top: -8px; margin-left: 5%;" stretch="none" (tap)="onPinSelect('crash')"></Image>
+      <Label text="Crash" style="font-size: 10em; color: white; margin-left: 20%; font-family: Roboto-Medium; margin-top: -34px;"></Label>
+      </FlexboxLayout>
+      <StackLayout style="margin-top: 11%;">
+        <Image src="~/app/images/iconNearMiss.png"  style="width: 77%;" stretch="aspectFit" (tap)="onPinSelect('close')"></Image>
+        <Label text="Close Call" style="font-size: 10em; color: white; text-align: center; font-family: Roboto-Medium;"></Label>
+      </StackLayout>
+      <StackLayout style="margin-top: 10%">
+        <Image src="~/app/images/iconAvoid2.png" style="width: 75%;" stretch="aspectFit" (tap)="onPinSelect('avoid')"></Image>
+      <Label text="Avoid Road" style="font-size: 10em; color: white; text-align: center; font-family: Roboto-Medium;"></Label>
+      </StackLayout>
+      <StackLayout style="margin-top: 10%">
+        <Image src="~/app/images/iconPotHole.png"  style="width: 75%;" stretch="aspectFit" (tap)="onPinSelect('pothole')"></Image>
+      <Label text="Pothole" style="font-size: 10em; color: white; text-align: center; font-family: Roboto-Medium;"></Label>
+        </StackLayout>
+      <StackLayout style="margin-top: 10%">
+      <Image src="~/app/images/iconStolen.png" style="width: 75%" stretch="aspectFit" (tap)="onPinSelect('stolen')"></Image>
+      <Label text="Stolen" style="font-size: 10em; color: white; text-align: center; font-family: Roboto-Medium;"></Label>
+        </StackLayout>
+        <StackLayout style="margin-top: 10%">
+        <Label class="fas" text="&#f2ea;" style="font-size: 50em; color: white; margin-top: 15%"
+          (tap)="onPinTap()"></Label>
+        </StackLayout>
     </FlexboxLayout>
 </FlexboxLayout>
-
-
-

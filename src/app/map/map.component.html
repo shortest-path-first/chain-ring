@@ -1,37 +1,25 @@
 <ActionBar class="action-bar">
-    <!-- 
-    Use the NavigationButton as a side-drawer button in Android
-    because ActionItems are shown on the right side of the ActionBar
-    -->
     <NavigationButton ios:visibility="collapsed" icon="res://menu" (tap)="onDrawerButtonTap()"></NavigationButton>
-    <!-- 
-    Use the ActionItem for IOS with position set to left. Using the
-    NavigationButton as a side-drawer button in iOS is not possible,
-    because its function is to always navigate back in the application.
-    -->
-    <ActionItem icon="res://navigation/menu" android:visibility="collapsed" (tap)="onDrawerButtonTap()"
-        ios.position="left">
-    </ActionItem>
-    <Label class="action-bar-title" text="Map"></Label>
+    <Label class="header" text="Chainring"></Label>
+    <ActionItem icon="~/app/images/home.png" ios.position="right" (tap)="homeTap('/home')"></ActionItem>
+
+
 </ActionBar>
 <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY">
 </script>
-    <Page xmlns:maps="nativescript-google-maps-sdk"
-        xmlns="http://schemas.nativescript.org/tns.xsd"
-        class="body">
+<ScrollView>
+    <Page xmlns:maps="nativescript-google-maps-sdk" xmlns="http://schemas.nativescript.org/tns.xsd" class="body">
         <StackLayout orientation="vertical" width="100%" height="95%">
-            <TextField #searchPlace
-            id="searchBox" text="" backgroundColor="white" width="95%" height="100"
-            (returnPress)="getPlaces(searchPlace.text)"
-            hint="Search Places"
-            ></TextField>
-            <maps:mapView
-                width="95%"
-                height="75%"
-                [latitude]="latitude" [longitude]="longitude" mapAnimationsEnabled="{{ mapAnimationsEnabled }}"
-                [zoom]="zoom" padding="{{padding}}" (mapReady)="onMapReady($event)"
-                (markerSelect)="onMarkerPick($event)" (coordinateTapped)="removeGetDirections()">
+            <TextField #searchPlace id="searchBox" text="" backgroundColor="white" width="95%" height="100"
+            (returnPress)="getPlaces(searchPlace.text)" hint="Search Places"></TextField>
+            <maps:mapView width="95%" height=400 [latitude]="latitude" [longitude]="longitude" mapAnimationsEnabled="{{ mapAnimationsEnabled }}"
+                [zoom]="zoom" padding="{{padding}}" (mapReady)="onMapReady($event)" (markerSelect)="onMarkerPick($event)" (coordinateTapped)="removeGetDirections()">
             </maps:mapView>
             <Button *ngIf=markerSelected width="95%" height="100" [text]=bottomButtonText (tap)="getDirections()"></Button>
+            <StackLayout *ngFor="let step of turnByList" class="direction-info-line" height="75">
+                <Label [text]="step[0]" height="40" textWrap="true"></Label>
+                <Label [text]="step[1]" height="20" textWrap="true"></Label>
+            </StackLayout>
         </StackLayout>
     </Page>
+</ScrollView>

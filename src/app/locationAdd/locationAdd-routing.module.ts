@@ -1,19 +1,18 @@
 import { NgModule } from "@angular/core";
 import { Routes } from "@angular/router";
 import { NativeScriptRouterModule } from "nativescript-angular/router";
-import { NativeScriptUIChartModule } from "nativescript-ui-chart/angular";
+import { FormsModule } from "@angular/forms";
 
-
-import { StatsComponent } from "./stats.component";
+import { LocationAddComponent } from "./locationAdd.component";
 
 const routes: Routes = [
-    { path: "", component: StatsComponent }
+    { path: "", component: LocationAddComponent }
 ];
 
 @NgModule({
     imports: [NativeScriptRouterModule.forChild(routes),
-    NativeScriptUIChartModule
+    FormsModule
     ],
     exports: [NativeScriptRouterModule]
 })
-export class StatsRoutingModule { }
+export class LocationAddRoutingModule { }

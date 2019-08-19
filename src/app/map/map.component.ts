@@ -11,12 +11,17 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { Router, NavigationExtras } from "@angular/router";
 const mapsModule = require("nativescript-google-maps-sdk");
 const decodePolyline = require("decode-google-map-polyline");
+import { Image } from "tns-core-modules/ui/image";
+import { ImageSource } from "tns-core-modules/image-source";
+
+declare var com: any;
 
 let actualMap;
 let markerLat;
 let markerLng;
-let linePlaceHolder;
+let directionsResponse;
 let markers = [];
+let turnBy;
 
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
@@ -26,16 +31,19 @@ registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView
     templateUrl: "./map.component.html"
 })
 export class MapComponent implements OnInit {
-
+    
+    showDirections = false;
+    compPoly;
     latitude = 30;
     longitude = -90.15;
-    zoom = 12;
+    zoom = 13;
     markers = [];
     bottomButtonText = "Get Directions";
     markerSelected = false;
     readyToRide = false;
+    turnByList: Array<object> = [];
 
-    readonly ROOT_URL = "https://3c712b5f.ngrok.io";
+    readonly ROOT_URL = "https://79dd5357.ngrok.io";
 
     places: Observable<Array<Place>>;
 
@@ -63,9 +71,7 @@ export class MapComponent implements OnInit {
         // search params from search bar
         this.readyToRide = false;
         const params = new HttpParams().set("place", text).set("userLoc", `${this.latitude},${this.longitude}`);
-        this.markers.forEach((marker) => {
-            marker.visible = false;
-        });
+        this.markers.forEach((marker) => {marker.visible = false; });
         this.markers = [];
         markers = [];
 
@@ -73,27 +79,24 @@ export class MapComponent implements OnInit {
         this.http.get<Array<Place>>(this.ROOT_URL + "/mapSearch", {params}).subscribe((response) => {
             // assigning response info to markers array and then placing each marker on our map
             this.markers = response;
-
-            let totalLat = 0;
-            let totalLng = 0;
-
+            const padding = 150;
+            const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
             this.markers.forEach((place) => {
                 const {lat, lng} = place[0];
-                totalLat += lat;
-                totalLng += lng;
-                console.log("markers added");
+                console.log("marker added");
                 const marker = new mapsModule.Marker({});
                 marker.position = mapsModule.Position.positionFromLatLng(lat, lng);
                 marker.title = place[1];
                 marker.snippet = place[2];
                 this.markers.push(marker);
                 markers.push(marker);
+                builder.include(marker.android.getPosition());
                 actualMap.addMarker(marker);
             });
             // recenter map over choices
-            actualMap.latitude = (totalLat / markers.length);
-            actualMap.longitude = (totalLng / markers.length);
-            actualMap.zoom = 12;
+            const bounds = builder.build();
+            const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(bounds, padding);
+            actualMap.gMap.animateCamera(newBounds);
         }, (err) => {
             console.log(err.message);
         }, () => {
@@ -113,73 +116,89 @@ export class MapComponent implements OnInit {
     removeGetDirections() {
         this.markerSelected = false;
         this.readyToRide = false;
+        this.markers.forEach((marker) => { marker.visible = false; });
+        this.markers = [];
+        markers = [];
+        this.showDirections = false;
+        if (this.compPoly) {
+            this.compPoly.visible = false;
+        }
+        this.turnByList = [];
     }
 
     onMapReady(args) {
         // assigns the map to acutalMap on component
         console.log("map reassign");
         actualMap = args.object;
+        const gMap = actualMap.gMap;
+        const uiSettings = gMap.getUiSettings();
+        uiSettings.setMyLocationButtonEnabled(true);
+        uiSettings.setCompassEnabled(true);
+        uiSettings.setMapToolbarEnabled(false);
+        uiSettings.setZoomControlsEnabled(true);
+        uiSettings.setCompassEnabled(true);
+        gMap.setMyLocationEnabled(true);
     }
 
     getDirections() {
         if (this.readyToRide === false) {
+            this.removeGetDirections();
 
-            this.markers.forEach((marker) => {
-                marker.visible = false;
-            });
-            this.markers = [];
-            markers = [];
             // params are set to the marker selected, info coming from component
             // tslint:disable-next-line: max-line-length
             const params = new HttpParams().set("place", `${markerLat},${markerLng}`).set("userLoc", `${this.latitude},${this.longitude}`);
             // http request to get directions between user point and marker selected
             this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
                 // reassigns response to variable to avoid dealing with "<Place[]>"
-            linePlaceHolder = response;
-            const { polyLine } = linePlaceHolder;
-            const flightPlanCoordinates = decodePolyline(polyLine);
+                directionsResponse = response;
+                const { polyLine, turnByTurn } = directionsResponse;
+                turnBy = turnByTurn;
+                this.turnByList = turnBy;
+                const bikePath = decodePolyline(polyLine);
+                const path = new mapsModule.Polyline();
+                this.compPoly = path;
+                // tslint:disable-next-line: prefer-for-of
+                for (let i = 0; i < bikePath.length; i++) {
+                    const coord = bikePath[i];
+                    path.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
+                }
+                path.visible = true;
+                path.width = 10;
+                path.geodesic = false;
+                const padding = 150;
 
-            const path = new mapsModule.Polyline();
-            // tslint:disable-next-line: prefer-for-of
-            for (let i = 0; i < flightPlanCoordinates.length; i++) {
-                const coord = flightPlanCoordinates[i];
-                path.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
-            }
-            path.visible = true;
-            path.width = 10;
-            path.geodesic = false;
-            // tslint:disable-next-line: max-line-length
-            actualMap.latitude = ((flightPlanCoordinates[0].lat + flightPlanCoordinates[flightPlanCoordinates.length - 1].lat) / 2);
-            // tslint:disable-next-line: max-line-length
-            actualMap.longitude = ((flightPlanCoordinates[0].lng + flightPlanCoordinates[flightPlanCoordinates.length - 1].lng) / 2);
-            actualMap.zoom = 12;
-            
-            const start = new mapsModule.Marker({});
-           
-            // tslint:disable-next-line: max-line-length
-            start.position = mapsModule.Position.positionFromLatLng(flightPlanCoordinates[0].lat, flightPlanCoordinates[0].lng);
-            start.title = "Start";
-            start.snippet = "3, 2, 1, GO";
-            this.markers.push(start);
-            actualMap.addMarker(start);
-            
-            const finish = new mapsModule.Marker({});
-            // tslint:disable-next-line: max-line-length
-            finish.position = mapsModule.Position.positionFromLatLng(flightPlanCoordinates[flightPlanCoordinates.length - 1].lat, flightPlanCoordinates[flightPlanCoordinates.length - 1].lng);
-            finish.title = "End";
-            finish.snippet = "Your Final Destination";
-            this.markers.push(finish);
-            actualMap.addMarker(finish);
-            actualMap.addPolyline(path);
-            this.readyToRide = true;
-        }, (err) => {
-            console.log("error", err.message);
-        }, () => {
-            console.log("completed");
-        });
+                const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
+                const start = new mapsModule.Marker({});
+                // tslint:disable-next-line: max-line-length
+                start.position = mapsModule.Position.positionFromLatLng(bikePath[0].lat, bikePath[0].lng);
+                start.title = "Start";
+                start.snippet = "3, 2, 1, GO";
+                start.color = "green";
+                this.markers.push(start);
+                builder.include(start.android.getPosition());
+                actualMap.addMarker(start);
+                const finish = new mapsModule.Marker({});
+                // tslint:disable-next-line: max-line-length
+                finish.position = mapsModule.Position.positionFromLatLng(bikePath[bikePath.length - 1].lat, bikePath[bikePath.length - 1].lng);
+                finish.title = "End";
+                finish.snippet = "Your Final Destination";
+                this.markers.push(finish);
+                builder.include(finish.android.getPosition());
+                actualMap.addMarker(finish);
+                actualMap.addPolyline(path);
+                const bounds = builder.build();
+                const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                actualMap.gMap.animateCamera(newBounds);
+                this.readyToRide = true;
+                this.bottomButtonText = "Go Now!";
+            }, (err) => {
+                console.log("error", err.message);
+            }, () => {
+                console.log("completed");
+            });
         } else if (this.readyToRide === true) {
             console.log("tapped");
-            const { polyLine } = linePlaceHolder;
+            const { polyLine } = directionsResponse;
             const params: NavigationExtras = {
                 queryParams: {
                     polyLine
@@ -187,5 +206,13 @@ export class MapComponent implements OnInit {
             };
             this.routerExtensions.navigate(["/ride"], params);
     }
+    }
+
+    homeTap(navItemRoute: string): void {
+        this.routerExtensions.navigate([navItemRoute], {
+            transition: {
+                name: "fade"
+            }
+        });
     }
 }

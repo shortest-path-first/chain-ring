@@ -17,8 +17,9 @@
 
 .fas {
     font-family: Font Awesome 5 Free, fa-solid-900;
-    font-weight: 900; 
+    font-weight: 900;    
 }
+
 
 // Common page class
 .page-content {
@@ -67,15 +68,24 @@ $sidedrawer-list-icon-size: 20;
     font-family: Roboto-Medium;
 }
 
+
 .speed {
     font-family: Orbitron-Black;
-    color: black;
-    opacity: 1 !important;
+    color: white;
+    opacity: .8 !important;
+}
+
+.direction {
+    opacity: .55;
+    font-size: 200em;
+    margin-left: -10px;
+    margin-right: -10px;
 }
 
 .test {
-    background-color: rgb(172, 168, 168);
-    opacity: .6;
+    //background-color: rgb(172, 168, 168);
+    background-image: linear-gradient(to bottom left, #393ef9, #9c27b0,);
+    opacity: .55;
     margin-top: 65%;
     margin-left: 5%;
     margin-bottom: 5%;
@@ -176,6 +186,44 @@ $sidedrawer-list-icon-size: 20;
     color: black;
     text-align: left;
     font-size: 20%;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: black;
+    border-width: 10px;
+    text-align: center;
+}
+.commute-header{
+    background-color: black;
+    color: white;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: white;
+    border-width: 10px;
+    width: 40%;
+    height: 100%;
+    font-size: 30%;
+    text-align: center;
+}
+.commute-info-line{
+    height: 100%;
+    width: 95%;
+    background-color: white;
+    color: black;
+    text-align: left;
+    font-size: 30%;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: black;
+    border-width: 10px;
+    text-align: center;
+}
+.direction-info-line{
+    height: 100%;
+    width: 95%;
+    background-color: white;
+    color: black;
+    text-align: left;
+    font-size: 15%;
     border-radius: 20px;
     border-style: solid;
     border-color: black;
