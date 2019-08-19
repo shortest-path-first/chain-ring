@@ -79,6 +79,11 @@ export class RideComponent implements OnInit {
     directionDistances = [];
     directionWords = [];
     turnPoints = [];
+    potholeIcon;
+    closeIcon;
+    avoidIcon;
+    crashIcon;
+    stolenIcon;
     steps = [
         {
             "distance": {
@@ -281,10 +286,11 @@ export class RideComponent implements OnInit {
      private routerExtensions: RouterExtensions, private route: ActivatedRoute,
      private zone: NgZone) {
         // Use the component constructor to inject providers.
-        this.route.queryParams.subscribe((params) => {
+        let paramSubscription = this.route.queryParams.subscribe((params) => {
             const {polyLine} = params;
             polylineHolder = polyLine;
         });
+        paramSubscription.unsubscribe();
     }
     
     ngOnInit(): void {
@@ -308,15 +314,37 @@ export class RideComponent implements OnInit {
                         (err: string) => console.log(err)
                     )
                 }
-             }, 2000);
+            }, 2000);
         })
-        
+        let potholeImageSource = new ImageSource();
+        this.potholeIcon = new Image();
+        potholeImageSource.loadFromFile("~/app/images/mapPotHole.png");
+        this.potholeIcon.imageSource = potholeImageSource;
+
+        let closeImageSource = new ImageSource();
+        this.closeIcon = new Image();
+        closeImageSource.loadFromFile("~/app/images/mapNearMiss.png");
+        this.closeIcon.imageSource = closeImageSource;
+
+        let avoidImageSource = new ImageSource();
+        this.avoidIcon = new Image();
+        avoidImageSource.loadFromFile("~/app/images/mapAvoid.png");
+        this.avoidIcon.imageSource = avoidImageSource;
+
+        let crashImageSource = new ImageSource();
+        this.crashIcon = new Image();
+        crashImageSource.loadFromFile("~/app/images/mapHit.png");
+        this.crashIcon.imageSource = crashImageSource;
+
+        let stolenImageSource = new ImageSource();
+        this.stolenIcon = new Image(); 
+        stolenImageSource.loadFromFile("~/app/images/mapStolen.png");
+        this.stolenIcon.imageSource = stolenImageSource;
     }
 
     onDrawerButtonTap(): void {
         const sideDrawer = <RadSideDrawer>app.getRootView();
         sideDrawer.showDrawer();
-   
     }
 
     onPinTap(): void {    
@@ -342,26 +370,24 @@ export class RideComponent implements OnInit {
 
     onPinSelect(pinType): void {
         this.pinClicked = false;
-        console.log(pinType);
+       
 
         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
                 const marker = new mapsModule.Marker();
                 const imageSource = new ImageSource();
                 if(pinType === "pothole"){
-                    imageSource.loadFromFile("~/app/images/mapPotHole.png");
+                    marker.icon = this.potholeIcon;
                 } else if (pinType === "close"){
-                    imageSource.loadFromFile("~/app/images/mapNearMiss.png");
+                    marker.icon = this.closeIcon;
                 } else if (pinType === "avoid"){
-                    imageSource.loadFromFile("~/app/images/mapAvoid.png");
+                    marker.icon = this.avoidIcon;
                 } else if (pinType === "crash"){
-                    imageSource.loadFromFile("~/app/images/mapHit.png");
+                    marker.icon = this.crashIcon;
                 } else if (pinType === "stolen"){
-                    imageSource.loadFromFile("~/app/images/mapStolen.png");
+                    marker.icon = this.stolenIcon;
                 }
-                const icon = new Image();
-                icon.imageSource = imageSource;
-                marker.icon = icon;
+            
                 marker.position = mapsModule.Position.positionFromLatLng(result.latitude, result.longitude);
                 this.mapView.addMarker(marker);
                 rideMarkers.markers.push({markerLat: result.latitude, markerLon: result.longitude, type: pinType});
@@ -401,7 +427,6 @@ export class RideComponent implements OnInit {
             dist = Math.acos(dist);
             dist = dist * 180 / Math.PI;
             dist = dist * 60 * 1.1515;
-            console.log("dist", dist, new Date());
         return Number(dist.toFixed(2));
     }
 }
@@ -458,7 +483,7 @@ export class RideComponent implements OnInit {
         const lastLat = this.newPathCoords[this.newPathCoords.length - 1].lat;
         const lastLng = this.newPathCoords[this.newPathCoords.length - 1].long;
         const params = new HttpParams().set("place", `${this.destLat},${this.destLng}`).set("userLoc", `${lastLat},${lastLng}`);
-        this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
+        let rerouteSubscription = this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
             // reassigns response to variable to avoid dealing with "<Place[]>"
             this.directionsResponse = response;
             let { rerouteHTML, rerouteEndLoc, rerouteDistance, polyLine } = this.directionsResponse;
@@ -479,6 +504,7 @@ export class RideComponent implements OnInit {
             this.mapView.latitude = newRoute[0].lat;
             this.mapView.longitude = newRoute[0].lng;
             this.mapView.addPolyline(reroutePolyline);
+            rerouteSubscription.unsubscribe();
         });
     }
 
@@ -516,16 +542,17 @@ export class RideComponent implements OnInit {
         let duration = this.stopTime.getTime() - this.startTime.getTime();
         duration = duration / 10000;
         console.log("duration", duration);
-        this.http.post(this.ROOT_URL + "/marker", rideMarkers, {
+        let markerSubscription = this.http.post(this.ROOT_URL + "/marker", rideMarkers, {
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
             })})
             .subscribe(() => {
                 console.log("success");
             });
+            markerSubscription.unsubscribe();
         const info = {pathPolyline, first, last, avgSpeed, duration, speedBreakdown,
                     topSpeed: this.topSpeed, totalDistance: this.totalDistance};
-        this.http.post(this.ROOT_URL + "/ride", info, {
+        let rideSubscription = this.http.post(this.ROOT_URL + "/ride", info, {
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
             })
@@ -533,6 +560,7 @@ export class RideComponent implements OnInit {
         .subscribe(() => {
             console.log("ride");
         });
+        rideSubscription.unsubscribe();
         const params: NavigationExtras = {
                 queryParams: {
                     polyLine: pathPolyline,
