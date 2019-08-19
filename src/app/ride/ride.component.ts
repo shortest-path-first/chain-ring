@@ -676,7 +676,7 @@ export class RideComponent implements OnInit {
             this.watchId = geolocation.watchLocation((loc) => {
                     const newPath = new mapsModule.Polyline();
                 if (loc && this.mapView !== null || loc && this.mapView !== undefined) {
-                 
+                
                     this.currentSpeed = loc.speed * 2.23694;
                     this.speedString = this.currentSpeed.toFixed(1).slice(0, -2);
                     this.speedStringDecimal = this.currentSpeed.toFixed(1).slice(-1);
@@ -851,8 +851,8 @@ export class RideComponent implements OnInit {
     onMapReady(args){
         this.mapView = args.object; 
 
-        // const line = polylineHolder;
-        const line = "yd}uDhjsdPfBG@P@\\`CInCKnFQdGSAW@VJhEL`Fy@BkBFuK^H`FtDM"
+        const line = polylineHolder;
+        //const line = "yd}uDhjsdPfBG@P@\\`CInCKnFQdGSAW@VJhEL`Fy@BkBFuK^H`FtDM"
         if(line !== undefined){
             this.directedRide = true;
             this.directionsParser();
