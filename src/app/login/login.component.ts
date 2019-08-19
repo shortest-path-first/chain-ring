@@ -68,27 +68,30 @@ export class LoginComponent implements OnInit {
     onLoginTap(): void {
         console.log("tapped");
 
-        this.file.readText().then((res) => {
-            this.vm.set("writtenContent", res);
-            console.log(res);
-            const options = {
-                url: `http://812bec1b.ngrok.io/login/${res}`,
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            };
+        this.file.readText()
+            .then((res) => {
+                this.vm.set("writtenContent", res);
+                console.log(res);
+                const options = {
+                    url: `http://812bec1b.ngrok.io/login/${res}`,
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                };
             // setTimeout(() => {
 
-            request(options)
-                    .then((isLoggedIn) => {
-                        console.log(isLoggedIn.content);
-                        if (isLoggedIn.content.toJSON().bool) {
-                            console.log("Rerouting");
-                            this._activatedUrl = "/home";
-                            this.routerExtensions.navigate(
-                                ["/home"],
-                                {
+            // tnsOauthLogin("google");
+
+                request(options)
+                        .then((isLoggedIn) => {
+                            console.log(isLoggedIn.content);
+                            if (isLoggedIn.content.toJSON().bool) {
+                                console.log("Rerouting");
+                                this._activatedUrl = "/home";
+                                this.routerExtensions.navigate(
+                                    ["/home"],
+                                    {
                                     transition: {
                                         name: "fade"
                                     }
@@ -98,9 +101,12 @@ export class LoginComponent implements OnInit {
                                 console.log("Not signed in");
                                 tnsOauthLogin("google");
                             }
-            });
-            // }, 500);
-    });
+                        })
+                    .catch((err) => {
+                        console.error(err.stack);
+                    });
+                    });
+    // });
 }
 
     onDrawerButtonTap(): void {
