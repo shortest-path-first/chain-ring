@@ -39,7 +39,7 @@ export class LocationAddComponent implements OnInit {
     bottomButtonText = "Save Location";
     locName = "";
     
-    readonly ROOT_URL = "https://79dd5357.ngrok.io";
+    readonly ROOT_URL = "http://chainring.tk:3000";
 
     places: Observable<Array<Place>>;
 
