@@ -2,7 +2,7 @@
   "nativescript": {
     "id": "org.nativescript.chainRing",
     "tns-android": {
-      "version": "6.0.0"
+      "version": "6.1.0-2019-08-15-185133-02"
     },
     "tns-ios": {
       "version": "6.0.1"
@@ -28,16 +28,20 @@
     "decode-google-map-polyline": "^1.0.1",
     "dotenv": "^8.0.0",
     "google-polyline": "^1.0.3",
+    "http": "0.0.0",
     "nativescript-accelerometer": "^2.0.1",
     "nativescript-angular": "~8.0.0",
     "nativescript-geolocation": "^5.1.0",
     "nativescript-google-maps-sdk": "^2.7.0",
     "nativescript-imagepicker": "^7.0.0",
+    "nativescript-insomnia": "^1.2.3",
     "nativescript-ngx-fonticon": "^4.2.1",
     "nativescript-oauth2": "^2.0.0",
     "nativescript-speech-recognition": "^1.5.0",
     "nativescript-theme-core": "~1.0.6",
+    "nativescript-ui-chart": "^6.0.0",
     "nativescript-ui-sidedrawer": "~7.0.0",
+    "nativescript-vibrate": "^2.1.3",
     "reflect-metadata": "~0.1.12",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
@@ -51,7 +55,11 @@
     "@angular/compiler-cli": "~8.0.0",
     "@ngtools/webpack": "~8.0.0",
     "codelyzer": "~4.5.0",
-    "nativescript-dev-webpack": "~1.0.0",
+    "eslint": "^6.1.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-airbnb-standard": "^3.0.1",
+    "eslint-plugin-import": "^2.18.2",
+    "nativescript-dev-webpack": "^1.0.3",
     "node-sass": "^4.7.1",
     "tslint": "~5.11.0",
     "typescript": "~3.4.0"
