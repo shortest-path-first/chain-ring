@@ -2,7 +2,7 @@ import { Component, OnInit, ElementRef, ViewChild } from "@angular/core";
 import { RadSideDrawer } from "nativescript-ui-sidedrawer";
 import { registerElement } from "nativescript-angular/element-registry";
 import * as app from "tns-core-modules/application";
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import { Place } from "./map";
 import { Observable } from "rxjs";
 import * as geolocation from "nativescript-geolocation";
@@ -43,7 +43,7 @@ export class MapComponent implements OnInit {
     readyToRide = false;
     turnByList: Array<object> = [];
 
-    readonly ROOT_URL = "https://79dd5357.ngrok.io";
+    readonly ROOT_URL = "http://chainring.tk:3000";
 
     places: Observable<Array<Place>>;
 
@@ -70,13 +70,18 @@ export class MapComponent implements OnInit {
     getPlaces(text) {
         // search params from search bar
         this.readyToRide = false;
+        
+
         const params = new HttpParams().set("place", text).set("userLoc", `${this.latitude},${this.longitude}`);
+        const headers = new HttpHeaders().set("Access-Control-Allow-Origin", "*");
+        const stuff = { params, headers};
+
         this.markers.forEach((marker) => {marker.visible = false; });
         this.markers = [];
         markers = [];
 
         // http request using the text provided
-        this.http.get<Array<Place>>(this.ROOT_URL + "/mapSearch", {params}).subscribe((response) => {
+        this.http.get<Array<Place>>(this.ROOT_URL + "/mapSearch", stuff).subscribe((response) => {
             // assigning response info to markers array and then placing each marker on our map
             this.markers = response;
             const padding = 150;
@@ -98,7 +103,7 @@ export class MapComponent implements OnInit {
             const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(bounds, padding);
             actualMap.gMap.animateCamera(newBounds);
         }, (err) => {
-            console.log(err.message);
+            console.log(err);
         }, () => {
             console.log("completed");
         });
