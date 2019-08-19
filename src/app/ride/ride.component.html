@@ -12,7 +12,12 @@
     <ActionItem icon="res://navigation/menu" android:visibility="collapsed" (tap)="onDrawerButtonTap()"
         ios.position="left">
     </ActionItem>
-    <Label class="action-bar-title" text="{{directionWords[0]}}"></Label>
+    <Stacklayout>
+      <Label class="action-bar-title" text="{{maneuvers[0]}}"></Label>
+      <Label *ngIf="maneuvers[1]" class="action-bar-title" text="{{maneuvers[1]}}"></Label>
+      <Label *ngIf="maneuvers[2]" class="action-bar-title" text="{{maneuvers[2]}}"></Label>
+      <Label *ngIf="maneuvers[3]" class="action-bar-title" text="{{maneuvers[3]}}"></Label>
+    </Stacklayout>
 </ActionBar>
 <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY">
 </script>
@@ -47,7 +52,7 @@
         <Label class="fas" text="&#xf04d;" style="font-size: 50em; color: white; margin-top: 15%" (tap)="onStopTap()"></Label>
         <Label class="fas" text="&#xf3fd;" style="font-size: 50em; color: white; margin-top: 15%" (tap)="onSpeedTap()"></Label>
         <Label class="fas" text="&#xf276;" style="font-size: 50em; color: white; margin-top: 15%" (tap)="onPinTap()"></Label>
-        <Label class="fas" text="&#xf277;" style="font-size: 50em; color: white; margin-top: 15%" (tap)="onReroute()"></Label>
+        <Label class="fas" text="&#xf277;" style="font-size: 50em; color: white; margin-top: 15%" (tap)="onDirectionsTap()"></Label>
     </FlexboxLayout>
       <FlexboxLayout *ngIf="pinClicked" class="body" align-items="stretch" height="25%" flexDirection="row" justifyContent="space-between">
       <FlexboxLayout justifyContent="center" flexDirection="column" align-items="stretch"> 

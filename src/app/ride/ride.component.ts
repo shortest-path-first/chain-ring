@@ -16,8 +16,13 @@ import { ImageSource } from "tns-core-modules/image-source";
 import { Place } from "../map/map";
 
 // const style = require("../../../App_Resources/style.json")
+<<<<<<< HEAD
 let insomnia = require("nativescript-insomnia");
 let mapsModule = require("nativescript-google-maps-sdk");
+=======
+const insomnia = require("nativescript-insomnia");
+const mapsModule = require("nativescript-google-maps-sdk");
+>>>>>>> d3fe8802e1bab6d6951f57da1c6f96ed35037156
 const decodePolyline = require("decode-google-map-polyline");
 const polylineEncoder = require("google-polyline");
 const rideMarkers = {markers: []};
@@ -37,6 +42,7 @@ export class RideComponent implements OnInit {
     show;
     pinClicked = false;
     directionsResponse;
+    maneuvers = [];
     listen;
     speed = 0;
     topSpeed = 0;
@@ -50,7 +56,6 @@ export class RideComponent implements OnInit {
     recognizedText;
     distanceString = "0";
     listenIntervalId;
-    lightIntervalId;
     light = false;
     distanceStringDecimal = "0";
     polyline;
@@ -71,128 +76,17 @@ export class RideComponent implements OnInit {
     directedRide = false;
     destLat;
     destLng;
+    turnPolyline;
+    turnPolylines = [];
     directionDistances = [];
     directionWords = [];
     turnPoints = [];
+    potholeIcon;
+    closeIcon;
+    avoidIcon;
+    crashIcon;
+    stolenIcon;
     steps = [
-        {
-            distance: {
-                text: "102 ft",
-                value: 31
-            },
-            duration: {
-                text: "1 min",
-                value: 5
-            },
-            end_location: {
-                lat: 29.9775096,
-                lng: -90.08047979999999
-            },
-            html_instructions: "Head <b>south</b> on <b>N White St</b> toward <b>Esplanade Ave</b>",
-            polyline: {
-                points: "a`~uDhyxdP`@JPH"
-            },
-            start_location: {
-                lat: 29.977767,
-                lng: -90.08036919999999
-            },
-            travel_mode: "BICYCLING"
-        },
-        {
-            distance: {
-                text: "0.9 mi",
-                value: 1478
-            },
-            duration: {
-                text: "7 mins",
-                value: 396
-            },
-            end_location: {
-                lat: 29.9692147,
-                lng: -90.0684981
-            },
-            html_instructions: "Turn <b>left</b> onto <b>Esplanade Ave</b>",
-            maneuver: "turn-left",
-            polyline: {
-                points: "m~}uD~yxdPf@w@p@iAT_@T_@dAcBl@aAl@_AN[h@aA`A_Bx@qARYt@oAp@gA|@uAbAaBr@kAnAuBf@y@Ze@TWV[@CNWLQBGLUp@kA`AaBzBmDvBmDtBoDhB}CJM?A@A@AFK@AFI?ALQ"
-            },
-            start_location: {
-                lat: 29.9775096,
-                lng: -90.08047979999999
-            },
-            travel_mode: "BICYCLING"
-        },
-        {
-            distance: {
-                text: "0.3 mi",
-                value: 563
-            },
-            duration: {
-                text: "2 mins",
-                value: 140
-            },
-            end_location: {
-                lat: 29.9728401,
-                lng: -90.06463289999999
-            },
-            html_instructions: "Turn <b>left</b> onto <b>N Claiborne Ave</b>",
-            maneuver: "turn-left",
-            polyline: {
-                points: "qj|uDbovdPYWuAkA]Wg@e@aDmC_DoC}CqCMMGIIMUk@CMAQAYAg@"
-            },
-            start_location: {
-                lat: 29.9692147,
-                lng: -90.0684981
-            },
-            travel_mode: "BICYCLING"
-        },
-        {
-            distance: {
-                text: "0.5 mi",
-                value: 850
-            },
-            duration: {
-                text: "4 mins",
-                value: 244
-            },
-            end_location: {
-                lat: 29.972658,
-                lng: -90.05600269999999
-            },
-            html_instructions: "Continue straight to stay on <b>N Claiborne Ave</b>",
-            maneuver: "straight",
-            polyline: {
-                points: "ga}uD|vudPCuACaBG}BC{BEmBK{DEe@K_FMeFE{BGkBPeAHYP]T_@NYHS@CBIRs@"
-            },
-            start_location: {
-                lat: 29.9728401,
-                lng: -90.06463289999999
-            },
-            travel_mode: "BICYCLING"
-        },
-        {
-            distance: {
-                text: "0.2 mi",
-                value: 354
-            },
-            duration: {
-                text: "1 min",
-                value: 63
-            },
-            end_location: {
-                lat: 29.9728897,
-                lng: -90.0523341
-            },
-            html_instructions: "Continue onto <b>LA-39 S</b>",
-            polyline: {
-                points: "c`}uD~`tdPA_@MaFMaFIeDAc@A]AQ"
-            },
-            start_location: {
-                lat: 29.972658,
-                lng: -90.05600269999999
-            },
-            travel_mode: "BICYCLING"
-        },
         {
             distance: {
                 text: "190 ft",
@@ -200,75 +94,301 @@ export class RideComponent implements OnInit {
             },
             duration: {
                 text: "1 min",
-                value: 51
+                value: 52
             },
             end_location: {
+                lat: 29.9728897,
+                lng: -90.0523341
+            },
+            html_instructions: "Head <b>south</b> on <b>St Roch Ave</b> toward <b>N Robertson St</b><div style=\"font-size:0.9em\">Walk your bicycle</div>",
+            polyline: {
+                points: "yd}uDhjsdPfBG"
+            },
+            start_location: {
                 lat: 29.9734092,
                 lng: -90.0523748
             },
-            html_instructions: "Turn <b>left</b> onto <b>St Roch Ave</b><div style=\"font-size:0.9em\">Destination will be on the right</div>",
-            maneuver: "turn-left",
+            travel_mode: "BICYCLING"
+        },
+        {
+            distance: {
+                text: "75 ft",
+                value: 23
+            },
+            duration: {
+                text: "1 min",
+                value: 47
+            },
+            end_location: {
+                lat: 29.9728692,
+                lng: -90.0525686
+            },
+            html_instructions: "Turn <b>right</b> onto <b>N Robertson St</b><div style=\"font-size:0.9em\">Walk your bicycle</div>",
+            maneuver: "turn-right",
             polyline: {
-                points: "qa}uD`jsdPgBF"
+                points: "qa}uD`jsdP@P@\\"
             },
             start_location: {
                 lat: 29.9728897,
                 lng: -90.0523341
             },
             travel_mode: "BICYCLING"
+        },
+        {
+            distance: {
+                text: "0.3 mi",
+                value: 432
+            },
+            duration: {
+                text: "2 mins",
+                value: 133
+            },
+            end_location: {
+                lat: 29.9689907,
+                lng: -90.0522691
+            },
+            html_instructions: "Turn <b>left</b> onto <b>St Roch Ave</b>",
+            maneuver: "turn-left",
+            polyline: {
+                points: "ma}uDpksdP`CIfAEfAEbCKjBE|AEvAEb@Cj@C"
+            },
+            start_location: {
+                lat: 29.9728692,
+                lng: -90.0525686
+            },
+            travel_mode: "BICYCLING"
+        },
+        {
+            distance: {
+                text: "36 ft",
+                value: 11
+            },
+            duration: {
+                text: "1 min",
+                value: 25
+            },
+            end_location: {
+                lat: 29.9689983,
+                lng: -90.05215219999999
+            },
+            html_instructions: "Turn <b>left</b> onto <b>St Claude Ave</b><div style=\"font-size:0.9em\">Walk your bicycle</div><div style=\"font-size:0.9em\">Destination will be on the left</div>",
+            maneuver: "turn-left",
+            polyline: {
+                points: "ei|uDtisdPAW"
+            },
+            start_location: {
+                lat: 29.9689907,
+                lng: -90.0522691
+            },
+            travel_mode: "BICYCLING"
+        },
+
+        {
+            distance: {
+                text: "0.1 mi",
+                value: 218
+            },
+            duration: {
+                text: "1 min",
+                value: 38
+            },
+            end_location: {
+                lat: 29.9688625,
+                lng: -90.0544055
+            },
+            html_instructions: "Head <b>west</b> on <b>St Claude Ave</b> toward <b>St Roch Ave</b>",
+            polyline: {
+                points: "gi|uD|hsdP@VB`AFfCL`F"
+            },
+            start_location: {
+                lat: 29.9689983,
+                lng: -90.05215219999999
+            },
+            travel_mode: "BICYCLING"
+        },
+        {
+            distance: {
+                text: "0.2 mi",
+                value: 319
+            },
+            duration: {
+                text: "1 min",
+                value: 55
+            },
+            end_location: {
+                lat: 29.9717233,
+                lng: -90.05463039999999
+            },
+            html_instructions: "Turn <b>right</b> onto <b>Mandeville St</b>",
+            maneuver: "turn-right",
+            polyline: {
+                points: "kh|uD`wsdPy@Bc@@gADkENiEN"
+            },
+            start_location: {
+                lat: 29.9688625,
+                lng: -90.0544055
+            },
+            travel_mode: "BICYCLING"
+        },
+        {
+            distance: {
+                text: "358 ft",
+                value: 109
+            },
+            duration: {
+                text: "1 min",
+                value: 20
+            },
+            end_location: {
+                lat: 29.971666,
+                lng: -90.055762
+            },
+            html_instructions: "Turn <b>left</b> onto <b>N Villere St</b>",
+            maneuver: "turn-left",
+            polyline: {
+                points: "gz|uDlxsdPH`F"
+            },
+            start_location: {
+                lat: 29.9717233,
+                lng: -90.05463039999999
+            },
+            travel_mode: "BICYCLING"
+        },
+        {
+            distance: {
+                text: "331 ft",
+                value: 101
+            },
+            duration: {
+                text: "1 min",
+                value: 19
+            },
+            end_location: {
+                lat: 29.9707555,
+                lng: -90.0556912
+            },
+            html_instructions: "Turn <b>left</b> onto <b>Marigny St</b><div style=\"font-size:0.9em\">Destination will be on the right</div>",
+            maneuver: "turn-left",
+            polyline: {
+                points: "}y|uDn_tdPtDM"
+            },
+            start_location: {
+                lat: 29.971666,
+                lng: -90.055762
+            },
+            travel_mode: "BICYCLING"
         }
     ];
-    
-    readonly ROOT_URL = "http://chainring.tk:3000";
+
+    readonly ROOT_URL = "https://79dd5357.ngrok.io";
 
     // tslint:disable-next-line: max-line-length
     constructor(private http: HttpClient, private router: Router,
                 private routerExtensions: RouterExtensions, private route: ActivatedRoute,
                 private zone: NgZone) {
         // Use the component constructor to inject providers.
-        this.route.queryParams.subscribe((params) => {
+        const paramSubscription = this.route.queryParams.subscribe((params) => {
             const {polyLine} = params;
             polylineHolder = polyLine;
         });
+        paramSubscription.unsubscribe();
     }
-    
+
     ngOnInit(): void {
         // Init your component properties here.
-        
+        this.startTime = new Date();
+        for (let i = 0; i < 100; i++) {
+            clearInterval(i);
+            geolocation.clearWatch(i);
+        }
+        this.listen = false;
+        this.recognized = false;
+        this.zone.runOutsideAngular(() => {
+            this.listenIntervalId = setInterval(() => {
+                if (this.listen === false) {
+                    this.listen = true;
+                    this.speechRecognition.available().then(
+                        (available: boolean) => {
+                            this.handleSpeech();
+                            console.log(available ? "YES!" : "NO");
+                        },
+                        (err: string) => console.log(err)
+                    );
+                }
+            }, 2000);
+        });
+        const potholeImageSource = new ImageSource();
+        this.potholeIcon = new Image();
+        potholeImageSource.loadFromFile("~/app/images/mapPotHole.png");
+        this.potholeIcon.imageSource = potholeImageSource;
+
+        const closeImageSource = new ImageSource();
+        this.closeIcon = new Image();
+        closeImageSource.loadFromFile("~/app/images/mapNearMiss.png");
+        this.closeIcon.imageSource = closeImageSource;
+
+        const avoidImageSource = new ImageSource();
+        this.avoidIcon = new Image();
+        avoidImageSource.loadFromFile("~/app/images/mapAvoid.png");
+        this.avoidIcon.imageSource = avoidImageSource;
+
+        const crashImageSource = new ImageSource();
+        this.crashIcon = new Image();
+        crashImageSource.loadFromFile("~/app/images/mapHit.png");
+        this.crashIcon.imageSource = crashImageSource;
+
+        const stolenImageSource = new ImageSource();
+        this.stolenIcon = new Image();
+        stolenImageSource.loadFromFile("~/app/images/mapStolen.png");
+        this.stolenIcon.imageSource = stolenImageSource;
     }
 
     onDrawerButtonTap(): void {
         const sideDrawer = <RadSideDrawer>app.getRootView();
         sideDrawer.showDrawer();
-   
     }
 
     onPinTap(): void {
         this.pinClicked = !this.pinClicked;
     }
 
+    maneuverParser(str) {
+        const tempManeuvers = [];
+    
+        function parser(str) {
+            if (str.length < 34) {
+                tempManeuvers.push(str);
+
+                return;
+            }
+            const index = str.slice(0, 34).lastIndexOf(" ");
+            const maneuver = str.slice(0, index);
+            tempManeuvers.push(maneuver.trim());
+            parser(str.slice(index));
+        }
+        parser(str);
+        this.maneuvers = tempManeuvers;
+    }
+
     onPinSelect(pinType): void {
         this.pinClicked = false;
-        console.log(pinType);
-
+       
         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
                 const marker = new mapsModule.Marker();
                 const imageSource = new ImageSource();
                 if (pinType === "pothole") {
-                    imageSource.loadFromFile("~/app/images/mapPotHole.png");
+                    marker.icon = this.potholeIcon;
                 } else if (pinType === "close") {
-                    imageSource.loadFromFile("~/app/images/mapNearMiss.png");
+                    marker.icon = this.closeIcon;
                 } else if (pinType === "avoid") {
-                    imageSource.loadFromFile("~/app/images/mapAvoid.png");
+                    marker.icon = this.avoidIcon;
                 } else if (pinType === "crash") {
-                    imageSource.loadFromFile("~/app/images/mapHit.png");
+                    marker.icon = this.crashIcon;
                 } else if (pinType === "stolen") {
-                    imageSource.loadFromFile("~/app/images/mapStolen.png");
+                    marker.icon = this.stolenIcon;
                 }
-                const icon = new Image();
-                icon.imageSource = imageSource;
-                marker.icon = icon;
+            
                 marker.position = mapsModule.Position.positionFromLatLng(result.latitude, result.longitude);
                 this.mapView.addMarker(marker);
                 rideMarkers.markers.push({markerLat: result.latitude, markerLon: result.longitude, type: pinType});
@@ -276,10 +396,9 @@ export class RideComponent implements OnInit {
     }
 
     onHomeTap(): void {
-    
+
         geolocation.clearWatch(this.watchId);
         clearInterval(this.listenIntervalId);
-        clearInterval(this.lightIntervalId);
         this.left = false;
         this.right = false;
         this.straight = false;
@@ -293,8 +412,8 @@ export class RideComponent implements OnInit {
 
     calculateDistance(lat1, lon1, lat2, lon2): number {
         if ((lat1 == lat2) && (lon1 == lon2)) {
-            let dist = 0;
-            
+            const dist = 0;
+
             return dist;
         } else {
             const radlat1 = Math.PI * lat1 / 180;
@@ -309,7 +428,6 @@ export class RideComponent implements OnInit {
             dist = Math.acos(dist);
             dist = dist * 180 / Math.PI;
             dist = dist * 60 * 1.1515;
-            // console.log("dist", dist, new Date());
             return Number(dist.toFixed(2));
     }
 }
@@ -343,21 +461,22 @@ export class RideComponent implements OnInit {
             }
             return tally;
         }, {});
-        const portions = [];
-        if (breakdown) {
-            for (const key in breakdown) {
-                portions.push((breakdown[key] / speeds.length * 100).toFixed(1));
-            }
-        }
-        return portions;
+        // const portions = [];
+        // if(breakdown){
+        //     for (let key in breakdown) {
+        //         portions.push((breakdown[key] / speeds.length * 100).toFixed(1));
+        //     }
+        // }
+        return breakdown;
     }
 
     directionsParser(): void {
         this.steps.forEach((step) => {
         this.directionDistances.push(step.distance.text);
-        this.directionWords.push(step["html_instructions"].replace(/<\/?[^>]+(>|$)/g, ""));
+        this.directionWords.push(step["html_instructions"].replace(/<\/?[^>]+(>|$)/g, " "));
         this.turnPoints.push(step["end_location"]);
-    });
+        });
+        this.maneuverParser(this.directionWords[0]);
     }
 
     onReroute(): void {
@@ -365,7 +484,7 @@ export class RideComponent implements OnInit {
         const lastLat = this.newPathCoords[this.newPathCoords.length - 1].lat;
         const lastLng = this.newPathCoords[this.newPathCoords.length - 1].long;
         const params = new HttpParams().set("place", `${this.destLat},${this.destLng}`).set("userLoc", `${lastLat},${lastLng}`);
-        this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
+        const rerouteSubscription = this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
             // reassigns response to variable to avoid dealing with "<Place[]>"
             this.directionsResponse = response;
             const { rerouteHTML, rerouteEndLoc, rerouteDistance, polyLine } = this.directionsResponse;
@@ -386,6 +505,7 @@ export class RideComponent implements OnInit {
             this.mapView.latitude = newRoute[0].lat;
             this.mapView.longitude = newRoute[0].lng;
             this.mapView.addPolyline(reroutePolyline);
+            rerouteSubscription.unsubscribe();
         });
     }
 
@@ -394,6 +514,7 @@ export class RideComponent implements OnInit {
             this.directionWords = this.directionWords.slice(1);
             this.directionDistances = this.directionDistances.slice(1);
             this.turnPoints = this.turnPoints.slice(1);
+            this.maneuverParser(this.directionWords[0]);
             this.checkForManeuver(29.9778246, -90.0801914);
     }
 
@@ -403,18 +524,12 @@ export class RideComponent implements OnInit {
         geolocation.clearWatch(this.watchId);
         this.speechRecognition.stopListening();
         clearInterval(this.listenIntervalId);
-        clearInterval(this.lightIntervalId);
+      
         this.listen = false;
         this.left = false;
         this.right = false;
         this.straight = false;
 
-        // this.speechRecognition.stopListening()
-        // .then(()=>{
-        //     console.log('stopped listening')
-        // }).catch((err)=>{
-        //     console.error('Error stop listen:', err)
-        // })
         insomnia.allowSleepAgain().then(function() {
         console.log("Insomnia is inactive, good night!");
         });
@@ -427,16 +542,17 @@ export class RideComponent implements OnInit {
         let duration = this.stopTime.getTime() - this.startTime.getTime();
         duration = duration / 10000;
         console.log("duration", duration);
-        this.http.post(this.ROOT_URL + "/marker", rideMarkers, {
+        const markerSubscription = this.http.post(this.ROOT_URL + "/marker", rideMarkers, {
             headers: new HttpHeaders({
                 "Content-Type": "application/json"
             })})
             .subscribe(() => {
                 console.log("success");
             });
+        markerSubscription.unsubscribe();
         const info = {pathPolyline, first, last, avgSpeed, duration, speedBreakdown,
                       topSpeed: this.topSpeed, totalDistance: this.totalDistance};
-        this.http.post(this.ROOT_URL + "/ride", info, {
+        const rideSubscription = this.http.post(this.ROOT_URL + "/ride", info, {
             headers: new HttpHeaders({
                 "Content-Type": "application/json"
             })
@@ -444,6 +560,7 @@ export class RideComponent implements OnInit {
         .subscribe(() => {
             console.log("ride");
         });
+        rideSubscription.unsubscribe();
         const params: NavigationExtras = {
                 queryParams: {
                     polyLine: pathPolyline,
@@ -473,17 +590,16 @@ export class RideComponent implements OnInit {
         // if the user's position is within .0001 latitude or longitude show signal
         if (lat >= this.turnPoints[0].lat - .001 && lat <= this.turnPoints[0].lat + .001
             && long >= this.turnPoints[0].lng - .001 && long <= this.turnPoints[0].lng + .001) {
-        
         if (this.directionWords[0].indexOf("left") !== -1) {
                 this.left = true;
                 this.right = false;
                 this.straight = false;
-                this.vibrator.vibrate(5000);
+                this.vibrator.vibrate(3000);
             } else if (this.directionWords[0].indexOf("right") !== -1) {
                 this.right = true;
                 this.left = false;
                 this.straight = false;
-                this.vibrator.vibrate(5000);
+                this.vibrator.vibrate(3000);
             } else if (this.directionWords[0].indexOf("straight") !== -1) {
                 this.straight = true;
                 this.right = false;
@@ -500,11 +616,52 @@ export class RideComponent implements OnInit {
         }
 
         // if the user location is within .0001 degrees show next direction
-        if (lat >= this.turnPoints[0].lat - .0001 && lat <= this.turnPoints[0].lat + .0001
-            && long >= this.turnPoints[0].lng - .0001 && long <= this.turnPoints[0].lng + .0001) {
-                this.directionWords.unshift();
-                this.directionDistances.unshift();
-                this.turnPoints.unshift();
+        if (lat >= this.turnPoints[0].lat - .0003 && lat <= this.turnPoints[0].lat + .0003
+            && long >= this.turnPoints[0].lng - .0003 && long <= this.turnPoints[0].lng + .0003) {
+                this.directionWords.shift();
+                this.directionDistances.shift();
+                this.turnPoints.shift();
+                this.maneuverParser(this.directionWords[0]);
+            }
+        }
+        // fail safe for two consecutive turns
+        if (this.turnPoints.length) {
+            // if the user's position is within .0001 latitude or longitude show signal
+            if (lat >= this.turnPoints[1].lat - .001 && lat <= this.turnPoints[1].lat + .001
+                && long >= this.turnPoints[1].lng - .001 && long <= this.turnPoints[1].lng + .001) {
+
+                if (this.directionWords[1].indexOf("left") !== -1) {
+                    this.left = true;
+                    this.right = false;
+                    this.straight = false;
+                    this.vibrator.vibrate(3000);
+                } else if (this.directionWords[1].indexOf("right") !== -1) {
+                    this.right = true;
+                    this.left = false;
+                    this.straight = false;
+                    this.vibrator.vibrate(3000);
+                } else if (this.directionWords[1].indexOf("straight") !== -1) {
+                    this.straight = true;
+                    this.right = false;
+                    this.left = false;
+                } else {
+                    this.left = false;
+                    this.right = false;
+                    this.straight = false;
+                }
+            } else {
+                this.left = false;
+                this.right = false;
+                this.straight = false;
+            }
+
+            // if the user location is within .0001 degrees show next direction
+            if (lat >= this.turnPoints[1].lat - .0003 && lat <= this.turnPoints[1].lat + .0003
+                && long >= this.turnPoints[1].lng - .0003 && long <= this.turnPoints[1].lng + .0003) {
+                this.directionWords = this.directionWords.slice(2);
+                this.directionDistances = this.directionWords.slice(2);
+                this.turnPoints = this.turnPoints.slice(2);
+                this.maneuverParser(this.directionWords[0]);
             }
         }
     }
@@ -517,12 +674,7 @@ export class RideComponent implements OnInit {
         this.watchId = geolocation.watchLocation((loc) => {
                     const newPath = new mapsModule.Polyline();
                     if (loc && this.mapView !== null || loc && this.mapView !== undefined) {
-                    //     if(this.listen === false && this.speechRecognition !== null){
-                    //         this.speechRecognition.stopListening();
-                    //     } else {
-                    //    // this.handleSpeech();
-                    //     }
-                    // this.handleSpeech();
+                
                     this.currentSpeed = loc.speed * 2.23694;
                     this.speedString = this.currentSpeed.toFixed(1).slice(0, -2);
                     this.speedStringDecimal = this.currentSpeed.toFixed(1).slice(-1);
@@ -530,11 +682,13 @@ export class RideComponent implements OnInit {
                     if (this.currentSpeed > this.topSpeed) {
                         this.topSpeed = this.currentSpeed;
                     }
+                    if (this.currentSpeed < 4 && this.allSpeeds[this.allSpeeds.length - 1] > 10) {
+                        this.onPinSelect("close");
+                    }
                     this.allSpeeds.push(this.currentSpeed);
                     this.speed += loc.speed;
                     const lat = loc.latitude;
                     const long = loc.longitude;
-                    // const time = loc.timestamp;
                     this.checkForManeuver(lat, long);
     
                     if (this.newPathCoords.length === 0) {
@@ -636,7 +790,7 @@ export class RideComponent implements OnInit {
                             this.recognizedTimeoutId = setTimeout(() => {
                                 this.recognized = false;
                                 clearTimeout(this.recognizedTimeoutId);
-                            } );
+                            }, 3000);
                         } else if (transcription.text.includes("zoom out") && this.recognized === false) {
                             this.recognized = true;
                             this.startZoom -= 1;
@@ -644,11 +798,20 @@ export class RideComponent implements OnInit {
                             this.recognizedTimeoutId = setTimeout(() => {
                                 this.recognized = false;
                                 clearTimeout(this.recognizedTimeoutId);
-                            } );
+                            }, 3000);
                         } else if (transcription.text.includes("stop ride") && this.recognized === false) {
                             this.recognized = true;
                             this.zone.run(() => {
                                 this.onStopTap();
+                            });
+                            this.recognizedTimeoutId = setTimeout(() => {
+                                this.recognized = false;
+                                clearTimeout(this.recognizedTimeoutId);
+                            }, 5000);
+                        } else if (transcription.text.includes("lost") && this.recognized === false) {
+                            this.recognized = true;
+                            this.zone.run(() => {
+                                this.onReroute();
                             });
                             this.recognizedTimeoutId = setTimeout(() => {
                                 this.recognized = false;
@@ -665,7 +828,7 @@ export class RideComponent implements OnInit {
                     }
                 }
             ).then(
-                (started) => { console.log(`started listening`); 
+                (started) => { console.log(`started listening`);
                                this.listen = false;
             },
                 (errorMessage) => {
@@ -684,35 +847,13 @@ export class RideComponent implements OnInit {
     
     onMapReady(args) {
         this.mapView = args.object;
-        this.startTime = new Date();
-        for (let i = 0; i < 100; i++) {
-            clearInterval(i);
-            geolocation.clearWatch(i);
-        }
-        this.listen = false;
-        this.recognized = false;
-        this.zone.runOutsideAngular(() => {
-            this.listenIntervalId = setInterval(() => {
-                if (this.listen === false) {
-                    this.listen = true;
-                    
-                    this.speechRecognition.available().then(
-                        (available: boolean) => {
-                           // this.handleSpeech();
-                            console.log(available ? "YES!" : "NO");},
-                        (err: string) => console.log(err)
-                    )
-                }
-            }, 5000);
-        });
-        console.log("interval id:", this.listenIntervalId);
-   
-        // const line = polylineHolder;
-        const line = "a`~uDhyxdP`@JeCdEoD|FuAxBq@CsBEGrF";
+
+        const line = polylineHolder;
+        // const line = "yd}uDhjsdPfBG@P@\\`CInCKnFQdGSAW@VJhEL`Fy@BkBFuK^H`FtDM"
         if (line !== undefined) {
             this.directedRide = true;
             this.directionsParser();
-            let flightPlanCoordinates = decodePolyline(line);
+            const flightPlanCoordinates = decodePolyline(line);
             this.polyline = new mapsModule.Polyline();
             for (let i = 0; i < flightPlanCoordinates.length; i++) {
                 const coord = flightPlanCoordinates[i];
@@ -723,7 +864,7 @@ export class RideComponent implements OnInit {
             this.polyline.visible = true;
             this.polyline.width = 10;
             this.polyline.geodesic = false;
-            this.polyline.color = new Color("#393ef9");
+            
             this.mapView.latitude = flightPlanCoordinates[0].lat;
             this.mapView.longitude = flightPlanCoordinates[0].lng;
             this.mapView.addPolyline(this.polyline);

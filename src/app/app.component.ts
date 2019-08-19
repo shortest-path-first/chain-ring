@@ -4,7 +4,17 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { DrawerTransitionBase, RadSideDrawer, SlideInOnTopTransition } from "nativescript-ui-sidedrawer";
 import { filter } from "rxjs/operators";
 import * as app from "tns-core-modules/application";
-import { configureOAuthProviders } from "../../App_Resources/auth-service";
+import { configureOAuthProviders } from "../auth-service";
+import * as imagepicker from "nativescript-imagepicker";
+import { knownFolders, Folder, File } from "tns-core-modules/file-system";
+import { fromObject, fromObjectRecursive, Observable, PropertyChangeData } from "tns-core-modules/data/observable";
+import {
+    request,
+    getFile,
+    getImage,
+    getJSON,
+    getString
+} from "tns-core-modules/http";
 
 @Component({
     moduleId: module.id,
@@ -12,22 +22,31 @@ import { configureOAuthProviders } from "../../App_Resources/auth-service";
     templateUrl: "app.component.html"
 })
 export class AppComponent implements OnInit {
+    showIcon = true;
+    showProPic = false;
+    imagePath = "";
 
     private _activatedUrl: string;
     private _sideDrawerTransition: DrawerTransitionBase;
 
-    constructor(private router: Router, private routerExtensions: RouterExtensions) {
+    constructor(
+        private router: Router,
+        private routerExtensions: RouterExtensions
+    ) {
         // Use the component constructor to inject services
     }
 
     ngOnInit(): void {
-       configureOAuthProviders();
+        configureOAuthProviders();
         this._activatedUrl = "/home";
         this._sideDrawerTransition = new SlideInOnTopTransition();
 
         this.router.events
-        .pipe(filter((event: any) => event instanceof NavigationEnd))
-        .subscribe((event: NavigationEnd) => this._activatedUrl = event.urlAfterRedirects);
+            .pipe(filter((event: any) => event instanceof NavigationEnd))
+            .subscribe(
+                (event: NavigationEnd) =>
+                    (this._activatedUrl = event.urlAfterRedirects)
+            );
     }
 
     get sideDrawerTransition(): DrawerTransitionBase {
@@ -47,5 +66,56 @@ export class AppComponent implements OnInit {
 
         const sideDrawer = <RadSideDrawer>app.getRootView();
         sideDrawer.closeDrawer();
+    }
+    onDrawerIconTap(): void {
+        const context = imagepicker.create({
+            mode: "single" // use "multiple" for multiple selection
+        });
+        context
+            .authorize()
+            .then(() => {
+                return context.present();
+            })
+            .then((selection) => {
+                console.log("selected");
+                selection.forEach((selected) => {
+                    // process the selected image
+                    this.imagePath = selected.android;
+                    this.showProPic = true;
+                    this.showIcon = false;
+                    console.log("selected", selected);
+                });
+                // list.items = selection;
+            })
+            .catch((e) => {
+                // process error
+                console.log(e);
+            });
+    }
+
+    logout(): void {
+        const vm = new Observable();
+        const documents: Folder = knownFolders.documents();
+        const folder: Folder = documents.getFolder(vm.get("src") || "src");
+        const file: File = folder.getFile(`${vm.get("token") || "token"}` + `.txt`);
+
+        file.readText()
+            .then((res) => {
+                vm.set("writtenContent", res);
+                console.log(res);
+
+                request({
+                    url: `http://812bec1b.ngrok.io/logout/${res}`,
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    content: JSON.stringify({
+                        token: res
+                    })
+                }).then(httpResponse => {
+                    this.onNavItemTap("/login");
+                });
+        });
     }
 }

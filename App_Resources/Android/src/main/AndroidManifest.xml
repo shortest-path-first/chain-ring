@@ -25,7 +25,6 @@
 		>
 
 		<meta-data
-						
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/nativescript_google_maps_api_key" />
 
