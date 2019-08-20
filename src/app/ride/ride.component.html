@@ -17,9 +17,15 @@
       <Label *ngIf="listen" class="action-bar-title" text="{{directionWords[0]}}" textWrap="true" style="color: rgb(221, 16, 16)">
       </Label>
     </StackLayout>
+    <FlexboxLayout *ngIf="!directedRide" align-items="stretch" flexDirection="row" justifyContent="space-between">
+      <!-- <Label class="header" text="Chainring"></Label> -->
+      <Label *ngIf="listen" class="fas" style="font-size: 50em; color: white;" text="&#xf130;"></Label>
+      <Label *ngIf="!listen" class="fas" style="font-size: 50em; color: white;" text="&#xf131;"></Label>
+    </FlexboxLayout>
+
     <StackLayout *ngIf="direct" (tap)="onDirectTap()">
       <StackLayout *ngFor="let step of directionWords; let i = index">
-        <Label *ngIf="direct" class="action-bar-title" [text]="step" [ngStyle]= "{'background-color': i % 2 === 0 ? white : black}"
+        <Label *ngIf="direct" class="action-bar-title" [text]="step" [ngStyle]= "{'background-color': i % 2 === 0 ? 'white' : 'black'}"
         textWrap="true"></Label>
       </StackLayout>
     </StackLayout>

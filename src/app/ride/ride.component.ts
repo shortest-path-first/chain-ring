@@ -728,6 +728,7 @@ export class RideComponent implements OnInit {
 
         const line = polylineHolder;
         // const line = "yd}uDhjsdPfBG@P@\\`CInCKnFQdGSAW@VJhEL`Fy@BkBFuK^H`FtDM"
+        console.log(this.directedRide);
         if (line !== undefined) {
             this.directedRide = true;
             this.directionsParser();
@@ -764,6 +765,8 @@ export class RideComponent implements OnInit {
             this.mapView.latitude = flightPlanCoordinates[0].lat;
             this.mapView.longitude = flightPlanCoordinates[0].lng;
             this.mapView.addPolyline(this.polyline);
+        } else {
+            this.directedRide = false;
         }
 
         this.mapView.mapAnimationsEnabled = true;
