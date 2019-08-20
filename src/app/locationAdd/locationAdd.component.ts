@@ -20,6 +20,8 @@ let markers = [];
 let markerLat;
 let markerLng;
 let userEmail;
+let directionsResponse;
+let peterInfo;
 
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
@@ -137,6 +139,19 @@ export class LocationAddComponent implements OnInit {
     saveLocation() {
         console.log("button press");
         console.log(markerLat, markerLng, this.locName);
+        // tslint:disable-next-line: max-line-length
+        const params = new HttpParams().set("place", `${markerLat},${markerLng}`).set("userLoc", `${this.latitude},${this.longitude}`);
+        this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
+            // reassigns response to variable to avoid dealing with "<Place[]>"
+            directionsResponse = response;
+            const { peterRide } = directionsResponse;
+            peterInfo = peterRide;
+            console.log(peterInfo);
+        }, (err) => {
+            console.log("error", err.message);
+        }, () => {
+            console.log("completed");
+        });
     }
 
     homeTap(navItemRoute: string): void {
