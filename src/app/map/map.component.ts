@@ -22,6 +22,8 @@ let markerLng;
 let directionsResponse;
 let markers = [];
 let turnBy;
+let peterInfo;
+
 
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
@@ -155,13 +157,12 @@ export class MapComponent implements OnInit {
             
             this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
                 // reassigns response to variable to avoid dealing with "<Place[]>"
-                console.log(response);
                 directionsResponse = response;
-                const { polyLine, turnByTurn } = directionsResponse;
+                const { polyLine, turnByTurn, peterRide } = directionsResponse;
+                peterInfo = peterRide;
                 turnBy = turnByTurn;
                 this.turnByList = turnBy;
                 const bikePath = decodePolyline(polyLine);
-                console.log(bikePath);
                 const path = new mapsModule.Polyline();
                 this.compPoly = path;
                 // tslint:disable-next-line: prefer-for-of
@@ -206,10 +207,12 @@ export class MapComponent implements OnInit {
             });
         } else if (this.readyToRide === true) {
             console.log("tapped");
-            const { polyLine } = directionsResponse;
+            const { polyLine, peterRide } = directionsResponse;
+            let hailMary = JSON.stringify(peterInfo);
             const params: NavigationExtras = {
                 queryParams: {
-                    polyLine
+                    polyLine,
+                    hailMary
                 }
             };
             this.routerExtensions.navigate(["/ride"], params);
