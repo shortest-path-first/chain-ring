@@ -29,7 +29,7 @@ export class StatsComponent implements OnInit {
 
     pieSource: Array<{ Speed: string, Amount: number }> = [];
 
-    readonly ROOT_URL = "https://53e76063.ngrok.io";
+    readonly ROOT_URL = "https://54ec740b.ngrok.io";
 
     storedStats: Observable<Array<storedStats>>;
 
@@ -40,7 +40,8 @@ export class StatsComponent implements OnInit {
         this.userTotalStats();
         this.userRecentStats();
         this.route.queryParams.subscribe((params) => {
-            this.displayedAverageSpeed = params.average;
+         
+            this.displayedAverageSpeed = params.average.toFixed(1);
             this.displayedTotalDistance = params.totalDistance;
             if (this.displayedTotalDistance.indexOf(".") !== -1) {
                 const decimalIndex = this.displayedTotalDistance.indexOf(".");
