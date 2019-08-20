@@ -29,7 +29,7 @@ export class CommuteComponent implements OnInit {
     workLat;
     workLng;
 
-    readonly ROOT_URL = "https://79dd5357.ngrok.io";
+    readonly ROOT_URL = "http://chainring.tk:3000";
 
     // tslint:disable-next-line: max-line-length
 

@@ -29,7 +29,7 @@ export class StatsComponent implements OnInit {
 
     pieSource: Array<{ Speed: string, Amount: number }> = [];
 
-    readonly ROOT_URL = "http://chainring.tk";
+    readonly ROOT_URL = "http://chainring.tk:3000";
 
     storedStats: Observable<Array<storedStats>>;
 
