@@ -13,6 +13,13 @@ const mapsModule = require("nativescript-google-maps-sdk");
 const decodePolyline = require("decode-google-map-polyline");
 import { Image } from "tns-core-modules/ui/image";
 import { ImageSource } from "tns-core-modules/image-source";
+import * as utils from "tns-core-modules/utils/utils";
+import { knownFolders, Folder, File } from "tns-core-modules/file-system";
+import {
+    fromObject,
+    fromObjectRecursive,
+    PropertyChangeData
+} from "tns-core-modules/data/observable";
 
 declare var com: any;
 
@@ -42,6 +49,9 @@ export class MapComponent implements OnInit {
     markerSelected = false;
     readyToRide = false;
     turnByList: Array<object> = [];
+    userAvoidMarkers = [];
+    vm;
+    
 
     readonly ROOT_URL = "http://chainring.tk:3000";
 
@@ -53,6 +63,10 @@ export class MapComponent implements OnInit {
 
     ngOnInit(): void {
         // Init your component properties here.
+        this.vm = new Observable();
+        const documents: Folder = knownFolders.documents();
+        const folder: Folder = documents.getFolder(this.vm.get("src") || "src");
+        const file: File = folder.getFile(`${this.vm.get("token") || "token"}` + `.txt`);
         geolocation.enableLocationRequest();
         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
@@ -60,6 +74,9 @@ export class MapComponent implements OnInit {
                 this.latitude = result.latitude;
                 this.longitude = result.longitude;
             });
+        this.http.get(this.ROOT_URL + '/marker',  ).subscribe((response)=>{
+
+        });
     }
 
     onDrawerButtonTap(): void {
