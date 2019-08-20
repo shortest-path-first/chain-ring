@@ -12,12 +12,17 @@
     <ActionItem icon="res://navigation/menu" android:visibility="collapsed" (tap)="onDrawerButtonTap()"
         ios.position="left">
     </ActionItem>
-    <Stacklayout>
-      <Label class="action-bar-title" text="{{maneuvers[0]}}"></Label>
-      <Label *ngIf="maneuvers[1]" class="action-bar-title" text="{{maneuvers[1]}}"></Label>
-      <Label *ngIf="maneuvers[2]" class="action-bar-title" text="{{maneuvers[2]}}"></Label>
-      <Label *ngIf="maneuvers[3]" class="action-bar-title" text="{{maneuvers[3]}}"></Label>
-    </Stacklayout>
+    <StackLayout *ngIf="!direct" (tap)="onDirectTap()">
+      <Label *ngIf="!listen" class="action-bar-title" text="{{directionWords[0]}}" textWrap="true" style="color: white"></Label>
+      <Label *ngIf="listen" class="action-bar-title" text="{{directionWords[0]}}" textWrap="true" style="color: rgb(253, 4, 4)">
+      </Label>
+    </StackLayout>
+    <StackLayout *ngIf="direct" (tap)="onDirectTap()">
+      <StackLayout *ngFor="let step of directionWords; let i = index">
+        <Label *ngIf="direct" class="action-bar-title" [text]="step" [ngStyle]= "{'background-color': i % 2 === 0 ? white : black}"
+        textWrap="true"></Label>
+      </StackLayout>
+    </StackLayout>
 </ActionBar>
 <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY">
 </script>

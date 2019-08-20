@@ -14,6 +14,8 @@ import { Vibrate } from 'nativescript-vibrate';
 import { Image } from "tns-core-modules/ui/image";
 import { ImageSource } from "tns-core-modules/image-source";
 import { Place } from "../map/map";
+import * as utils from "tns-core-modules/utils/utils";
+
 
 
 //const style = require("../../../App_Resources/style.json")
@@ -21,9 +23,11 @@ var insomnia = require("nativescript-insomnia");
 var mapsModule = require("nativescript-google-maps-sdk");
 const decodePolyline = require('decode-google-map-polyline');
 const polylineEncoder = require('google-polyline')
-const rideMarkers = {markers: []};
+let rideMarkers = {markers: []};
 let polylineHolder;
 
+
+declare var com: any;
 
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
@@ -78,12 +82,14 @@ export class RideComponent implements OnInit {
     turnPolylines = [];
     directionDistances = [];
     directionWords = [];
+    allDirectionWords = [];
     turnPoints = [];
     potholeIcon;
     closeIcon;
     avoidIcon;
     crashIcon;
     stolenIcon;
+    direct = false;
     steps = [
         {
             "distance": {
@@ -305,7 +311,7 @@ export class RideComponent implements OnInit {
         this.zone.runOutsideAngular(() => {
             this.listenIntervalId = setInterval(() => {
                 if (this.listen === false) {
-                    this.listen = true;
+                    
                     this.speechRecognition.available().then(
                         (available: boolean) => {
                             this.handleSpeech();
@@ -347,26 +353,15 @@ export class RideComponent implements OnInit {
         sideDrawer.showDrawer();
     }
 
+    onDirectTap(): void {
+        console.log("direct click")
+        this.direct = !this.direct;
+    }
+
     onPinTap(): void {    
         this.pinClicked = !this.pinClicked;
     }
 
-    maneuverParser(str){
-        let tempManeuvers = [];
-    
-       function parser(str){
-            if (str.length < 34) {
-                tempManeuvers.push(str);
-                return;
-            }
-            let index = str.slice(0, 34).lastIndexOf(" ");
-            let maneuver = str.slice(0, index);
-            tempManeuvers.push(maneuver.trim());
-            parser(str.slice(index));
-        }
-        parser(str);
-        this.maneuvers = tempManeuvers;
-    }
 
     onPinSelect(pinType): void {
         this.pinClicked = false;
@@ -473,9 +468,10 @@ export class RideComponent implements OnInit {
         this.steps.forEach((step)=>{
         this.directionDistances.push(step.distance.text);
         this.directionWords.push(step['html_instructions'].replace(/<\/?[^>]+(>|$)/g, " "));
+        //this.allDirectionWords.push(step['html_instructions'].replace(/<\/?[^>]+(>|$)/g, " "))
         this.turnPoints.push(step['end_location']);
         });
-        this.maneuverParser(this.directionWords[0]);
+
     }
 
     onReroute(): void{
@@ -499,7 +495,7 @@ export class RideComponent implements OnInit {
             reroutePolyline.visible = true;
             reroutePolyline.width = 10;
             reroutePolyline.geodesic = false;
-            reroutePolyline.color = new Color("#393ef9");
+            reroutePolyline.color = new Color("#393ef9"); 
             this.mapView.removeAllPolylines();
             this.mapView.latitude = newRoute[0].lat;
             this.mapView.longitude = newRoute[0].lng;
@@ -513,7 +509,6 @@ export class RideComponent implements OnInit {
             this.directionWords = this.directionWords.slice(1);
             this.directionDistances = this.directionDistances.slice(1);
             this.turnPoints = this.turnPoints.slice(1);
-            this.maneuverParser(this.directionWords[0]);
             this.checkForManeuver(29.9778246, -90.0801914);
     }
 
@@ -571,6 +566,58 @@ export class RideComponent implements OnInit {
                     topSpeed: this.topSpeed,
                 }
             };
+
+        this.mapView = null;
+        this.watchId = null;
+        this.show = null;
+        this.pinClicked = null;
+        this.directionsResponse = null;
+        this.maneuvers = null;
+        this.listen = null;
+        this.speed = null;
+        this.topSpeed = null;
+        this.allSpeeds = null;
+        this.callCount = null;
+        this.currentSpeed = null;
+        this.speedString = null;
+        this.speedStringDecimal = null;
+        this.newPathCoords = null;
+        this.totalDistance = null;
+        this.recognizedText = null;
+        this.distanceString = null;
+        this.listenIntervalId = null;
+        this.light = null;
+        this.distanceStringDecimal = null;
+        this.polyline = null;
+        this.startZoom = null;
+        this.speechRecognition = null;
+        this.startTime = null;
+        this.stopTime = null;
+        this.left = null;
+        this.right = null;
+        this.recognized = null;
+        this.recognizedTimeoutId = null;
+        this.straight = null;
+        this.vibrator = null;
+        this.colorCount = null;
+        this.colorArray = null;
+        this.directedRide = null;
+        this.destLat = null;
+        this.destLng = null;
+        this.turnPolyline = null;
+        this.turnPolylines = null;
+        this.directionDistances = null;
+        this.directionWords = null;
+        this.allDirectionWords = null;
+        this.turnPoints = null;
+        this.potholeIcon = null;
+        this.closeIcon = null;
+        this.avoidIcon = null;
+        this.crashIcon = null;
+        this.stolenIcon = null;
+        this.direct = null;
+        this.steps = null;
+        rideMarkers = null;
     this.routerExtensions.navigate(["/stats"], params);
     }
 
@@ -622,7 +669,7 @@ export class RideComponent implements OnInit {
                 this.directionWords.shift();
                 this.directionDistances.shift();
                 this.turnPoints.shift();
-                this.maneuverParser(this.directionWords[0]);
+            
             }
         }
         // fail safe for two consecutive turns
@@ -662,7 +709,6 @@ export class RideComponent implements OnInit {
                 this.directionWords = this.directionWords.slice(2);
                 this.directionDistances = this.directionWords.slice(2);
                 this.turnPoints = this.turnPoints.slice(2);
-                this.maneuverParser(this.directionWords[0]);
             }
         }
     }
@@ -754,6 +800,7 @@ export class RideComponent implements OnInit {
                     returnPartialResults: false,
                     // this callback will be invoked repeatedly during recognition
                     onResult: (transcription: SpeechRecognitionTranscription) => {
+                       
                         console.log('Getting results');
                         this.zone.run(() => this.recognizedText = transcription.text);
                         if (transcription.text.includes("speedometer") && this.recognized === false) {
@@ -821,10 +868,14 @@ export class RideComponent implements OnInit {
                                 clearTimeout(this.recognizedTimeoutId);
                             }, 5000);
                         }
+                        this.zone.run(()=>{
                             this.listen = false;
+                        })
                     },
                     onError: (error) => {
-                        this.listen = false;
+                        this.zone.run(()=>{
+                            this.listen = false;
+                        })
                         // - iOS: A 'string', describing the issue. 
                         // - Android: A 'number', referencing an 'ERROR_*' constant from https://developer.android.com/reference/android/speech/SpeechRecognizer.
                         //            If that code is either 6 or 7 you may want to restart listening.
@@ -832,17 +883,24 @@ export class RideComponent implements OnInit {
                 }
             ).then(
                 (started) => { console.log(`started listening`) 
-                this.listen = false;
+                this.zone.run(()=>{
+                    this.listen = true;
+                })
             },
                 (errorMessage) => { 
                     //console.log(`Listen Error: ${errorMessage}`);
+                    this.zone.run(()=>{
                         this.listen = false;
+                    })
                 }
             )
                 .catch((error) => {
                     // same as the 'onError' handler, but this may not return if the error occurs after listening has successfully started (because that resolves the promise,
                     // hence the' onError' handler was created.
                     console.error("Where's the error",error);
+                    this.zone.run(()=>{
+                        this.listen = false;
+                    })
                 });
             }
      
@@ -851,17 +909,44 @@ export class RideComponent implements OnInit {
     onMapReady(args){
         this.mapView = args.object; 
 
-        const line = polylineHolder;
-        //const line = "yd}uDhjsdPfBG@P@\\`CInCKnFQdGSAW@VJhEL`Fy@BkBFuK^H`FtDM"
+        //const line = polylineHolder;
+        const line = "yd}uDhjsdPfBG@P@\\`CInCKnFQdGSAW@VJhEL`Fy@BkBFuK^H`FtDM"
         if(line !== undefined){
             this.directedRide = true;
             this.directionsParser();
             var flightPlanCoordinates = decodePolyline(line);
-             this.polyline = new mapsModule.Polyline();
+            this.polyline = new mapsModule.Polyline();
             for (let i = 0; i < flightPlanCoordinates.length; i++){
                 let coord = flightPlanCoordinates[i];
                 this.polyline.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
             }
+            //let bikeLayer = new google.maps.BicyclingLayer()
+            //let bikeLayer = new mapsModule.L
+            //kayer.BicyclingLayer();
+            //this.mapView.set(bikeLayer);
+            let myLatLng = { lat: 29.9688625, lng: -90.0544055 }; 
+        
+            var latLng = new com.google.android.gms.maps.model.LatLng(29.9688625, -90.0544055);
+            let decoded = com.google.maps.android.PolyUtil.decode(line);
+            console.log(decoded);
+            // this.mapView.gMap.geometry.poly.isLocationOnEdge(latLng, flightPlanCoordinates, 10e-1);
+            //mapsModule.Geometry.Poly.isLocationOnEdge(latLng, flightPlanCoordinates, 10e-1);
+            //console.log(mapsModule);
+            //this.mapView.gMap.maps.geometry.poly.isLocationOnEdge(latLng, flightPlanCoordinates, 10e-1);
+            //this.mapView.gMap.PolyUtil.isLocationOnEdge(latLng, flightPlanCoordinates, 10e-1);
+            //let latLng = new mapsModule.LatLng(myLatLng.lat, myLatLng.lng);
+            //new google.maps.geometry.poly.isLocationOnEdge
+            console.log(com.google.maps.android.PolyUtil.isLocationOnEdge(latLng, decoded, true, 10e-1));
+            //console.log(myLatLng);
+            // let bicyclingLayer = com.google.maps.android.data.Layer;
+            // console.log(bicyclingLayer);
+            // let KML = new com.google.maps.android.data.kml.KmlLayer(this.mapView, {
+            //     url: "https://data.nola.gov/api/geospatial/8npz-j6vy?method=export&format=KML",
+            //     map: this.mapView,
+            // }, getApplicationContext());
+
+
+            //console.log("on edge:", google.maps.geometry.poly.isLocationOnEdge(myLatLng, flightPlanCoordinates, 10e-1));
             this.destLat = flightPlanCoordinates[flightPlanCoordinates.length - 1].lat;
             this.destLng = flightPlanCoordinates[flightPlanCoordinates.length - 1].lng;
             this.polyline.visible = true;
