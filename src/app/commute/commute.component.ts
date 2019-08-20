@@ -29,13 +29,12 @@ export class CommuteComponent implements OnInit {
     workLat;
     workLng;
 
-    readonly ROOT_URL = "http://chainring.tk:3000";
+    readonly ROOT_URL = "https://53e76063.ngrok.io";
 
     // tslint:disable-next-line: max-line-length
 
     constructor(private http: HttpClient, private routerExtensions: RouterExtensions) {
         // Use the component constructor to inject providers.
-        // this.locationList = this.locations;
     }
 
     ngOnInit(): void {

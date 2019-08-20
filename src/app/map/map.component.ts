@@ -43,7 +43,7 @@ export class MapComponent implements OnInit {
     readyToRide = false;
     turnByList: Array<object> = [];
 
-    readonly ROOT_URL = "http://chainring.tk:3000";
+    readonly ROOT_URL = "https://53e76063.ngrok.io";
 
     places: Observable<Array<Place>>;
 
@@ -120,7 +120,6 @@ export class MapComponent implements OnInit {
 
     removeGetDirections() {
         this.markerSelected = false;
-        this.readyToRide = false;
         this.markers.forEach((marker) => { marker.visible = false; });
         this.markers = [];
         markers = [];
@@ -153,13 +152,16 @@ export class MapComponent implements OnInit {
             // tslint:disable-next-line: max-line-length
             const params = new HttpParams().set("place", `${markerLat},${markerLng}`).set("userLoc", `${this.latitude},${this.longitude}`);
             // http request to get directions between user point and marker selected
+            
             this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
                 // reassigns response to variable to avoid dealing with "<Place[]>"
+                console.log(response);
                 directionsResponse = response;
                 const { polyLine, turnByTurn } = directionsResponse;
                 turnBy = turnByTurn;
                 this.turnByList = turnBy;
                 const bikePath = decodePolyline(polyLine);
+                console.log(bikePath);
                 const path = new mapsModule.Polyline();
                 this.compPoly = path;
                 // tslint:disable-next-line: prefer-for-of
@@ -195,6 +197,7 @@ export class MapComponent implements OnInit {
                 const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(bounds, padding);
                 actualMap.gMap.animateCamera(newBounds);
                 this.readyToRide = true;
+                this.markerSelected = true;
                 this.bottomButtonText = "Go Now!";
             }, (err) => {
                 console.log("error", err.message);
