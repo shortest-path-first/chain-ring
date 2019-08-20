@@ -16,7 +16,7 @@
                 [zoom]="zoom" padding="{{padding}}" (mapReady)="onMapReady($event)" (markerSelect)="onMarkerPick($event)" (coordinateTapped)="removeGetDirections()">
             </maps:mapView>
             <Button *ngIf=markerSelected width="95%" height="100" [text]=bottomButtonText (tap)="getDirections()" fontSize="25"></Button>
-            <StackLayout *ngFor="let step of turnByList" class="commute-info-line" height="75">
+            <StackLayout *ngFor="let step of turnByList" class="map-info-line" height="75">
                 <Label [text]="step[0]" height="40" textWrap="true"></Label>
                 <Label [text]="step[1]" height="20" textWrap="true"></Label>
             </StackLayout>

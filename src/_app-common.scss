@@ -236,3 +236,18 @@ $sidedrawer-list-icon-size: 20;
     border-width: 10px;
     text-align: center;
 }
+.map-info-line{
+    background-color: black;
+    color: white;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: white;
+    border-width: 10px;
+    margin: 10px 10px;
+    max-width: 30%;
+    height: 18%;
+    opacity: .5;
+    font-size: 18%;
+    text-align: center;
+    font-family: Roboto-Medium;
+}
