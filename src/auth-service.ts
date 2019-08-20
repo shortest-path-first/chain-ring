@@ -58,10 +58,10 @@ export function tnsOauthLogin(providerType) {
       console.log("Logged in", tokenResult.refreshTokenExpiration);
 
       const options = {
-          url: "http://812bec1b.ngrok.io/userInfo",
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          content: JSON.stringify({
+        url: "https://53e76063.ngrok.io/userInfo",
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        content: JSON.stringify({
               accesstoken: tokenResult.accessToken,
               idToken: tokenResult.idToken
           })
@@ -89,16 +89,16 @@ export function tnsOauthLogin(providerType) {
                       vm.set("isItemVisible", true);
 
                       request({
-                          url: `http://812bec1b.ngrok.io/login/${res}`,
-                          method: "Patch",
-                          headers: {
+                        url: `https://53e76063.ngrok.io/login/${res}`,
+                        method: "Patch",
+                        headers: {
                               "Content-Type":
                                   "application/json"
                           },
-                          content: JSON.stringify({
+                        content: JSON.stringify({
                               token: res
                           })
-                      }).then(response => {
+                      }).then((response) => {
                           console.log(
                               response.content.toString()
                           );

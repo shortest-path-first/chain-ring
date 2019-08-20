@@ -93,8 +93,8 @@ export class RideComponent implements OnInit {
     steps;
     
 
+    readonly ROOT_URL = "https://54ec740b.ngrok.io";
 
-    readonly ROOT_URL = "http://chainring.tk"
     // tslint:disable-next-line: max-line-length
     constructor(private http: HttpClient, private router: Router,
                 private routerExtensions: RouterExtensions, private route: ActivatedRoute,

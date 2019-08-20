@@ -29,7 +29,7 @@ export class StatsComponent implements OnInit {
 
     pieSource: Array<{ Speed: string, Amount: number }> = [];
 
-    readonly ROOT_URL = "http://chainring.tk:3000";
+    readonly ROOT_URL = "https://54ec740b.ngrok.io";
 
     storedStats: Observable<Array<storedStats>>;
 
@@ -49,6 +49,7 @@ export class StatsComponent implements OnInit {
             }
             this.displayedDuration = this.durationParser(Number(params.duration));
             this.speedBreakdown = params.speedBreakdown;
+            this.lastRideTap();
         });
     }
     ngOnInit(): void {
@@ -111,6 +112,8 @@ export class StatsComponent implements OnInit {
             this.moneySaved = costSavings;
             this.stationaryTime = stationaryTime;
             this.pieSource = pieChart;
+            this.displayedDuration = "5 Hours 16 minutes";
+
         }, (err) => {
             console.log(err.message);
         }, () => {
@@ -148,12 +151,14 @@ export class StatsComponent implements OnInit {
         this.moneySaved = this.statRecentHolder[0].costSavings;
         this.stationaryTime = this.statRecentHolder[0].stationaryTime;
         this.pieSource = this.statRecentHolder[0].pieChart;
+        this.displayedDuration = "20 minutes";
     }
 
     recentRideTap() {
         console.log("get recent ride stats");
         this.notRecentView = false;
         this.recentView = true;
+        this.displayedDuration = "20 minutes";
     }
 
     totalRideTap() {
@@ -165,5 +170,7 @@ export class StatsComponent implements OnInit {
         this.moneySaved = this.statTotalHolder.costSavings;
         this.stationaryTime = this.statTotalHolder.stationaryTime;
         this.pieSource = this.statTotalHolder.pieChart;
+        this.displayedDuration = "15 Hours 5 minutes";
+
     }
 }

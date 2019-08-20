@@ -15,11 +15,16 @@
         <Label *ngIf=notRecentView row="3" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{displayedTotalDistance}} miles"></Label>
         <Label *ngIf=notRecentView row="5" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Duration"></Label>
         <Label *ngIf=notRecentView row="5" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{displayedDuration}}"></Label>
-        <GridLayout *ngIf=notRecentView row="7" col="0" colSpan="12" rowSpan="3" height="100%" width="100%" class="stats-info-line">
-            <RadPieChart allowAnimation="true" row="0">
-                <PieSeries tkPieSeries selectionMode="DataPoint" [items]="pieSource" valueProperty="Amount" legendLabel="Speed"></PieSeries>
-                <RadLegendView tkPieLegend position="Right" title="Speeds (based on max speed)" offsetOrigin="TopRight" width="150" enableSelection="true"></RadLegendView>
-            </RadPieChart>
+        <GridLayout *ngIf=notRecentView row="7" col="0" colSpan="12" rowSpan="3" height="100%" width="100%">
+            <chart:RadPieChart allowAnimation="true" row="0">
+                <chart:PieSeries tkPieSeries selectionMode="DataPoint" [items]="pieSource" valueProperty="Amount" legendLabel="Speed" color="white">
+                    <chart:PieSeries.labelStyle>
+                        <chart:PointLabelStyle margin="15" textColor="white"></chart:PointLabelStyle>/>
+                    </chart:PieSeries.labelStyle>
+                </chart:PieSeries>
+                <chart:RadLegendView tkPieLegend position="Right" title="Speeds (based on max speed)" offsetOrigin="TopRight" width="150" enableSelection="true"
+                titleColor="white"></chart:RadLegendView>
+            </chart:RadPieChart>
         </GridLayout>
     </GridLayout>
 
@@ -27,8 +32,8 @@
         <Label row="0" col="0" rowSpan="1" colSpan="4" class="stats-header" (tap)="lastRideTap()" text="Last Ride"></Label>
         <Label row="0" col="4" rowSpan="1" colSpan="4" class="stats-header" (tap)="recentRideTap()" text="Recent"></Label>
         <Label row="0" col="8" rowSpan="1" colSpan="4" class="stats-header" (tap)="totalRideTap()" text="Total"></Label>
-        <StackLayout row="1" col="0" rowSpan="10" colSpan="12"  class="direction-info-line" height="100%">
-            <Label  *ngFor="let ride of statHolder; let i = index" text="REPLACE WITH TIME AND/IF ROUTE NAME" height="20%" textWrap="true"></Label>
+        <StackLayout row="1" col="0" rowSpan="10" colSpan="12"  class="stats-info-line" height="100%">
+            <Label  *ngFor="let ride of statHolder; let i = index" text="Feature coming soon" height="20%" textWrap="true"></Label>
             
         </StackLayout>
     </GridLayout>
