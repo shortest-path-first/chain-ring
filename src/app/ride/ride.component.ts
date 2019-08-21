@@ -16,13 +16,8 @@ import { ImageSource } from "tns-core-modules/image-source";
 import { Place } from "../map/map";
 
 // const style = require("../../../App_Resources/style.json")
-<<<<<<< HEAD
-let insomnia = require("nativescript-insomnia");
-let mapsModule = require("nativescript-google-maps-sdk");
-=======
 const insomnia = require("nativescript-insomnia");
 const mapsModule = require("nativescript-google-maps-sdk");
->>>>>>> d3fe8802e1bab6d6951f57da1c6f96ed35037156
 const decodePolyline = require("decode-google-map-polyline");
 const polylineEncoder = require("google-polyline");
 const rideMarkers = {markers: []};
