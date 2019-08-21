@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
                 this.vm.set("writtenContent", res);
                 console.log(res);
                 const options = {
-                    url: `https://53e76063.ngrok.io/login/${res}`,
+                    url: `http://812bec1b.ngrok.io/login/${res}`,
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -46,6 +46,7 @@ export class LoginComponent implements OnInit {
                 request(options)
                     .then((isLoggedIn) => {
                         console.log(isLoggedIn.content);
+                        console.log("<===========>")
                         if (isLoggedIn.content.toJSON().bool) {
                             console.log("Rerouting");
                             this._activatedUrl = "/home";
@@ -73,7 +74,7 @@ export class LoginComponent implements OnInit {
         //         this.vm.set("writtenContent", res);
         //         console.log(res);
         //         const options = {
-        //             url: `https://53e76063.ngrok.io/login/${res || "123"}`,
+        //             url: `http://812bec1b.ngrok.io/login/${res || "123"}`,
         //             method: "GET",
         //             headers: {
         //                 "Content-Type": "application/json"
@@ -105,11 +106,11 @@ export class LoginComponent implements OnInit {
                                     console.log("Rerouting This App!");
                                     this._activatedUrl = "/home";
                                     this.routerExtensions.navigate(["/home"], {
-                                            transition: {
-                                                name:
-                                                    "fade"
-                                            }
+                                        transition: {
+                                            name: "fade"
+                                        }
                                     });
+                                    console.log("<=====================>");
                                     // }
                                 })
                             // }
@@ -119,6 +120,11 @@ export class LoginComponent implements OnInit {
                     });
                     // })
     // });
+        // this.routerExtensions.navigate(["/home"], {
+        //     transition: {
+        //         name: "fade"
+        //     }
+        // });
 }
 
     onDrawerButtonTap(): void {
