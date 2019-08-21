@@ -49,11 +49,12 @@ export class MapComponent implements OnInit {
     markerSelected = false;
     readyToRide = false;
     turnByList: Array<object> = [];
-    userAvoidMarkers = [];
+    userAvoidMarkers = [{lat: 29.971742, lng: -90.066258},];
     vm;
+    latLng;
     
 
-    readonly ROOT_URL = "https://54ec740b.ngrok.io";
+    readonly ROOT_URL = "https://ede2137b.ngrok.io";
 
     places: Observable<Array<Place>>;
 
@@ -74,29 +75,28 @@ export class MapComponent implements OnInit {
                 this.latitude = result.latitude;
                 this.longitude = result.longitude;
             });
-        this.http.get(this.ROOT_URL + '/marker',  ).subscribe((response)=>{
-
-        });
+        //this.latLng = new com.google.android.gms.maps.model.LatLng(29.9688625, -90.0544055);
+        //let decoded = com.google.maps.android.PolyUtil.decode(line);
     }
-
+    
     onDrawerButtonTap(): void {
         const sideDrawer = <RadSideDrawer>app.getRootView();
         sideDrawer.showDrawer();
     }
-
+    
     getPlaces(text) {
         // search params from search bar
         this.readyToRide = false;
         
-
+        
         const params = new HttpParams().set("place", text).set("userLoc", `${this.latitude},${this.longitude}`);
         const headers = new HttpHeaders().set("Access-Control-Allow-Origin", "*");
         const stuff = { params, headers};
-
+        
         this.markers.forEach((marker) => {marker.visible = false; });
         this.markers = [];
         markers = [];
-
+        
         // http request using the text provided
         this.http.get<Array<Place>>(this.ROOT_URL + "/mapSearch", stuff).subscribe((response) => {
             // assigning response info to markers array and then placing each marker on our map
@@ -125,7 +125,7 @@ export class MapComponent implements OnInit {
             console.log("completed");
         });
     }
-
+    
     onMarkerPick(args) {
         // sets marker selected to marker on component
         markerLat = args.marker.position.latitude;
@@ -134,7 +134,7 @@ export class MapComponent implements OnInit {
         this.readyToRide = false;
         this.bottomButtonText = "Get Directions";
     }
-
+    
     removeGetDirections() {
         this.markerSelected = false;
         this.markers.forEach((marker) => { marker.visible = false; });
@@ -146,7 +146,7 @@ export class MapComponent implements OnInit {
         }
         this.turnByList = [];
     }
-
+    
     onMapReady(args) {
         // assigns the map to acutalMap on component
         console.log("map reassign");
@@ -160,11 +160,11 @@ export class MapComponent implements OnInit {
         uiSettings.setCompassEnabled(true);
         gMap.setMyLocationEnabled(true);
     }
-
+    
     getDirections() {
         if (this.readyToRide === false) {
             this.removeGetDirections();
-
+            
             // params are set to the marker selected, info coming from component
             // tslint:disable-next-line: max-line-length
             const params = new HttpParams().set("place", `${markerLat},${markerLng}`).set("userLoc", `${this.latitude},${this.longitude}`);
@@ -175,6 +175,7 @@ export class MapComponent implements OnInit {
                 console.log(response);
                 directionsResponse = response;
                 const { polyLine, turnByTurn } = directionsResponse;
+               // console.log(com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, polyLine, true, 10e-1));
                 turnBy = turnByTurn;
                 this.turnByList = turnBy;
                 const bikePath = decodePolyline(polyLine);
@@ -190,7 +191,7 @@ export class MapComponent implements OnInit {
                 path.width = 10;
                 path.geodesic = false;
                 const padding = 150;
-
+                
                 const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
                 const start = new mapsModule.Marker({});
                 // tslint:disable-next-line: max-line-length

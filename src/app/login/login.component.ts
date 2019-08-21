@@ -33,16 +33,21 @@ export class LoginComponent implements OnInit {
 
         this.file.readText()
             .then((res) => {
-                this.vm.set("writtenContent", res);
                 console.log(res);
+                if(res){
+                    this.vm.set("writtenContent", "");
+                }
+                if(res.indexOf("Bad") !== -1){
+                    res = "";
+                }
                 const options = {
-                    url: `https://53e76063.ngrok.io/login/${res}`,
+                    url: `https://ede2137b.ngrok.io/login/${res}`,
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
                     }
                 };
-
+                console.log(options);
                 request(options)
                     .then((isLoggedIn) => {
                         console.log(isLoggedIn.content);
@@ -72,8 +77,9 @@ export class LoginComponent implements OnInit {
             .then((res) => {
                 this.vm.set("writtenContent", res);
                 console.log(res);
+              
                 const options = {
-                    url: `https://53e76063.ngrok.io/login/${res || "123"}`,
+                    url: `https://ede2137b.ngrok.io/login/${res || "123"}`,
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
