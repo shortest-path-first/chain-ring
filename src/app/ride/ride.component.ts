@@ -103,6 +103,7 @@ export class RideComponent implements OnInit {
             const peterInfo = JSON.parse(hailMary);
             polylineHolder = polyLine;
             this.steps = peterInfo;
+            console.log(peterInfo);
         });
         paramSubscription.unsubscribe();
     }
@@ -277,7 +278,7 @@ export class RideComponent implements OnInit {
         // this.allDirectionWords.push(step['html_instructions'].replace(/<\/?[^>]+(>|$)/g, " "))
         this.turnPoints.push(step["end_location"]);
         });
-
+        console.log(this.directionWords[0])
     }
 
     onReroute(): void {

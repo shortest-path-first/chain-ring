@@ -52,7 +52,6 @@ export class MapComponent implements OnInit {
     readyToRide = false;
     turnByList: Array<object> = [];
     userAvoidMarkers = [{lat: 29.971742, lng: -90.066258},];
-    vm;
     latLng;
     
 
@@ -66,10 +65,7 @@ export class MapComponent implements OnInit {
 
     ngOnInit(): void {
         // Init your component properties here.
-        this.vm = new Observable();
-        const documents: Folder = knownFolders.documents();
-        const folder: Folder = documents.getFolder(this.vm.get("src") || "src");
-        const file: File = folder.getFile(`${this.vm.get("token") || "token"}` + `.txt`);
+       
         geolocation.enableLocationRequest();
         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
@@ -77,7 +73,7 @@ export class MapComponent implements OnInit {
                 this.latitude = result.latitude;
                 this.longitude = result.longitude;
             });
-        //this.latLng = new com.google.android.gms.maps.model.LatLng(29.9688625, -90.0544055);
+        this.latLng = new com.google.android.gms.maps.model.LatLng(29.9688625, -90.0544055);
         //let decoded = com.google.maps.android.PolyUtil.decode(line);
     }
     
@@ -176,6 +172,8 @@ export class MapComponent implements OnInit {
                 // reassigns response to variable to avoid dealing with "<Place[]>"
                 directionsResponse = response;
                 const { polyLine, turnByTurn, peterRide } = directionsResponse;
+                let decoded = com.google.maps.android.PolyUtil.decode(polyLine);
+                console.log("Overlap:", com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, decoded, true, 10e-1));
                 peterInfo = peterRide;
                 turnBy = turnByTurn;
                 this.turnByList = turnBy;

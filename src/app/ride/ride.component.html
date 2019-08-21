@@ -12,10 +12,12 @@
     <ActionItem icon="res://navigation/menu" android:visibility="collapsed" (tap)="onDrawerButtonTap()"
         ios.position="left">
     </ActionItem>
+    <StackLayout *ngIf="directedRide">
     <StackLayout *ngIf="!direct" (tap)="onDirectTap()">
       <Label *ngIf="!listen" class="action-bar-title" text="{{directionWords[0]}}" textWrap="true" style="color: white"></Label>
       <Label *ngIf="listen" class="action-bar-title" text="{{directionWords[0]}}" textWrap="true" style="color: rgb(221, 16, 16)">
       </Label>
+      </StackLayout>
     </StackLayout>
     <FlexboxLayout *ngIf="!directedRide" align-items="stretch" flexDirection="row" justifyContent="space-between">
       <!-- <Label class="header" text="Chainring"></Label> -->

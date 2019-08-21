@@ -35,7 +35,7 @@ export class LoginComponent implements OnInit {
             .then((res) => {
                 console.log(res);
                 if(res){
-                    this.vm.set("writtenContent", "");
+                    this.vm.set("writtenContent", res);
                 }
                 if(res.indexOf("Bad") !== -1){
                     res = "";
