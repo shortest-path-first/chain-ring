@@ -16,19 +16,17 @@ import { ImageSource } from "tns-core-modules/image-source";
 import { Place } from "../map/map";
 import * as utils from "tns-core-modules/utils/utils";
 
-
 declare var com: any;
 
 // const style = require("../../../App_Resources/style.json")
 
-let insomnia = require("nativescript-insomnia");
-let mapsModule = require("nativescript-google-maps-sdk");
+const insomnia = require("nativescript-insomnia");
+const mapsModule = require("nativescript-google-maps-sdk");
 
 const decodePolyline = require("decode-google-map-polyline");
 const polylineEncoder = require("google-polyline");
 let rideMarkers = {markers: []};
 let polylineHolder;
-
 
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
@@ -61,7 +59,7 @@ export class RideComponent implements OnInit {
     light = false;
     distanceStringDecimal = "0";
     polyline;
-    startZoom;
+    startZoom = 13;
     speechRecognition = new SpeechRecognition();
     startTime;
     stopTime;
@@ -92,7 +90,6 @@ export class RideComponent implements OnInit {
     direct = false;
     steps;
     
-
     readonly ROOT_URL = "https://54ec740b.ngrok.io";
 
     // tslint:disable-next-line: max-line-length
@@ -101,8 +98,11 @@ export class RideComponent implements OnInit {
                 private zone: NgZone) {
         // Use the component constructor to inject providers.
         const paramSubscription = this.route.queryParams.subscribe((params) => {
-            const {polyLine} = params;
+            console.log("<==========================================+++++>");
+            const {polyLine, hailMary} = params;
+            const peterInfo = JSON.parse(hailMary);
             polylineHolder = polyLine;
+            this.steps = peterInfo;
         });
         paramSubscription.unsubscribe();
     }
@@ -162,14 +162,13 @@ export class RideComponent implements OnInit {
     }
 
     onDirectTap(): void {
-        console.log("direct click")
+        console.log("direct click");
         this.direct = !this.direct;
     }
 
-    onPinTap(): void {    
+    onPinTap(): void {
         this.pinClicked = !this.pinClicked;
     }
-
 
     onPinSelect(pinType): void {
         this.pinClicked = false;
@@ -274,9 +273,9 @@ export class RideComponent implements OnInit {
     directionsParser(): void {
         this.steps.forEach((step) => {
         this.directionDistances.push(step.distance.text);
-        this.directionWords.push(step['html_instructions'].replace(/<\/?[^>]+(>|$)/g, " "));
-        //this.allDirectionWords.push(step['html_instructions'].replace(/<\/?[^>]+(>|$)/g, " "))
-        this.turnPoints.push(step['end_location']);
+        this.directionWords.push(step["html_instructions"].replace(/<\/?[^>]+(>|$)/g, " "));
+        // this.allDirectionWords.push(step['html_instructions'].replace(/<\/?[^>]+(>|$)/g, " "))
+        this.turnPoints.push(step["end_location"]);
         });
 
     }
@@ -302,7 +301,7 @@ export class RideComponent implements OnInit {
             reroutePolyline.visible = true;
             reroutePolyline.width = 10;
             reroutePolyline.geodesic = false;
-            reroutePolyline.color = new Color("#393ef9"); 
+            reroutePolyline.color = new Color("#393ef9");
             this.mapView.removeAllPolylines();
             this.mapView.latitude = newRoute[0].lat;
             this.mapView.longitude = newRoute[0].lng;
@@ -332,7 +331,7 @@ export class RideComponent implements OnInit {
         this.straight = false;
 
         insomnia.allowSleepAgain().then(function() {
-        //console.log("Insomnia is inactive, good night!");
+        // console.log("Insomnia is inactive, good night!");
         });
         const avgSpeed = (this.speed * 2.23694) / this.allSpeeds.length;
         const speedBreakdown = this.findSpeedBreakdown(this.allSpeeds);
@@ -342,8 +341,8 @@ export class RideComponent implements OnInit {
         
         let duration = this.stopTime.getTime() - this.startTime.getTime();
         duration = duration / 10000;
-        //console.log("duration", duration);
-        let markerSubscription = this.http.post(this.ROOT_URL + "/marker", rideMarkers, {
+        // console.log("duration", duration);
+        const markerSubscription = this.http.post(this.ROOT_URL + "/marker", rideMarkers, {
             headers: new HttpHeaders({
                 "Content-Type": "application/json"
             })})
@@ -424,7 +423,7 @@ export class RideComponent implements OnInit {
         this.direct = null;
         this.steps = null;
         rideMarkers = null;
-    this.routerExtensions.navigate(["/stats"], params);
+        this.routerExtensions.navigate(["/stats"], params);
     }
 
     onSpeedTap(): void {
@@ -463,7 +462,7 @@ export class RideComponent implements OnInit {
                 this.straight = false;
             }
         } else {
-            //This is only for demo purposes
+            // This is only for demo purposes
             if (this.directionWords[0].indexOf("left") !== -1) {
                 this.left = true;
                 this.right = false;
@@ -478,7 +477,7 @@ export class RideComponent implements OnInit {
                 this.straight = true;
                 this.right = false;
                 this.left = false;
-            } else{
+            } else {
                 this.left = false;
                 this.right = false;
                 this.straight = false;
@@ -606,8 +605,8 @@ export class RideComponent implements OnInit {
 
     handleSpeech() {
         this.callCount++;
-        //console.log("speech:", this.callCount, new Date());
-            if(this.speechRecognition !== null){
+        // console.log("speech:", this.callCount, new Date());
+        if (this.speechRecognition !== null) {
             this.speechRecognition.startListening(
                 {
                     // optional, uses the device locale by default
@@ -617,7 +616,7 @@ export class RideComponent implements OnInit {
                     // this callback will be invoked repeatedly during recognition
                     onResult: (transcription: SpeechRecognitionTranscription) => {
                     
-                        //console.log('Getting results');
+                        // console.log('Getting results');
                         this.zone.run(() => this.recognizedText = transcription.text);
                         if (transcription.text.includes("speedometer") && this.recognized === false) {
                                 this.recognized = true;
@@ -684,40 +683,40 @@ export class RideComponent implements OnInit {
                                 clearTimeout(this.recognizedTimeoutId);
                             }, 5000);
                         }
-                        this.zone.run(()=>{
+                        this.zone.run(() => {
                             this.listen = false;
-                        })
+                        });
                     },
                     onError: (error) => {
-                        this.zone.run(()=>{
+                        this.zone.run(() => {
                             this.listen = false;
-                        })
-                        // - iOS: A 'string', describing the issue. 
+                        });
+                        // - iOS: A 'string', describing the issue.
                         // - Android: A 'number', referencing an 'ERROR_*' constant from https://developer.android.com/reference/android/speech/SpeechRecognizer.
                         //            If that code is either 6 or 7 you may want to restart listening.
                     }
                 }
             ).then(
-                (started) => { 
-                //console.log(`started listening`) 
-                this.zone.run(()=>{
+                (started) => {
+                // console.log(`started listening`)
+                this.zone.run(() => {
                     this.listen = true;
-                })
+                });
             },
-                (errorMessage) => { 
-                    //console.log(`Listen Error: ${errorMessage}`);
-                    this.zone.run(()=>{
+                (errorMessage) => {
+                    // console.log(`Listen Error: ${errorMessage}`);
+                    this.zone.run(() => {
                         this.listen = false;
-                    })
+                    });
                 }
             )
                 .catch((error) => {
                     // same as the 'onError' handler, but this may not return if the error occurs after listening has successfully started (because that resolves the promise,
                     // hence the' onError' handler was created.
-                    console.error("Where's the error",error);
-                    this.zone.run(()=>{
+                    console.error("Where's the error", error);
+                    this.zone.run(() => {
                         this.listen = false;
-                    })
+                    });
                 });
             }
      
@@ -731,21 +730,21 @@ export class RideComponent implements OnInit {
         console.log(this.directedRide);
         if (line !== undefined) {
             this.directedRide = true;
-            this.directionsParser();
-            var flightPlanCoordinates = decodePolyline(line);
+            // this.directionsParser();
+            let flightPlanCoordinates = decodePolyline(line);
             this.polyline = new mapsModule.Polyline();
-            for (let i = 0; i < flightPlanCoordinates.length; i++){
-                let coord = flightPlanCoordinates[i];
+            for (let i = 0; i < flightPlanCoordinates.length; i++) {
+                const coord = flightPlanCoordinates[i];
                 this.polyline.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
             }
-            //let bikeLayer = new google.maps.BicyclingLayer()
-            //let bikeLayer = new mapsModule.L
-            //kayer.BicyclingLayer();
-            //this.mapView.set(bikeLayer);
-            let myLatLng = { lat: 29.9688625, lng: -90.0544055 }; 
+            // let bikeLayer = new google.maps.BicyclingLayer()
+            // let bikeLayer = new mapsModule.L
+            // kayer.BicyclingLayer();
+            // this.mapView.set(bikeLayer);
+            const myLatLng = { lat: 29.9688625, lng: -90.0544055 };
         
-            var latLng = new com.google.android.gms.maps.model.LatLng(29.9688625, -90.0544055);
-            let decoded = com.google.maps.android.PolyUtil.decode(line);
+            let latLng = new com.google.android.gms.maps.model.LatLng(29.9688625, -90.0544055);
+            const decoded = com.google.maps.android.PolyUtil.decode(line);
             com.google.maps.android.PolyUtil.isLocationOnEdge(latLng, decoded, true, 10e-1);
           
             // let bicyclingLayer = com.google.maps.android.data.Layer;
@@ -754,7 +753,6 @@ export class RideComponent implements OnInit {
             //     url: "https://data.nola.gov/api/geospatial/8npz-j6vy?method=export&format=KML",
             //     map: this.mapView,
             // }, getApplicationContext());
-
 
             this.destLat = flightPlanCoordinates[flightPlanCoordinates.length - 1].lat;
             this.destLng = flightPlanCoordinates[flightPlanCoordinates.length - 1].lng;
@@ -792,5 +790,6 @@ export class RideComponent implements OnInit {
                 console.error("Get location error:", err);
             });
         this.drawUserPath();
+        this.directionsParser();
     }
 }
