@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
                 this.vm.set("writtenContent", res);
                 console.log(res);
                 const options = {
-                    url: `http://812bec1b.ngrok.io/login/${res}`,
+                    url: `https://53e76063.ngrok.io/login/${res}`,
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -73,7 +73,7 @@ export class LoginComponent implements OnInit {
         //         this.vm.set("writtenContent", res);
         //         console.log(res);
         //         const options = {
-        //             url: `http://812bec1b.ngrok.io/login/${res || "1234567"}`,
+        //             url: `https://53e76063.ngrok.io/login/${res || "123"}`,
         //             method: "GET",
         //             headers: {
         //                 "Content-Type": "application/json"

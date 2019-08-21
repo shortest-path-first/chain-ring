@@ -182,18 +182,19 @@ $sidedrawer-list-icon-size: 20;
 
 }
 .stats-info-line{
-    height: 100%;
-    width: 95%;
-    background-color: white;
-    color: black;
-    text-align: left;
-    font-size: 20%;
+    background-color: black;
+    color: white;
     border-radius: 20px;
     border-style: solid;
-    border-color: black;
-    border-width: 5px 10px 10px 5px;
+    border-color: white;
+    border-width: 10px;
+    margin: 5px 5px;
+    max-width: 30%;
+    height: 18%;
+    opacity: .5;
+    font-size: 18%;
     text-align: center;
-    font-family: Roboto-Regular;
+    font-family: Roboto-Medium;
 }
 .commute-header{
     background-color: black;
@@ -208,17 +209,19 @@ $sidedrawer-list-icon-size: 20;
     text-align: center;
 }
 .commute-info-line{
-    height: 100%;
-    width: 95%;
-    background-color: white;
-    color: black;
-    text-align: left;
-    font-size: 30%;
+    background-color: black;
+    color: white;
     border-radius: 20px;
     border-style: solid;
-    border-color: black;
+    border-color: white;
     border-width: 10px;
+    margin: 25px 30px;
+    max-width: 30%;
+    height: 18%;
+    opacity: .5;
+    font-size: 18%;
     text-align: center;
+    font-family: Roboto-Medium;
 }
 .direction-info-line{
     height: 100%;
