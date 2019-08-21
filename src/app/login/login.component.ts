@@ -30,7 +30,7 @@ export class LoginComponent implements OnInit {
 
     ngOnInit(): void {
         // Init your component properties here
-
+        console.log("LOGIN");
         this.file.readText()
             .then((res) => {
                 this.vm.set("writtenContent", res);
@@ -68,44 +68,56 @@ export class LoginComponent implements OnInit {
     onLoginTap(): void {
         console.log("tapped");
 
-        this.file.readText()
-            .then((res) => {
-                this.vm.set("writtenContent", res);
-                console.log(res);
-                const options = {
-                    url: `http://812bec1b.ngrok.io/login/${res}`,
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                };
+        // this.file.readText()
+        //     .then((res) => {
+        //         this.vm.set("writtenContent", res);
+        //         console.log(res);
+        //         const options = {
+        //             url: `http://812bec1b.ngrok.io/login/${res || "1234567"}`,
+        //             method: "GET",
+        //             headers: {
+        //                 "Content-Type": "application/json"
+        //             }
+        //         };
             // setTimeout(() => {
 
             // tnsOauthLogin("google");
 
-                request(options)
-                        .then((isLoggedIn) => {
-                            console.log(isLoggedIn.content);
-                            if (isLoggedIn.content.toJSON().bool) {
-                                console.log("Rerouting");
-                                this._activatedUrl = "/home";
-                                this.routerExtensions.navigate(
-                                    ["/home"],
-                                    {
-                                    transition: {
-                                        name: "fade"
-                                    }
-                                }
-                                );
-                            } else {
-                                console.log("Not signed in");
-                                tnsOauthLogin("google");
-                            }
-                        })
-                    .catch((err) => {
+                // request(options)
+                        // .then((isLoggedIn) => {
+                            // console.log(isLoggedIn.content);
+                            // if (isLoggedIn.content.toJSON().bool) {
+                            //     console.log("Rerouting");
+                            //     this._activatedUrl = "/home";
+                            //     this.routerExtensions.navigate(
+                            //         ["/home"],
+                            //         {
+                            //         transition: {
+                            //             name: "fade"
+                            //         }
+                            //     }
+                            //     );
+                            // } else {
+        console.log("Not signed in");
+
+        tnsOauthLogin("google").then(() => {
+                                    // if (isLoggedIn.content.toJSON().bool) {
+                                    console.log("Rerouting This App!");
+                                    this._activatedUrl = "/home";
+                                    this.routerExtensions.navigate(["/home"], {
+                                            transition: {
+                                                name:
+                                                    "fade"
+                                            }
+                                    });
+                                    // }
+                                })
+                            // }
+                        // })
+                    .catch ((err) => {
                         console.error(err.stack);
                     });
-                    });
+                    // })
     // });
 }
 
