@@ -27,7 +27,7 @@
 
     <StackLayout *ngIf="direct" (tap)="onDirectTap()">
       <StackLayout *ngFor="let step of directionWords; let i = index">
-        <Label *ngIf="direct" class="action-bar-title" [text]="step" [ngStyle]= "{'background-color': i % 2 === 0 ? 'white' : 'black'}"
+        <Label *ngIf="direct" class="action-bar-title" [text]="step"
         textWrap="true"></Label>
       </StackLayout>
     </StackLayout>

@@ -51,7 +51,7 @@ export class MapComponent implements OnInit {
     markerSelected = false;
     readyToRide = false;
     turnByList: Array<object> = [];
-    userAvoidMarkers = [{lat: 29.971742, lng: -90.066258},];
+    userAvoidMarkers = [{ lat: 29.971742, lng: -90.066258 }, {lat: 29.973568, lng: -90.057576}];
     latLng;
     
 
@@ -73,7 +73,7 @@ export class MapComponent implements OnInit {
                 this.latitude = result.latitude;
                 this.longitude = result.longitude;
             });
-        this.latLng = new com.google.android.gms.maps.model.LatLng(29.9688625, -90.0544055);
+        this.latLng = new com.google.android.gms.maps.model.LatLng(29.973568, -90.057576);
         //let decoded = com.google.maps.android.PolyUtil.decode(line);
     }
     
@@ -159,6 +159,13 @@ export class MapComponent implements OnInit {
         gMap.setMyLocationEnabled(true);
     }
     
+    getAlternative(){
+        const params = new HttpParams().set("place", `${markerLat},${markerLng}`).set("userLoc", `${this.latitude},${this.longitude}`).set("wayPoint", `${this.userAvoidMarkers[1].lat -.003}, ${this.userAvoidMarkers[1].lng - .003}`);
+        this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
+            let alternativeResponse = response;
+        
+        });
+    }
     getDirections() {
         if (this.readyToRide === false) {
             this.removeGetDirections();
@@ -171,23 +178,38 @@ export class MapComponent implements OnInit {
             this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
                 // reassigns response to variable to avoid dealing with "<Place[]>"
                 directionsResponse = response;
-                const { polyLine, turnByTurn, peterRide } = directionsResponse;
+                const { polyLine, turnByTurn, peterRide, safePath } = directionsResponse;
                 let decoded = com.google.maps.android.PolyUtil.decode(polyLine);
-                console.log("Overlap:", com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, decoded, true, 10e-1));
+                //console.log("SafePath:", safePath);
+
+                if (com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, decoded, true, 75)){
+                    this.getAlternative();
+                }
+                console.log("Overlap:", com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, decoded, true, 75));
                 peterInfo = peterRide;
                 turnBy = turnByTurn;
                 this.turnByList = turnBy;
                 const bikePath = decodePolyline(polyLine);
                 const path = new mapsModule.Polyline();
+                const safePathPolyLine = new mapsModule.Polyline(); 
                 this.compPoly = path;
                 // tslint:disable-next-line: prefer-for-of
                 for (let i = 0; i < bikePath.length; i++) {
                     const coord = bikePath[i];
                     path.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
                 }
+                console.log(safePath.path);
+                for (let i = 0; i < safePath.path.length; i++){
+                    const coord = safePath.path[i];
+                    console.log(coord);
+                    safePathPolyLine.addPoint(mapsModule.Position.positionFromLatLng(coord[0], coord[1]));
+                }
                 path.visible = true;
+                safePathPolyLine.visible = true;
                 path.width = 10;
+                safePathPolyLine.width = 10;
                 path.geodesic = false;
+                safePathPolyLine.geodesic = false;
                 const padding = 150;
                 
                 const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
@@ -209,6 +231,7 @@ export class MapComponent implements OnInit {
                 builder.include(finish.android.getPosition());
                 actualMap.addMarker(finish);
                 actualMap.addPolyline(path);
+                actualMap.addPolyline(safePathPolyLine);
                 const bounds = builder.build();
                 const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(bounds, padding);
                 actualMap.gMap.animateCamera(newBounds);

@@ -791,6 +791,8 @@ export class RideComponent implements OnInit {
                 console.error("Get location error:", err);
             });
         this.drawUserPath();
-        this.directionsParser();
+        if(this.steps){
+            this.directionsParser();
+        }
     }
 }
