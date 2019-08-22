@@ -207,12 +207,12 @@ export class MapComponent implements OnInit {
             });
         } else if (this.readyToRide === true) {
             console.log("tapped");
-            const { polyLine, peterRide } = directionsResponse;
-            let hailMary = JSON.stringify(peterInfo);
+            const { polyLine } = directionsResponse;
+            const parsedPeter = JSON.stringify(peterInfo);
             const params: NavigationExtras = {
                 queryParams: {
                     polyLine,
-                    hailMary
+                    parsedPeter
                 }
             };
             this.routerExtensions.navigate(["/ride"], params);

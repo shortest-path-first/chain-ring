@@ -5,10 +5,6 @@
     -->
     <NavigationButton ios:visibility="collapsed" icon="res://menu" (tap)="onDrawerButtonTap()"></NavigationButton>
     
-    <!-- Use the ActionItem for IOS with position set to left. Using the
-    NavigationButton as a side-drawer button in iOS is not possible,
-    because its function is to always navigate back in the application. -->
-   
     <ActionItem icon="res://navigation/menu" android:visibility="collapsed" (tap)="onDrawerButtonTap()"
         ios.position="left">
     </ActionItem>
@@ -28,7 +24,7 @@
 </script>
     <Page xmlns:maps="nativescript-google-maps-sdk"> 
     </Page>
-<FlexboxLayout class="page page-content" align-items="stretch" flexDirection="column">
+<FlexboxLayout class="page page-content" align-items="stretch" flexDirection="column" width="100%">
 <AbsoluteLayout>
         <maps:mapView width="100%" height="100%" latitude="{{ latitude }}" longitude="{{ longitude }}"
         mapAnimationsEnabled="{{ mapAnimationsEnabled }}" zoom="{{ zoom }}" bearing="{{ bearing }}"
@@ -60,30 +56,18 @@
         <Label class="fas" text="&#xf277;" style="font-size: 50em; color: white; margin-top: 15%" (tap)="onReroute()"></Label>
         <Label class="fas" text="&#xf5eb;" style="font-size: 50em; color: white; margin-top: 15%" (tap)="onDirectionsTap()"></Label>
     </FlexboxLayout>
-      <FlexboxLayout *ngIf="pinClicked" class="body" align-items="stretch" height="25%" flexDirection="row" justifyContent="space-between">
-      <FlexboxLayout justifyContent="center" flexDirection="column" align-items="stretch"> 
-        <Image src="~/app/images/iconHit.png" style="width: 86%; margin-top: -8px; margin-left: 5%;" stretch="none" (tap)="onPinSelect('crash')"></Image>
-      <Label text="Crash" style="font-size: 10em; color: white; margin-left: 20%; font-family: Roboto-Medium; margin-top: -34px;"></Label>
-      </FlexboxLayout>
-      <StackLayout style="margin-top: 11%;">
-        <Image src="~/app/images/iconNearMiss.png"  style="width: 77%;" stretch="aspectFit" (tap)="onPinSelect('close')"></Image>
-        <Label text="Close Call" style="font-size: 10em; color: white; text-align: center; font-family: Roboto-Medium;"></Label>
-      </StackLayout>
-      <StackLayout style="margin-top: 10%">
-        <Image src="~/app/images/iconAvoid2.png" style="width: 75%;" stretch="aspectFit" (tap)="onPinSelect('avoid')"></Image>
-      <Label text="Avoid Road" style="font-size: 10em; color: white; text-align: center; font-family: Roboto-Medium;"></Label>
-      </StackLayout>
-      <StackLayout style="margin-top: 10%">
-        <Image src="~/app/images/iconPotHole.png"  style="width: 75%;" stretch="aspectFit" (tap)="onPinSelect('pothole')"></Image>
-      <Label text="Pothole" style="font-size: 10em; color: white; text-align: center; font-family: Roboto-Medium;"></Label>
-        </StackLayout>
-      <StackLayout style="margin-top: 10%">
-      <Image src="~/app/images/iconStolen.png" style="width: 75%" stretch="aspectFit" (tap)="onPinSelect('stolen')"></Image>
-      <Label text="Stolen" style="font-size: 10em; color: white; text-align: center; font-family: Roboto-Medium;"></Label>
-        </StackLayout>
-        <StackLayout style="margin-top: 10%">
-        <Label class="fas" text="&#f2ea;" style="font-size: 50em; color: white; margin-top: 15%"
-          (tap)="onPinTap()"></Label>
-        </StackLayout>
-    </FlexboxLayout>
+
+    <GridLayout *ngIf="pinClicked" class="body" columns="*, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *" rows="*, *, *" width="100%" height="25%"> 
+      <Image src="~/app/images/iconHit.png" row="0" col="1" rowSpan="2" colSpan="2" (tap)="onPinSelect('crash')"></Image>
+            <Label text="Crash" textWrap=True row="3" col="1" rowSpan="2" colSpan="2" style="font-size: 10em; color: white; text-align: center; font-family: Roboto-Medium;"></Label>
+      <Image src="~/app/images/iconNearMiss.png" row="0" col="5" rowSpan="2" colSpan="2" (tap)="onPinSelect('close')"></Image>
+            <Label text="Close Call" textWrap=True row="3" col="5" rowSpan="2" colSpan="2" style="font-size: 10em; color: white; text-align: center; font-family: Roboto-Medium;"></Label>
+      <Image src="~/app/images/iconAvoid.png" row="0" col="9" rowSpan="2" colSpan="2" (tap)="onPinSelect('avoid')"></Image>
+            <Label text="Avoid Road" textWrap=True row="3" col="9" rowSpan="2" colSpan="2" style="font-size: 10em; color: white; text-align: center; font-family: Roboto-Medium;"></Label>
+      <Image src="~/app/images/iconPotHole.png" row="0" col="13" rowSpan="2" colSpan="2" (tap)="onPinSelect('pothole')"></Image>
+            <Label text="Pothole" row="3" col="13" rowSpan="2" colSpan="2" style="font-size: 10em; color: white; text-align: center; font-family: Roboto-Medium;"></Label>
+      <Image src="~/app/images/iconStolen.png" row="0" col="17" rowSpan="2" colSpan="2" (tap)="onPinSelect('stolen')"></Image>
+            <Label text="Stolen Bike" textWrap=True row="3" col="17" rowSpan="2" colSpan="2" style="font-size: 10em; color: white; text-align: center; font-family: Roboto-Medium;"></Label>
+      <Label class="fas" text="&#xf276;" row="0" col="20" rowSpan="2" colSpan="2" style="font-size: 50em; color: white; margin-top: 15%" (tap)="onPinTap()"></Label>
+    </GridLayout>
 </FlexboxLayout>

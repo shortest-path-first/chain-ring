@@ -16,14 +16,17 @@
         <Label *ngIf=notRecentView row="5" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Duration"></Label>
         <Label *ngIf=notRecentView row="5" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{displayedDuration}}"></Label>
         <GridLayout *ngIf=notRecentView row="7" col="0" colSpan="12" rowSpan="3" height="100%" width="100%">
-            <chart:RadPieChart allowAnimation="true" row="0">
+            <chart:RadPieChart allowAnimation="true" row="0" class="stats-pie-line">
                 <chart:PieSeries tkPieSeries selectionMode="DataPoint" [items]="pieSource" valueProperty="Amount" legendLabel="Speed" color="white">
-                    <chart:PieSeries.labelStyle>
-                        <chart:PointLabelStyle margin="15" textColor="white"></chart:PointLabelStyle>/>
-                    </chart:PieSeries.labelStyle>
+                    <chart:PointLabelStyle tkPieLabelStyle textColor="white"></chart:PointLabelStyle>                    
                 </chart:PieSeries>
-                <chart:RadLegendView tkPieLegend position="Right" title="Speeds (based on max speed)" offsetOrigin="TopRight" width="150" enableSelection="true"
-                titleColor="white"></chart:RadLegendView>
+                <chart:Palette tkPiePalette>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="1" fillColor="#393ef9"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="1" fillColor="#8533da"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="1" fillColor="#9330ca"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="1" fillColor="#9c27b0"></PaletteEntry>
+                </chart:Palette>
+                <chart:RadLegendView tkPieLegend position="Right" title="Speeds (based on max speed)" offsetOrigin="TopRight" width="150" enableSelection="true"></chart:RadLegendView>
             </chart:RadPieChart>
         </GridLayout>
     </GridLayout>
