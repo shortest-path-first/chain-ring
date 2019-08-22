@@ -107,7 +107,7 @@ export function tnsOauthLogin(providerType) {
                                     vm.set("isItemVisible", true);
 
                                     // request({
-                                    //     url: `http://812bec1b.ngrok.io/login/${res || "noexist"}`,
+                                    //     url: `http://b35c6d0e.ngrok.io/login/${res || "noexist"}`,
                                     //     method: "Patch",
                                     //     headers: {
                                     //         "Content-Type":
