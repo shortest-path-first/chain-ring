@@ -8,7 +8,8 @@ import { Commute } from "./commute";
 import { Router, NavigationExtras } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
 
-let encodedPolyLine;
+let directionsResponse;
+let peterInfo;
 const user = "francoappss@gmail.com";
 
 @Component({
@@ -65,11 +66,14 @@ export class CommuteComponent implements OnInit {
             // http request to get directions between user point and marker selected
         this.http.get<Array<Commute>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
                 // reassigns response to variable to avoid dealing with "<Place[]>"
-                encodedPolyLine = response;
-                const { polyLine } = encodedPolyLine;
+                directionsResponse = response;
+                const { polyLine, peterRide } = directionsResponse;
+                peterInfo = peterRide;
+                const parsedPeter = JSON.stringify(peterInfo);
                 const param: NavigationExtras = {
                     queryParams: {
-                        polyLine
+                        polyLine,
+                        parsedPeter
                     }
                 };
                 this.routerExtensions.navigate(["/ride"], param);

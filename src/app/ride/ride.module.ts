@@ -8,7 +8,7 @@ import { RideComponent } from "./ride.component";
     imports: [
         NativeScriptCommonModule,
         RideRoutingModule,
-        HttpClientModule   
+        HttpClientModule
     ],
     declarations: [
         RideComponent

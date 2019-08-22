@@ -6,17 +6,17 @@ import { HttpClientModule } from "@angular/common/http";
 import { NativeScriptFormsModule } from "nativescript-angular/forms";
 
 @NgModule({
-    imports: [
-        NativeScriptCommonModule,
-        LocationAddRoutingModule,
-        HttpClientModule,
-        NativeScriptFormsModule
-    ],
-    declarations: [
-        LocationAddComponent
-    ],
-    schemas: [
-        NO_ERRORS_SCHEMA
-    ]
+  imports: [
+    NativeScriptCommonModule,
+    LocationAddRoutingModule,
+    HttpClientModule,
+    NativeScriptFormsModule
+  ],
+  declarations: [
+    LocationAddComponent
+  ],
+  schemas: [
+    NO_ERRORS_SCHEMA
+  ]
 })
 export class LocationAddModule { }

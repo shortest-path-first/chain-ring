@@ -6,13 +6,13 @@ import { FormsModule } from "@angular/forms";
 import { LocationAddComponent } from "./locationAdd.component";
 
 const routes: Routes = [
-    { path: "", component: LocationAddComponent }
+  { path: "", component: LocationAddComponent }
 ];
 
 @NgModule({
-    imports: [NativeScriptRouterModule.forChild(routes),
+  imports: [NativeScriptRouterModule.forChild(routes),
     FormsModule
-    ],
-    exports: [NativeScriptRouterModule]
+  ],
+  exports: [NativeScriptRouterModule]
 })
 export class LocationAddRoutingModule { }
