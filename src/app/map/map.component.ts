@@ -45,7 +45,7 @@ export class MapComponent implements OnInit {
     readyToRide = false;
     turnByList: Array<object> = [];
 
-    readonly ROOT_URL = "https://54ec740b.ngrok.io";
+    readonly ROOT_URL = "https://a2880c74.ngrok.io";
 
     places: Observable<Array<Place>>;
 
@@ -225,5 +225,9 @@ export class MapComponent implements OnInit {
                 name: "fade"
             }
         });
+    }
+
+    displayHazards(){
+        console.log("yes");
     }
 }
