@@ -74,6 +74,7 @@ export class MapComponent implements OnInit {
                 this.longitude = result.longitude;
             });
         this.latLng = new com.google.android.gms.maps.model.LatLng(29.973568, -90.057576);
+   
         //let decoded = com.google.maps.android.PolyUtil.decode(line);
     }
     
@@ -178,14 +179,14 @@ export class MapComponent implements OnInit {
             this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
                 // reassigns response to variable to avoid dealing with "<Place[]>"
                 directionsResponse = response;
-                const { polyLine, turnByTurn, peterRide, safePath } = directionsResponse;
+                const { polyLine, turnByTurn, peterRide, safePath, wayPointArr } = directionsResponse;
                 let decoded = com.google.maps.android.PolyUtil.decode(polyLine);
                 //console.log("SafePath:", safePath);
 
                 if (com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, decoded, true, 75)){
                     this.getAlternative();
                 }
-                console.log("Overlap:", com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, decoded, true, 75));
+                //console.log("Overlap:", com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, decoded, true, 75));
                 peterInfo = peterRide;
                 turnBy = turnByTurn;
                 this.turnByList = turnBy;
@@ -198,10 +199,19 @@ export class MapComponent implements OnInit {
                     const coord = bikePath[i];
                     path.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
                 }
-                console.log(safePath.path);
+                console.log(wayPointArr);
+                let wayPointLatLngs = [];
+                if(wayPointArr){
+                    wayPointArr.forEach((waypoint)=>{
+                    let latlng = new com.google.android.gms.maps.model.LatLng(waypoint[0], waypoint[1]);
+                    wayPointLatLngs.push(latlng);
+                    })
+                    console.log(wayPointLatLngs);
+                }
+            
+
                 for (let i = 0; i < safePath.path.length; i++){
                     const coord = safePath.path[i];
-                    console.log(coord);
                     safePathPolyLine.addPoint(mapsModule.Position.positionFromLatLng(coord[0], coord[1]));
                 }
                 path.visible = true;
