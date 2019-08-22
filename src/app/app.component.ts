@@ -107,10 +107,10 @@ export class AppComponent implements OnInit {
             .then(() => file.readText())
             .then((res) => {
                 vm.set("writtenContent", res);
-                console.log(res);
+                console.log("Written token", res);
 
                 request({
-                    url: `https://53e76063.ngrok.io/logout/${res}`,
+                    url: `https://b35c6d0e.ngrok.io/logout/${res}`,
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json"
