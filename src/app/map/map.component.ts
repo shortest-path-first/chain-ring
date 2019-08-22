@@ -44,6 +44,11 @@ export class MapComponent implements OnInit {
     markerSelected = false;
     readyToRide = false;
     turnByList: Array<object> = [];
+    potholeIcon = null;
+    closeIcon = null;
+    avoidIcon = null;
+    crashIcon = null;
+    stolenIcon = null;
 
     readonly ROOT_URL = "https://a2880c74.ngrok.io";
 
@@ -62,6 +67,30 @@ export class MapComponent implements OnInit {
                 this.latitude = result.latitude;
                 this.longitude = result.longitude;
             });
+        const potholeImageSource = new ImageSource();
+        this.potholeIcon = new Image();
+        potholeImageSource.loadFromFile("~/app/images/mapPotHole.png");
+        this.potholeIcon.imageSource = potholeImageSource;
+
+        const closeImageSource = new ImageSource();
+        this.closeIcon = new Image();
+        closeImageSource.loadFromFile("~/app/images/mapNearMiss.png");
+        this.closeIcon.imageSource = closeImageSource;
+
+        const avoidImageSource = new ImageSource();
+        this.avoidIcon = new Image();
+        avoidImageSource.loadFromFile("~/app/images/mapAvoid.png");
+        this.avoidIcon.imageSource = avoidImageSource;
+
+        const crashImageSource = new ImageSource();
+        this.crashIcon = new Image();
+        crashImageSource.loadFromFile("~/app/images/mapHit.png");
+        this.crashIcon.imageSource = crashImageSource;
+
+        const stolenImageSource = new ImageSource();
+        this.stolenIcon = new Image();
+        stolenImageSource.loadFromFile("~/app/images/mapStolen.png");
+        this.stolenIcon.imageSource = stolenImageSource;
     }
 
     onDrawerButtonTap(): void {
@@ -229,5 +258,28 @@ export class MapComponent implements OnInit {
 
     displayHazards(){
         console.log("yes");
+        // const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
+        // put a for each
+        // const hazard = new mapsModule.Marker({});
+        // if (pinType === "pothole") {
+        //     hazard.icon = this.potholeIcon;
+        // } else if (pinType === "close") {
+        //     hazard.icon = this.closeIcon;
+        // } else if (pinType === "avoid") {
+        //     hazard.icon = this.avoidIcon;
+        // } else if (pinType === "crash") {
+        //     hazard.icon = this.crashIcon;
+        // } else if (pinType === "stolen") {
+        //     hazard.icon = this.stolenIcon;
+        // }
+
+        // hazard.position = mapsModule.Position.positionFromLatLng(lat, lng);
+        // hazard.title = place[1];
+        // this.markers.push(hazard);
+        // markers.push(hazard);
+        // builder.include(hazard.android.getPosition());
+        // const bounds = builder.build();
+        // const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(bounds, padding);
+        // actualMap.gMap.animateCamera(newBounds);
     }
 }
