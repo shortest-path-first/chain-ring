@@ -45,8 +45,8 @@
         <Label style="background-color: black; width: 100%; height: 1%;" top="155px"></Label>
         <Label text="MPH" class="speed" top="60%" left="109%" style="font-size: 13em"></Label>
         <Label text="DIST" class="speed" style="font-size: 20em;" left="1%" top="77%"></Label>
-        <Label text="{{distanceString}}.{{distanceStringDecimal}}" class="speed" style="font-size: 60em; letter-spacing: -5px;" left="10%" right="5px" top="87%"></Label>
-        </AbsoluteLayout>
+        <Label text="{{distanceString}}.{{distanceStringDecimal}}" class="speed" style="font-size: 60em;" left="10%" right="5px" top="87%"></Label>
+      </AbsoluteLayout>
     </AbsoluteLayout>
     <FlexboxLayout *ngIf="!pinClicked" class="body" align-items="stretch" height="25%" flexDirection="row" justifyContent="space-around">
         <Label class="fas" text="&#xf015;" style="font-size: 50em; color: white; margin-top: 15%" (tap)="onHomeTap()"></Label>
