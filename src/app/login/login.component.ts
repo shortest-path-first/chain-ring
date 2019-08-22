@@ -1,3 +1,5 @@
+const globalAny: any = global;
+
 import { Component, OnInit } from "@angular/core";
 import { RadSideDrawer } from "nativescript-ui-sidedrawer";
 import * as app from "tns-core-modules/application";
@@ -42,10 +44,9 @@ export class LoginComponent implements OnInit {
                         "Content-Type": "application/json"
                     }
                 };
-
                 request(options)
                     .then((isLoggedIn) => {
-                        console.log(isLoggedIn.content);
+                        console.log(isLoggedIn.content.toJSON());
                         console.log("<===========>");
                         if (isLoggedIn.content.toJSON().bool) {
                             console.log("Rerouting");
@@ -66,70 +67,56 @@ export class LoginComponent implements OnInit {
             });
     }
 
-    onLoginTap(): void {
+    onLoginTap(username, password): void {
         console.log("tapped");
-
-        // this.file.readText()
-        //     .then((res) => {
-        //         this.vm.set("writtenContent", res);
-        //         console.log(res);
-        //         const options = {
-        //             url: `http://812bec1b.ngrok.io/login/${res || "123"}`,
-        //             method: "GET",
-        //             headers: {
-        //                 "Content-Type": "application/json"
-        //             }
-        //         };
-            // setTimeout(() => {
-
-            // tnsOauthLogin("google");
-
-                // request(options)
-                        // .then((isLoggedIn) => {
-                            // console.log(isLoggedIn.content);
-                            // if (isLoggedIn.content.toJSON().bool) {
-                            //     console.log("Rerouting");
-                            //     this._activatedUrl = "/home";
-                            //     this.routerExtensions.navigate(
-                            //         ["/home"],
-                            //         {
-                            //         transition: {
-                            //             name: "fade"
-                            //         }
-                            //     }
-                            //     );
-                            // } else {
-        console.log("Not signed in");
-
-        tnsOauthLogin("google").then(() => {
-                                    // if (isLoggedIn.content.toJSON().bool) {
-                                    console.log("Rerouting This App!");
-                                    this._activatedUrl = "/home";
-                                    this.routerExtensions.navigate(["/home"], {
-                                        transition: {
-                                            name: "fade"
-                                        }
-                                    });
-                                    console.log("<=====================>");
-                                    // }
-                                })
-                            // }
-                        // })
-                    .catch ((err) => {
-                        console.error(err.stack);
+        console.log("username", username);
+        console.log("password", password);
+        request({
+            url: `http://b35c6d0e.ngrok.io/login`,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            content: JSON.stringify({
+                username,
+                password
+            })
+        }).then((response) => {
+            console.log(response.statusCode);
+            if (response.statusCode === 200) {
+                this.file.writeText(response.content
+                    .toString().slice(response.content.toString().indexOf(":") + 1).match(/[A-Z, 0-9]/gi).join(""))
+                    .then(() => this.file.readText())
+                    .then((res) => {
+                        this.vm.set("writtenContent", res);
+                        console.log("logged in");
+                        console.log(response.content.toString());
+                        (global as any).username = username;
+                        console.log((global as any).username);
+                        this._activatedUrl = "/home";
+                        this.routerExtensions.navigate(["/home"], {
+                            transition: {
+                                name: "fade"
+                            }
+                        });
                     });
-                    // })
-    // });
-        // this.routerExtensions.navigate(["/home"], {
-        //     transition: {
-        //         name: "fade"
-        //     }
-        // });
+            } else {
+                console.log("Wrong user name or password");
+            }
+        });
 }
 
     onDrawerButtonTap(): void {
         const sideDrawer = <RadSideDrawer>app.getRootView();
         sideDrawer.showDrawer();
     }
+
+    signup(): void {
+        this._activatedUrl = "/signup";
+        this.routerExtensions.navigate(["/signup"], {
+            transition: {
+                name: "fade"
+            }
+        });
+    }
 }
-// http://b35c6d0e.ngrok.io
