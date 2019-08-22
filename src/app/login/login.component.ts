@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
                 this.vm.set("writtenContent", res);
                 console.log(res);
                 const options = {
-                    url: `http://812bec1b.ngrok.io/login/${res}`,
+                    url: `http://b35c6d0e.ngrok.io/login/${res}`,
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -46,7 +46,7 @@ export class LoginComponent implements OnInit {
                 request(options)
                     .then((isLoggedIn) => {
                         console.log(isLoggedIn.content);
-                        console.log("<===========>")
+                        console.log("<===========>");
                         if (isLoggedIn.content.toJSON().bool) {
                             console.log("Rerouting");
                             this._activatedUrl = "/home";
@@ -132,3 +132,4 @@ export class LoginComponent implements OnInit {
         sideDrawer.showDrawer();
     }
 }
+// http://b35c6d0e.ngrok.io

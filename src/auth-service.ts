@@ -64,9 +64,11 @@ export function tnsOauthLogin(providerType) {
                 );
 
                 const options = {
-                    url: "http://812bec1b.ngrok.io/userInfo",
+                    url: "http://b35c6d0e.ngrok.io/userInfo",
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
                     content: JSON.stringify({
                         accesstoken: tokenResult.accessToken,
                         idToken: tokenResult.idToken
@@ -104,22 +106,22 @@ export function tnsOauthLogin(providerType) {
                                     vm.set("writtenContent", res);
                                     vm.set("isItemVisible", true);
 
-                                    request({
-                                        url: `http://812bec1b.ngrok.io/login/${res || "noexist"}`,
-                                        method: "Patch",
-                                        headers: {
-                                            "Content-Type":
-                                                "application/json"
-                                        },
-                                        content: JSON.stringify({
-                                            token: res
-                                        })
-                                    }).then(response => {
-                                        console.log(
-                                            response.content.toString()
-                                        );
-                                        resolve(response.content.toString());
-                                    });
+                                    // request({
+                                    //     url: `http://b35c6d0e.ngrok.io/login/${res || "noexist"}`,
+                                    //     method: "Patch",
+                                    //     headers: {
+                                    //         "Content-Type":
+                                    //             "application/json"
+                                    //     },
+                                    //     content: JSON.stringify({
+                                    //         token: res
+                                    //     })
+                                    // }).then(response => {
+                                    //     console.log(
+                                    //         response.content.toString()
+                                    //     );
+                                    //     resolve(response.content.toString());
+                                    // });
                                 });
                             })
                             .catch(err => {
