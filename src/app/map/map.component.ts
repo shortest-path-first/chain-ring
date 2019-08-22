@@ -40,6 +40,7 @@ export class MapComponent implements OnInit {
     longitude = -90.15;
     zoom = 13;
     markers = [];
+    hazards = [];
     bottomButtonText = "Get Directions";
     markerSelected = false;
     readyToRide = false;
@@ -258,32 +259,45 @@ export class MapComponent implements OnInit {
 
     displayHazards(){
         console.log("yes");
-        // const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
+        this.http.get<Array<Place>>(this.ROOT_URL + "/marker").subscribe((response) => {
+            // assigning response info to markers array and then placing each marker on our map
+            this.hazards = response;
+            console.log(this.hazards);
+            console.log("<==================>");
+            const padding = 150;
+            const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
 
-        // put a for each
-
-        // const hazard = new mapsModule.Marker({});
-        // if (pinType === "pothole") {
-        //     hazard.icon = this.potholeIcon;
-        // } else if (pinType === "close") {
-        //     hazard.icon = this.closeIcon;
-        // } else if (pinType === "avoid") {
-        //     hazard.icon = this.avoidIcon;
-        // } else if (pinType === "crash") {
-        //     hazard.icon = this.crashIcon;
-        // } else if (pinType === "stolen") {
-        //     hazard.icon = this.stolenIcon;
-        // }
-        // hazard.position = mapsModule.Position.positionFromLatLng(lat, lng);
-        // hazard.title = place[1];
-        // this.markers.push(hazard);
-        // markers.push(hazard);
-
-        // end for each
-
-        // builder.include(hazard.android.getPosition());
-        // const bounds = builder.build();
-        // const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(bounds, padding);
-        // actualMap.gMap.animateCamera(newBounds);
+            this.hazards.forEach((hazard) => {
+                const lat = hazard.markerLat;
+                const lng = hazard.markerLon;
+                const pinType = hazard.type;
+                console.log(lat, lng, pinType);
+                const marker = new mapsModule.Marker({});
+                marker.position = mapsModule.Position.positionFromLatLng(lat, lng);
+                if (pinType === "pothole") {
+                    marker.icon = this.potholeIcon;
+                } else if (pinType === "close") {
+                    marker.icon = this.closeIcon;
+                } else if (pinType === "avoid") {
+                    marker.icon = this.avoidIcon;
+                } else if (pinType === "crash") {
+                    marker.icon = this.crashIcon;
+                } else if (pinType === "stolen") {
+                    marker.icon = this.stolenIcon;
+                }
+                builder.include(marker.android.getPosition());
+                actualMap.addMarker(marker);
+            });
+            // recenter map over choices
+            const bounds = builder.build();
+            console.log("<====******====>");
+            const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(bounds, padding);
+            actualMap.gMap.animateCamera(newBounds);
+            
+        }, (err) => {
+            console.log(err);
+        }, () => {
+            console.log("completed");
+        });
     }
 }
