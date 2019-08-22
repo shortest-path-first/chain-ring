@@ -105,7 +105,7 @@ export class AppComponent implements OnInit {
                 console.log(res);
 
                 request({
-                    url: `https://ede2137b.ngrok.io/logout/${res}`,
+                    url: `https://6b409c5a.ngrok.io/logout/${res}`,
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json"

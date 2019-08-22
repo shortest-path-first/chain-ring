@@ -9,6 +9,7 @@ import * as geolocation from "nativescript-geolocation";
 import { Accuracy } from "tns-core-modules/ui/enums";
 import { RouterExtensions } from "nativescript-angular/router";
 import { Router, NavigationExtras } from "@angular/router";
+import { Color } from "tns-core-modules/color/color";
 const mapsModule = require("nativescript-google-maps-sdk");
 const decodePolyline = require("decode-google-map-polyline");
 import { Image } from "tns-core-modules/ui/image";
@@ -55,7 +56,7 @@ export class MapComponent implements OnInit {
     latLng;
     
 
-    readonly ROOT_URL = "https://ede2137b.ngrok.io";
+    readonly ROOT_URL = "https://6b409c5a.ngrok.io";
 
     places: Observable<Array<Place>>;
 
@@ -179,9 +180,12 @@ export class MapComponent implements OnInit {
             this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
                 // reassigns response to variable to avoid dealing with "<Place[]>"
                 directionsResponse = response;
-                const { polyLine, turnByTurn, peterRide, safePath, wayPointArr } = directionsResponse;
+                const { polyLine, turnByTurn, peterRide, safePath, wayPointArr, safePolyline} = directionsResponse;
+                console.log(Object.keys(directionsResponse));
+            
                 let decoded = com.google.maps.android.PolyUtil.decode(polyLine);
-                //console.log("SafePath:", safePath);
+                //let decodedSafe = com.google.maps.android.PolyUtil.decode(safePolyline);
+                //console.log("SafePath:", safePolyline);
 
                 if (com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, decoded, true, 75)){
                     this.getAlternative();
@@ -191,35 +195,50 @@ export class MapComponent implements OnInit {
                 turnBy = turnByTurn;
                 this.turnByList = turnBy;
                 const bikePath = decodePolyline(polyLine);
+                const safePathPoints = decodePolyline(safePolyline)
+                
                 const path = new mapsModule.Polyline();
                 const safePathPolyLine = new mapsModule.Polyline(); 
+                const wayPointPath = new mapsModule.Polyline();
                 this.compPoly = path;
+               
                 // tslint:disable-next-line: prefer-for-of
                 for (let i = 0; i < bikePath.length; i++) {
                     const coord = bikePath[i];
                     path.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
                 }
-                console.log(wayPointArr);
-                let wayPointLatLngs = [];
-                if(wayPointArr){
-                    wayPointArr.forEach((waypoint)=>{
-                    let latlng = new com.google.android.gms.maps.model.LatLng(waypoint[0], waypoint[1]);
-                    wayPointLatLngs.push(latlng);
-                    })
-                    console.log(wayPointLatLngs);
+             
+                for (let i = 0; i < safePathPoints.length; i++){
+                    const coord = safePathPoints[i];
+                    safePathPolyLine.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
                 }
-            
 
-                for (let i = 0; i < safePath.path.length; i++){
-                    const coord = safePath.path[i];
-                    safePathPolyLine.addPoint(mapsModule.Position.positionFromLatLng(coord[0], coord[1]));
+                for (let i = 0; safePath.length; i++) {
+                    const coord = safePath[i];
+                    wayPointPath.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
                 }
+                // let wayPointLatLngs = [];
+                // if(wayPointArr){
+                //     wayPointArr.forEach((waypoint)=>{
+                //     wayPointLatLngs.push(new com.google.android.gms.maps.model.LatLng(waypoint[0], waypoint[1]));
+                //     //let locObj = {location: "", stopover: false};
+                //     //locObj.location = latlng;
+                //     //console.log(locObj);
+                  
+                //     })
+                 //   console.log("waypoints:", wayPointLatLngs);
+                //}
+
+              
                 path.visible = true;
                 safePathPolyLine.visible = true;
+                wayPointPath.visible = true;
                 path.width = 10;
                 safePathPolyLine.width = 10;
+                wayPointPath.visible = true;
                 path.geodesic = false;
                 safePathPolyLine.geodesic = false;
+                wayPointPath.geodesic = false;
                 const padding = 150;
                 
                 const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
@@ -239,9 +258,13 @@ export class MapComponent implements OnInit {
                 finish.snippet = "Your Final Destination";
                 this.markers.push(finish);
                 builder.include(finish.android.getPosition());
+                path.color = new Color("black");
+                //safePathPolyLine.color = new Color("red");
+                wayPointPath.color = new Color("pink");
                 actualMap.addMarker(finish);
                 actualMap.addPolyline(path);
                 actualMap.addPolyline(safePathPolyLine);
+                actualMap.addPolyline(wayPointPath);
                 const bounds = builder.build();
                 const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(bounds, padding);
                 actualMap.gMap.animateCamera(newBounds);

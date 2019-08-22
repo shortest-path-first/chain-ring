@@ -58,7 +58,7 @@ export function tnsOauthLogin(providerType) {
       console.log("Logged in", tokenResult.refreshTokenExpiration);
 
       const options = {
-        url: "https://ede2137b.ngrok.io/userInfo",
+        url: "https://6b409c5a.ngrok.io/userInfo",
         method: "POST",
         headers: { "Content-Type": "application/json" },
         content: JSON.stringify({
@@ -89,7 +89,7 @@ export function tnsOauthLogin(providerType) {
                       vm.set("isItemVisible", true);
 
                       request({
-                        url: `https://ede2137b.ngrok.io/login/${res}`,
+                        url: `https://6b409c5a.ngrok.io/login/${res}`,
                         method: "Patch",
                         headers: {
                               "Content-Type":
