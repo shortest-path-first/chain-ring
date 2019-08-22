@@ -259,7 +259,9 @@ export class MapComponent implements OnInit {
     displayHazards(){
         console.log("yes");
         // const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
+
         // put a for each
+
         // const hazard = new mapsModule.Marker({});
         // if (pinType === "pothole") {
         //     hazard.icon = this.potholeIcon;
@@ -272,11 +274,13 @@ export class MapComponent implements OnInit {
         // } else if (pinType === "stolen") {
         //     hazard.icon = this.stolenIcon;
         // }
-
         // hazard.position = mapsModule.Position.positionFromLatLng(lat, lng);
         // hazard.title = place[1];
         // this.markers.push(hazard);
         // markers.push(hazard);
+
+        // end for each
+
         // builder.include(hazard.android.getPosition());
         // const bounds = builder.build();
         // const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(bounds, padding);
