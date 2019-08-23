@@ -102,7 +102,7 @@ export class RideComponent implements OnInit {
             const peterInfo = JSON.parse(parsedPeter);
             polylineHolder = polyLine;
             this.steps = peterInfo;
-            console.log(peterInfo);
+            console.log(params);
         });
         paramSubscription.unsubscribe();
     }

@@ -30,6 +30,7 @@ let markerLng;
 let directionsResponse;
 let markers = [];
 let turnBy;
+let safeTurnBy;
 let peterInfo;
 
 
@@ -49,6 +50,7 @@ export class MapComponent implements OnInit {
     zoom = 13;
     markers = [];
     hazards = [];
+    safeRideFlat;
     bottomButtonText = "Get Directions";
     markerSelected = false;
     readyToRide = false;
@@ -58,7 +60,9 @@ export class MapComponent implements OnInit {
     latLng;
     selectedRoute;
     safePoly;
-   
+    safest = false;
+    shortest = true;
+    safeRidePolyline;
     
 
     readonly ROOT_URL = "https://6b409c5a.ngrok.io";
@@ -158,6 +162,7 @@ export class MapComponent implements OnInit {
         });
     }
     
+
     onMarkerPick(args) {
         // sets marker selected to marker on component
         markerLat = args.marker.position.latitude;
@@ -183,7 +188,7 @@ export class MapComponent implements OnInit {
         this.turnByList = [];
         this.safeTurnByList = [];
         this.selectedRoute = null;
-        this.readyToRide = false;
+        
     }
     
     onMapReady(args) {
@@ -208,14 +213,26 @@ export class MapComponent implements OnInit {
         });
     }
 
-    onRouteClick(str){
+    onRouteTap(str){
+      
         this.selectedRoute = str;
+        this.safest = !this.safest
+        this.shortest = !this.shortest
+        if(this.shortest === true){
+            this.safePoly.visible = true;
+            this.compPoly.visible = false;
+            console.log(this.selectedRoute);
+        } else {
+            this.safePoly.visible = false;
+            this.compPoly.visible = true;
+            console.log(this.selectedRoute);
+        }
     }
 
     getDirections() {
         if (this.readyToRide === false) {
             this.removeGetDirections();
-            
+            this.showDirections = true;
             // params are set to the marker selected, info coming from component
             // tslint:disable-next-line: max-line-length
             const params = new HttpParams().set("place", `${markerLat},${markerLng}`).set("userLoc", `${this.latitude},${this.longitude}`);
@@ -224,21 +241,23 @@ export class MapComponent implements OnInit {
             this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
                 // reassigns response to variable to avoid dealing with "<Place[]>"
                 directionsResponse = response;
-                const { polyLine, turnByTurn, peterRide, safePath, wayPointArr, safePolyline, safeRide, safeTurnByTurn} = directionsResponse;
-              
-                const safeRideFlat = safeRide.flat();
-                this.safeTurnByList = safeTurnByTurn.flat();
-                let decoded = com.google.maps.android.PolyUtil.decode(polyLine);
+                const { turnByTurn, peterRide, safePath, wayPointArr, safePolyline, safeRide, safeTurnByTurn} = directionsResponse;
+                let { polyLine } = directionsResponse;
+                this.safeRidePolyline = safePolyline;
+                this.safeRideFlat = safeRide.flat();
+                safeTurnBy = safeTurnByTurn.flat();
+                // let decoded = com.google.maps.android.PolyUtil.decode(polyLine);
                 //let decodedSafe = com.google.maps.android.PolyUtil.decode(safePolyline);
                 //console.log("SafePath:", safePolyline);
 
-                if (com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, decoded, true, 75)){
-                    this.getAlternative();
-                }
+                // if (com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, decoded, true, 75)){
+                //     this.getAlternative();
+                // }
                 //console.log("Overlap:", com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, decoded, true, 75));
                 peterInfo = peterRide;
                 turnBy = turnByTurn;
                 this.turnByList = turnBy;
+                this.safeTurnByList = Array.from(safeTurnBy);
                 const bikePath = decodePolyline(polyLine);
                 const safePathPoints = decodePolyline(safePolyline)
                 
@@ -277,11 +296,11 @@ export class MapComponent implements OnInit {
 
               
                 path.visible = true;
-                safePathPolyLine.visible = true;
-                wayPointPath.visible = true;
+                safePathPolyLine.visible = false;
+                //wayPointPath.visible = true;
                 path.width = 10;
                 safePathPolyLine.width = 10;
-                wayPointPath.visible = true;
+                //wayPointPath.visible = true;
                 path.geodesic = false;
                 safePathPolyLine.geodesic = false;
                 wayPointPath.geodesic = false;
@@ -324,15 +343,29 @@ export class MapComponent implements OnInit {
             });
         } else if (this.readyToRide === true) {
             console.log("tapped");
-            const { polyLine, peterRide } = directionsResponse;
-            let hailMary = JSON.stringify(peterInfo);
-            const params: NavigationExtras = {
-                queryParams: {
-                    polyLine,
-                    hailMary
+            let { polyLine, peterRide } = directionsResponse;
+            if(this.selectedRoute === "shortest"){
+                let parsedPeter = JSON.stringify(peterInfo);
+                const params: NavigationExtras = {
+                    queryParams: {
+                        polyLine,
+                        parsedPeter
+                    }
                 }
-            };
+                this.routerExtensions.navigate(["/ride"], params);
+            } else if (this.selectedRoute === "safest"){
+                let parsedPeter = JSON.stringify(this.safeRideFlat);
+                const { safePolyline } = directionsResponse;
+                polyLine = this.safeRidePolyline;
+                console.log("hit");
+                const params: NavigationExtras = {
+                    queryParams: {
+                        polyLine,
+                        parsedPeter
+                    }
+            }
             this.routerExtensions.navigate(["/ride"], params);
+        };
     }
     }
 
