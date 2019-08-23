@@ -38,7 +38,7 @@ export class AppComponent implements OnInit {
 
     ngOnInit(): void {
         configureOAuthProviders();
-        this._activatedUrl = "/home";
+        this._activatedUrl = "/login";
         this._sideDrawerTransition = new SlideInOnTopTransition();
 
         this.router.events
@@ -84,6 +84,10 @@ export class AppComponent implements OnInit {
                     this.showProPic = true;
                     this.showIcon = false;
                     console.log("selected", selected);
+                    // const name = file.substr(file.lastIndexOf("/") + 1);
+                    // const session = bghttp.session(
+                    //     "image-upload"
+                    // );
                 });
                 // list.items = selection;
             })
@@ -99,13 +103,18 @@ export class AppComponent implements OnInit {
         const folder: Folder = documents.getFolder(vm.get("src") || "src");
         const file: File = folder.getFile(`${vm.get("token") || "token"}` + `.txt`);
 
-        file.readText()
+        file.writeText("")
+            .then(() => file.readText())
             .then((res) => {
                 vm.set("writtenContent", res);
-                console.log(res);
+                console.log("Written token", res);
 
                 request({
+<<<<<<< HEAD
                     url: `https://6b409c5a.ngrok.io/logout/${res}`,
+=======
+                    url: `https://b35c6d0e.ngrok.io/logout/${res}`,
+>>>>>>> b25e28f86ca74ea2784b0cf1668732f4c11e8b58
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json"

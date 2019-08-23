@@ -98,9 +98,8 @@ export class RideComponent implements OnInit {
                 private zone: NgZone) {
         // Use the component constructor to inject providers.
         const paramSubscription = this.route.queryParams.subscribe((params) => {
-            console.log("<==========================================+++++>");
-            const {polyLine, hailMary} = params;
-            const peterInfo = JSON.parse(hailMary);
+            const {polyLine, parsedPeter} = params;
+            const peterInfo = JSON.parse(parsedPeter);
             polylineHolder = polyLine;
             this.steps = peterInfo;
             console.log(peterInfo);
@@ -731,7 +730,6 @@ export class RideComponent implements OnInit {
         console.log(this.directedRide);
         if (line !== undefined) {
             this.directedRide = true;
-            // this.directionsParser();
             let flightPlanCoordinates = decodePolyline(line);
             this.polyline = new mapsModule.Polyline();
             for (let i = 0; i < flightPlanCoordinates.length; i++) {

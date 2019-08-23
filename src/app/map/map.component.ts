@@ -180,7 +180,7 @@ export class MapComponent implements OnInit {
             this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
                 // reassigns response to variable to avoid dealing with "<Place[]>"
                 directionsResponse = response;
-                const { polyLine, turnByTurn, peterRide, safePath, wayPointArr, safePolyline} = directionsResponse;
+                const { polyLine, turnByTurn, peterRide, safePath, wayPointArr, safePolyline, safeRide, safeTurnByTurn} = directionsResponse;
                 console.log(Object.keys(directionsResponse));
             
                 let decoded = com.google.maps.android.PolyUtil.decode(polyLine);
@@ -259,8 +259,8 @@ export class MapComponent implements OnInit {
                 this.markers.push(finish);
                 builder.include(finish.android.getPosition());
                 path.color = new Color("black");
-                //safePathPolyLine.color = new Color("red");
-                wayPointPath.color = new Color("pink");
+                safePathPolyLine.color = new Color("red");
+                //wayPointPath.color = new Color("pink");
                 actualMap.addMarker(finish);
                 actualMap.addPolyline(path);
                 actualMap.addPolyline(safePathPolyLine);

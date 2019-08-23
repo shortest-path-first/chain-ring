@@ -48,15 +48,8 @@ export function tnsOauthLogin(providerType) {
   const file: File = folder.getFile(`${vm.get("token") || "token"}` + `.txt`);
 
   client = new TnsOAuthClient(providerType);
-  client.loginWithCompletion((tokenResult: ITnsOAuthTokenResult, error) => {
-    if (error) {
-      console.error("error loggin in:", error);
-      // (error);
-    } else {
-      console.log("Logged in", tokenResult.idTokenExpiration);
-      console.log("Logged in", tokenResult.accessTokenExpiration);
-      console.log("Logged in", tokenResult.refreshTokenExpiration);
 
+<<<<<<< HEAD
       const options = {
         url: "https://6b409c5a.ngrok.io/userInfo",
         method: "POST",
@@ -68,26 +61,66 @@ export function tnsOauthLogin(providerType) {
       };
       request(options)
         .then((result) => {
+=======
+  return new Promise((resolve, reject) => {
+    client.loginWithCompletion(
+        (tokenResult: ITnsOAuthTokenResult, error) => {
+            if (error !== undefined) {
+                console.error("error loggin in:", error);
+                // (error);
+            } else {
+                console.log("Logged in", tokenResult.idTokenExpiration);
+                console.log("Logged in", tokenResult.accessTokenExpiration);
+                console.log(
+                    "Logged in",
+                    tokenResult.refreshTokenExpiration
+                );
+>>>>>>> b25e28f86ca74ea2784b0cf1668732f4c11e8b58
 
-          console.log(result.content.toString().slice(result.content.toString().indexOf(":") + 1)
-            .match(/[A-Z, 0-9]/gi)
-            .join(""));
-          // result.content.toFile("file:///src/token.txt");
-          file.writeText(
-              result.content
-                  .toString()
-                  .slice(result.content.toString().indexOf(":") + 1)
-                  .match(/[A-Z, 0-9]/gi)
-                  .join(""))
-              .then(() => {
-                  file.readText().then((res) => {
-                      vm.set(
-                          "successMessage",
-                          `Successfully saved in${file.path}`
-                      );
-                      vm.set("writtenContent", res);
-                      vm.set("isItemVisible", true);
+                const options = {
+                    url: "http://b35c6d0e.ngrok.io/userInfo",
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    content: JSON.stringify({
+                        accesstoken: tokenResult.accessToken,
+                        idToken: tokenResult.idToken
+                    })
+                };
+                request(options)
+                    .then(result => {
+                        console.log(
+                            result.content
+                                .toString()
+                                .slice(
+                                    result.content.toString().indexOf(":") +
+                                        1
+                                )
+                                .match(/[A-Z, 0-9]/gi)
+                                .join("")
+                        );
+                        // result.content.toFile("file:///src/token.txt");
+                        file.writeText(
+                            result.content
+                                .toString()
+                                .slice(
+                                    result.content.toString().indexOf(":") +
+                                        1
+                                )
+                                .match(/[A-Z, 0-9]/gi)
+                                .join("")
+                        )
+                            .then(() => {
+                                file.readText().then(res => {
+                                    vm.set(
+                                        "successMessage",
+                                        `Successfully saved in${file.path}`
+                                    );
+                                    vm.set("writtenContent", res);
+                                    vm.set("isItemVisible", true);
 
+<<<<<<< HEAD
                       request({
                         url: `https://6b409c5a.ngrok.io/login/${res}`,
                         method: "Patch",
@@ -112,9 +145,37 @@ export function tnsOauthLogin(providerType) {
         .catch((err) => {
           console.error("err", err.stack);
         });
+=======
+                                    // request({
+                                    //     url: `http://b35c6d0e.ngrok.io/login/${res || "noexist"}`,
+                                    //     method: "Patch",
+                                    //     headers: {
+                                    //         "Content-Type":
+                                    //             "application/json"
+                                    //     },
+                                    //     content: JSON.stringify({
+                                    //         token: res
+                                    //     })
+                                    // }).then(response => {
+                                    //     console.log(
+                                    //         response.content.toString()
+                                    //     );
+                                    //     resolve(response.content.toString());
+                                    // });
+                                });
+                            })
+                            .catch(err => {
+                                console.log(err);
+                            });
+                    })
+                    .catch(err => {
+                        console.error("err", err.stack);
+                    });
+            }
+>>>>>>> b25e28f86ca74ea2784b0cf1668732f4c11e8b58
 
-      }
-
-    // return client;
+            // return client;
+        }
+    );
   });
 }
