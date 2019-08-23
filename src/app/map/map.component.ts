@@ -48,6 +48,7 @@ export class MapComponent implements OnInit {
     longitude = -90.15;
     zoom = 13;
     markers = [];
+    hazards = [];
     bottomButtonText = "Get Directions";
     markerSelected = false;
     readyToRide = false;
@@ -61,6 +62,12 @@ export class MapComponent implements OnInit {
     
 
     readonly ROOT_URL = "https://6b409c5a.ngrok.io";
+    potholeIcon = null;
+    closeIcon = null;
+    avoidIcon = null;
+    crashIcon = null;
+    stolenIcon = null;
+
 
     places: Observable<Array<Place>>;
 
@@ -78,9 +85,30 @@ export class MapComponent implements OnInit {
                 this.latitude = result.latitude;
                 this.longitude = result.longitude;
             });
-        this.latLng = new com.google.android.gms.maps.model.LatLng(29.973568, -90.057576);
-   
-        //let decoded = com.google.maps.android.PolyUtil.decode(line);
+        const potholeImageSource = new ImageSource();
+        this.potholeIcon = new Image();
+        potholeImageSource.loadFromFile("~/app/images/mapPotHole.png");
+        this.potholeIcon.imageSource = potholeImageSource;
+
+        const closeImageSource = new ImageSource();
+        this.closeIcon = new Image();
+        closeImageSource.loadFromFile("~/app/images/mapNearMiss.png");
+        this.closeIcon.imageSource = closeImageSource;
+
+        const avoidImageSource = new ImageSource();
+        this.avoidIcon = new Image();
+        avoidImageSource.loadFromFile("~/app/images/mapAvoid.png");
+        this.avoidIcon.imageSource = avoidImageSource;
+
+        const crashImageSource = new ImageSource();
+        this.crashIcon = new Image();
+        crashImageSource.loadFromFile("~/app/images/mapHit.png");
+        this.crashIcon.imageSource = crashImageSource;
+
+        const stolenImageSource = new ImageSource();
+        this.stolenIcon = new Image();
+        stolenImageSource.loadFromFile("~/app/images/mapStolen.png");
+        this.stolenIcon.imageSource = stolenImageSource;
     }
     
     onDrawerButtonTap(): void {
@@ -313,6 +341,50 @@ export class MapComponent implements OnInit {
             transition: {
                 name: "fade"
             }
+        });
+    }
+
+    displayHazards(){
+        console.log("yes");
+        this.http.get<Array<Place>>(this.ROOT_URL + "/marker").subscribe((response) => {
+            // assigning response info to markers array and then placing each marker on our map
+            this.hazards = response;
+            console.log(this.hazards);
+            console.log("<==================>");
+            const padding = 150;
+            const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
+
+            this.hazards.forEach((hazard) => {
+                const lat = hazard.markerLat;
+                const lng = hazard.markerLon;
+                const pinType = hazard.type;
+                console.log(lat, lng, pinType);
+                const marker = new mapsModule.Marker({});
+                marker.position = mapsModule.Position.positionFromLatLng(lat, lng);
+                if (pinType === "pothole") {
+                    marker.icon = this.potholeIcon;
+                } else if (pinType === "close") {
+                    marker.icon = this.closeIcon;
+                } else if (pinType === "avoid") {
+                    marker.icon = this.avoidIcon;
+                } else if (pinType === "crash") {
+                    marker.icon = this.crashIcon;
+                } else if (pinType === "stolen") {
+                    marker.icon = this.stolenIcon;
+                }
+                builder.include(marker.android.getPosition());
+                actualMap.addMarker(marker);
+            });
+            // recenter map over choices
+            const bounds = builder.build();
+            console.log("<====******====>");
+            const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(bounds, padding);
+            actualMap.gMap.animateCamera(newBounds);
+            
+        }, (err) => {
+            console.log(err);
+        }, () => {
+            console.log("completed");
         });
     }
 }

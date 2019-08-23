@@ -179,7 +179,6 @@ $sidedrawer-list-icon-size: 20;
     font-size: 22%;
     text-align: center;
     font-family: Roboto-Regular;
-
 }
 .stats-info-line{
     background-color: black;
@@ -265,4 +264,18 @@ $sidedrawer-list-icon-size: 20;
     font-size: 18%;
     text-align: center;
     font-family: Roboto-Medium;
+}
+.map-buttons{
+    background-color: black;
+    color: white;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: white;
+    border-width: 10px;
+    width: 95%;
+    height: 100%;
+    font-size: 25%;
+    text-align: center;
+    font-family: Roboto-Regular;
+    margin: 15px;
 }

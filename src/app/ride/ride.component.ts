@@ -176,7 +176,6 @@ export class RideComponent implements OnInit {
         geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
             .then((result) => {
                 const marker = new mapsModule.Marker();
-                const imageSource = new ImageSource();
                 if (pinType === "pothole") {
                     marker.icon = this.potholeIcon;
                 } else if (pinType === "close") {
