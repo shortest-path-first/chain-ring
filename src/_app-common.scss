@@ -189,9 +189,24 @@ $sidedrawer-list-icon-size: 20;
     border-width: 10px;
     margin: 5px 5px;
     max-width: 30%;
-    height: 18%;
+    height: 13%;
     opacity: .5;
-    font-size: 18%;
+    font-size: 23%;
+    text-align: center;
+    font-family: Roboto-Medium;
+}
+.stats-recent-line{
+    background-color: black;
+    color: white;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: white;
+    border-width: 10px;
+    margin: 20px 5px;
+    max-width: 30%;
+    height: 13%;
+    opacity: .5;
+    font-size: 23%;
     text-align: center;
     font-family: Roboto-Medium;
 }
@@ -206,21 +221,6 @@ $sidedrawer-list-icon-size: 20;
     max-width: 30%;
     height: 100%;
     opacity: .6;
-    font-size: 18%;
-    text-align: center;
-    font-family: Roboto-Medium;
-}
-.stats-recent-line{
-    background-color: black;
-    color: white;
-    border-radius: 20px;
-    border-style: solid;
-    border-color: white;
-    border-width: 10px;
-    margin: 5px 5px;
-    max-width: 30%;
-    height: 18%;
-    opacity: .5;
     font-size: 18%;
     text-align: center;
     font-family: Roboto-Medium;

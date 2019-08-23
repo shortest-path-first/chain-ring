@@ -55,7 +55,7 @@ export class StatsComponent implements OnInit {
     }
     ngOnInit(): void {
         // Init your component properties here.
-        for(let i = 0; i < 100; i++){
+        for (let i = 0; i < 100; i++) {
             geolocation.clearWatch(i);
             clearInterval(i);
         }
@@ -99,6 +99,7 @@ export class StatsComponent implements OnInit {
         }
         time = `${hours}:${minutes}:${seconds}`;
         console.log(time);
+
         return time;
     }
 

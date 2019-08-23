@@ -9,22 +9,19 @@
         <Label row="0" col="0" rowSpan="1" colSpan="4" class="stats-header" (tap)="lastRideTap()" text="Last Ride"></Label>
         <Label row="0" col="4" rowSpan="1" colSpan="4" class="stats-header" (tap)="recentRideTap()" text="Recent"></Label>
         <Label row="0" col="8" rowSpan="1" colSpan="4" class="stats-header" (tap)="totalRideTap()" text="Total"></Label>
-        <Label *ngIf=notRecentView row="1" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Average Speed"></Label>
-        <Label *ngIf=notRecentView row="1" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{displayedAverageSpeed}} mph"></Label>
-        <Label *ngIf=notRecentView row="3" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Total Distance"></Label>
-        <Label *ngIf=notRecentView row="3" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{displayedTotalDistance}} miles"></Label>
-        <Label *ngIf=notRecentView row="5" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Duration"></Label>
-        <Label *ngIf=notRecentView row="5" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{displayedDuration}}"></Label>
-        <GridLayout *ngIf=notRecentView row="7" col="0" colSpan="12" rowSpan="3" height="100%" width="100%">
+        <Label *ngIf=notRecentView row="1" col="0" colSpan="12" rowSpan="1" class="stats-info-line" text="Average Speed: {{displayedAverageSpeed}} mph"></Label>
+        <Label *ngIf=notRecentView row="2" col="0" colSpan="12" rowSpan="1" class="stats-info-line" text="Total Distance: {{displayedTotalDistance}} miles"></Label>
+        <Label *ngIf=notRecentView row="3" col="0" colSpan="12" rowSpan="1" class="stats-info-line" text="Duration: {{displayedDuration}}"></Label>
+        <GridLayout *ngIf=notRecentView row="5" col="0" colSpan="12" rowSpan="3" height="100%" width="100%">
             <chart:RadPieChart allowAnimation="true" row="0" class="stats-pie-line">
                 <chart:PieSeries tkPieSeries selectionMode="DataPoint" [items]="pieSource" valueProperty="Amount" legendLabel="Speed" color="white">
                     <chart:PointLabelStyle tkPieLabelStyle textColor="white"></chart:PointLabelStyle>                    
                 </chart:PieSeries>
                 <chart:Palette tkPiePalette>
-                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="1" fillColor="#393ef9"></PaletteEntry>
-                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="1" fillColor="#8533da"></PaletteEntry>
-                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="1" fillColor="#9330ca"></PaletteEntry>
-                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="1" fillColor="#9c27b0"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="10" fillColor="#ff0048" strokeColor="#ffffff"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="10" fillColor="#48ff00" strokeColor="#ffffff"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="10" fillColor="#0091ff" strokeColor="#ffffff"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="10" fillColor="#ff5e00" strokeColor="#ffffff"></PaletteEntry>
                 </chart:Palette>
                 <chart:RadLegendView tkPieLegend position="Right" title="Speeds (based on max speed)" offsetOrigin="TopRight" width="150" enableSelection="true"></chart:RadLegendView>
             </chart:RadPieChart>
@@ -44,23 +41,20 @@
     <GridLayout columns="*, *, *, *, *, *, *, *, *, *, *, *" rows="*, *, *, *, *, *, *, *, *, *" width="95%" height="95%"
         *ngIf=indieView>
         <Label row="0" col="0" rowSpan="1" colSpan="12" class="stats-header" (tap)="totalRideTap()" text="Go Back"></Label>
-        <Label *ngIf=indieView row="1" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Average Speed"></Label>
-        <Label *ngIf=indieView row="1" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{displayedAverageSpeed}} mph"></Label>
-        <Label *ngIf=indieView row="3" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Total Distance"></Label>
-        <Label *ngIf=indieView row="3" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{displayedTotalDistance}} miles"></Label>
-        <Label *ngIf=indieView row="5" col="0" colSpan="6" rowSpan="2" class="stats-info-line" text="Duration"></Label>
-        <Label *ngIf=indieView row="5" col="6" colSpan="6" rowSpan="2" class="stats-info-line" text="{{displayedDuration}}"></Label>
-        <GridLayout *ngIf=indieView row="7" col="0" colSpan="12" rowSpan="3" height="100%" width="100%">
+        <Label *ngIf=indieView row="1" col="0" colSpan="12" rowSpan="1" class="stats-info-line" text="Average Speed: {{displayedAverageSpeed}} mph"></Label>
+        <Label *ngIf=indieView row="2" col="0" colSpan="12" rowSpan="1" class="stats-info-line" text="Total Distance: {{displayedTotalDistance}} miles"></Label>
+        <Label *ngIf=indieView row="3" col="0" colSpan="12" rowSpan="1" class="stats-info-line" text="Duration: {{displayedDuration}}"></Label>
+        <GridLayout *ngIf=indieView row="5" col="0" colSpan="12" rowSpan="3" height="100%" width="100%">
             <chart:RadPieChart allowAnimation="true" row="0" class="stats-pie-line">
                 <chart:PieSeries tkPieSeries selectionMode="DataPoint" [items]="pieSource" valueProperty="Amount" legendLabel="Speed" color="white">
                     <chart:PointLabelStyle tkPieLabelStyle textColor="white"></chart:PointLabelStyle>
                 </chart:PieSeries>
                 <chart:Palette tkPiePalette>
-                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="1" fillColor="#393ef9"></PaletteEntry>
-                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="1" fillColor="#8533da"></PaletteEntry>
-                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="1" fillColor="#9330ca"></PaletteEntry>
-                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="1" fillColor="#9c27b0"></PaletteEntry>
-                </chart:Palette>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="10" fillColor="#ff0048" strokeColor="#ffffff"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="10" fillColor="#48ff00" strokeColor="#ffffff"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="10" fillColor="#0091ff" strokeColor="#ffffff"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="10" fillColor="#ff5e00" strokeColor="#ffffff"></PaletteEntry>
+                    </chart:Palette>
                 <chart:RadLegendView tkPieLegend position="Right" title="Speeds (based on max speed)" offsetOrigin="TopRight" width="150" enableSelection="true"></chart:RadLegendView>
             </chart:RadPieChart>
         </GridLayout>
