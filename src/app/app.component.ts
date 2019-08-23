@@ -110,11 +110,7 @@ export class AppComponent implements OnInit {
                 console.log("Written token", res);
 
                 request({
-<<<<<<< HEAD
                     url: `https://6b409c5a.ngrok.io/logout/${res}`,
-=======
-                    url: `https://b35c6d0e.ngrok.io/logout/${res}`,
->>>>>>> b25e28f86ca74ea2784b0cf1668732f4c11e8b58
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json"

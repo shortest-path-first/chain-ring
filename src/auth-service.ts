@@ -49,19 +49,6 @@ export function tnsOauthLogin(providerType) {
 
   client = new TnsOAuthClient(providerType);
 
-<<<<<<< HEAD
-      const options = {
-        url: "https://6b409c5a.ngrok.io/userInfo",
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        content: JSON.stringify({
-              accesstoken: tokenResult.accessToken,
-              idToken: tokenResult.idToken
-          })
-      };
-      request(options)
-        .then((result) => {
-=======
   return new Promise((resolve, reject) => {
     client.loginWithCompletion(
         (tokenResult: ITnsOAuthTokenResult, error) => {
@@ -75,7 +62,6 @@ export function tnsOauthLogin(providerType) {
                     "Logged in",
                     tokenResult.refreshTokenExpiration
                 );
->>>>>>> b25e28f86ca74ea2784b0cf1668732f4c11e8b58
 
                 const options = {
                     url: "http://b35c6d0e.ngrok.io/userInfo",
@@ -120,32 +106,6 @@ export function tnsOauthLogin(providerType) {
                                     vm.set("writtenContent", res);
                                     vm.set("isItemVisible", true);
 
-<<<<<<< HEAD
-                      request({
-                        url: `https://6b409c5a.ngrok.io/login/${res}`,
-                        method: "Patch",
-                        headers: {
-                              "Content-Type":
-                                  "application/json"
-                          },
-                        content: JSON.stringify({
-                              token: res
-                          })
-                      }).then((response) => {
-                          console.log(
-                              response.content.toString()
-                          );
-                      });
-                  });
-              })
-              .catch((err) => {
-                  console.log(err);
-              });
-        })
-        .catch((err) => {
-          console.error("err", err.stack);
-        });
-=======
                                     // request({
                                     //     url: `http://b35c6d0e.ngrok.io/login/${res || "noexist"}`,
                                     //     method: "Patch",
@@ -172,7 +132,6 @@ export function tnsOauthLogin(providerType) {
                         console.error("err", err.stack);
                     });
             }
->>>>>>> b25e28f86ca74ea2784b0cf1668732f4c11e8b58
 
             // return client;
         }

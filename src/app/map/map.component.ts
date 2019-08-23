@@ -181,8 +181,9 @@ export class MapComponent implements OnInit {
                 // reassigns response to variable to avoid dealing with "<Place[]>"
                 directionsResponse = response;
                 const { polyLine, turnByTurn, peterRide, safePath, wayPointArr, safePolyline, safeRide, safeTurnByTurn} = directionsResponse;
-                console.log(Object.keys(directionsResponse));
-            
+              
+                const safeRideFlat = safeRide.flat();
+                const safeTurnByTurnFlat = safeTurnByTurn.flat();
                 let decoded = com.google.maps.android.PolyUtil.decode(polyLine);
                 //let decodedSafe = com.google.maps.android.PolyUtil.decode(safePolyline);
                 //console.log("SafePath:", safePolyline);

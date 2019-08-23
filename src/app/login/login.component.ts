@@ -41,11 +41,7 @@ export class LoginComponent implements OnInit {
                     res = "";
                 }
                 const options = {
-<<<<<<< HEAD
-                    url: `https://6b409c5a.ngrok.io/login/${res}`,
-=======
                     url: `http://b35c6d0e.ngrok.io/login/${res}`,
->>>>>>> b25e28f86ca74ea2784b0cf1668732f4c11e8b58
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -78,20 +74,6 @@ export class LoginComponent implements OnInit {
     onLoginTap(): void {
         console.log("tapped");
 
-<<<<<<< HEAD
-        this.file.readText()
-            .then((res) => {
-                this.vm.set("writtenContent", res);
-                console.log(res);
-              
-                const options = {
-                    url: `https://6b409c5a.ngrok.io/login/${res || "123"}`,
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                };
-=======
         // this.file.readText()
         //     .then((res) => {
         //         this.vm.set("writtenContent", res);
@@ -103,7 +85,6 @@ export class LoginComponent implements OnInit {
         //                 "Content-Type": "application/json"
         //             }
         //         };
->>>>>>> b25e28f86ca74ea2784b0cf1668732f4c11e8b58
             // setTimeout(() => {
 
             // tnsOauthLogin("google");
