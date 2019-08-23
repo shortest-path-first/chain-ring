@@ -52,8 +52,12 @@ export class MapComponent implements OnInit {
     markerSelected = false;
     readyToRide = false;
     turnByList: Array<object> = [];
+    safeTurnByList: Array<object> = [];
     userAvoidMarkers = [{ lat: 29.971742, lng: -90.066258 }, {lat: 29.973568, lng: -90.057576}];
     latLng;
+    selectedRoute;
+    safePoly;
+   
     
 
     readonly ROOT_URL = "https://6b409c5a.ngrok.io";
@@ -136,6 +140,7 @@ export class MapComponent implements OnInit {
     }
     
     removeGetDirections() {
+       
         this.markerSelected = false;
         this.markers.forEach((marker) => { marker.visible = false; });
         this.markers = [];
@@ -144,7 +149,13 @@ export class MapComponent implements OnInit {
         if (this.compPoly) {
             this.compPoly.visible = false;
         }
+        if (this.safePoly){
+            this.safePoly.visible = false;
+        }
         this.turnByList = [];
+        this.safeTurnByList = [];
+        this.selectedRoute = null;
+        this.readyToRide = false;
     }
     
     onMapReady(args) {
@@ -168,6 +179,11 @@ export class MapComponent implements OnInit {
         
         });
     }
+
+    onRouteClick(str){
+        this.selectedRoute = str;
+    }
+
     getDirections() {
         if (this.readyToRide === false) {
             this.removeGetDirections();
@@ -183,7 +199,7 @@ export class MapComponent implements OnInit {
                 const { polyLine, turnByTurn, peterRide, safePath, wayPointArr, safePolyline, safeRide, safeTurnByTurn} = directionsResponse;
               
                 const safeRideFlat = safeRide.flat();
-                const safeTurnByTurnFlat = safeTurnByTurn.flat();
+                this.safeTurnByList = safeTurnByTurn.flat();
                 let decoded = com.google.maps.android.PolyUtil.decode(polyLine);
                 //let decodedSafe = com.google.maps.android.PolyUtil.decode(safePolyline);
                 //console.log("SafePath:", safePolyline);
@@ -199,7 +215,8 @@ export class MapComponent implements OnInit {
                 const safePathPoints = decodePolyline(safePolyline)
                 
                 const path = new mapsModule.Polyline();
-                const safePathPolyLine = new mapsModule.Polyline(); 
+                const safePathPolyLine = new mapsModule.Polyline();
+                this.safePoly = safePathPolyLine; 
                 const wayPointPath = new mapsModule.Polyline();
                 this.compPoly = path;
                
