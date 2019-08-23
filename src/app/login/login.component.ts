@@ -8,7 +8,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { request, getFile, getImage, getJSON, getString } from "tns-core-modules/http";
 import { knownFolders, Folder, File } from "tns-core-modules/file-system";
 import { fromObject, fromObjectRecursive, Observable, PropertyChangeData } from "tns-core-modules/data/observable";
-import { tnsOauthLogin } from "../../auth-service";
+// import { tnsOauthLogin } from "../../auth-service";
 
 @Component({
     selector: "Login",
@@ -20,6 +20,7 @@ export class LoginComponent implements OnInit {
     documents: Folder = knownFolders.documents();
     folder: Folder = this.documents.getFolder(this.vm.get("src") || "src");
     file: File = this.folder.getFile(`${this.vm.get("token") || "token"}` + `.txt`);
+    incorrect = false;
 
     private _activatedUrl: string;
 
@@ -38,7 +39,7 @@ export class LoginComponent implements OnInit {
                 this.vm.set("writtenContent", res);
                 console.log(res);
                 const options = {
-                    url: `http://b35c6d0e.ngrok.io/login/${res}`,
+                    url: `http://ceabe4e9.ngrok.io/login/${res}`,
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -72,7 +73,7 @@ export class LoginComponent implements OnInit {
         console.log("username", username);
         console.log("password", password);
         request({
-            url: `http://b35c6d0e.ngrok.io/login`,
+            url: `http://ceabe4e9.ngrok.io/login`,
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -81,13 +82,23 @@ export class LoginComponent implements OnInit {
                 username,
                 password
             })
-        }).then((response) => {
+        }).then(response => {
             console.log(response.statusCode);
             if (response.statusCode === 200) {
-                this.file.writeText(response.content
-                    .toString().slice(response.content.toString().indexOf(":") + 1).match(/[A-Z, 0-9]/gi).join(""))
+                this.file
+                    .writeText(
+                        response.content
+                            .toString()
+                            .slice(
+                                response.content
+                                    .toString()
+                                    .indexOf(":") + 1
+                            )
+                            .match(/[A-Z, 0-9]/gi)
+                            .join("")
+                    )
                     .then(() => this.file.readText())
-                    .then((res) => {
+                    .then(res => {
                         this.vm.set("writtenContent", res);
                         console.log("logged in");
                         console.log(response.content.toString());
@@ -102,6 +113,7 @@ export class LoginComponent implements OnInit {
                     });
             } else {
                 console.log("Wrong user name or password");
+                this.incorrect = true;
             }
         });
 }
