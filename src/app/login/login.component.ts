@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
                 this.vm.set("writtenContent", res);
                 console.log(res);
                 const options = {
-                    url: `http://b35c6d0e.ngrok.io/login/${res}`,
+                    url: `https://97864893.ngrok.io/login/${res}`,
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -132,4 +132,4 @@ export class LoginComponent implements OnInit {
         sideDrawer.showDrawer();
     }
 }
-// http://b35c6d0e.ngrok.io
+// https://97864893.ngrok.io
