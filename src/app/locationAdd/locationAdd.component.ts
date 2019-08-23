@@ -10,7 +10,6 @@ import { Accuracy } from "tns-core-modules/ui/enums";
 import { ActivatedRoute } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
 
-
 declare var com: any;
 
 const mapsModule = require("nativescript-google-maps-sdk");
