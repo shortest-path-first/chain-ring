@@ -19,7 +19,7 @@ import {
     Observable,
     PropertyChangeData
 } from "tns-core-modules/data/observable";
-import { tnsOauthLogin } from "../../auth-service";
+// import { tnsOauthLogin } from "../../auth-service";
 
 @Component({
     selector: "Login",
@@ -33,6 +33,7 @@ export class SignupComponent implements OnInit {
     file: File = this.folder.getFile(
         `${this.vm.get("token") || "token"}` + `.txt`
     );
+    taken = false;
 
     private _activatedUrl: string;
 
@@ -52,7 +53,7 @@ export class SignupComponent implements OnInit {
                 this.vm.set("writtenContent", res);
                 console.log(res);
                 const options = {
-                    url: `http://b35c6d0e.ngrok.io/login/${res}`,
+                    url: `http://ceabe4e9.ngrok.io/login/${res}`,
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -87,7 +88,7 @@ export class SignupComponent implements OnInit {
         console.log("username", username);
         console.log("password", password);
         request({
-            url: `http://b35c6d0e.ngrok.io/userInfo`,
+            url: `http://ceabe4e9.ngrok.io/userInfo`,
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -97,16 +98,21 @@ export class SignupComponent implements OnInit {
                 password
             })
         }).then(response => {
-            console.log("logged in");
-            console.log(response.content.toString());
-            (global as any).username = username;
-            console.log((global as any).username);
-            this._activatedUrl = "/home";
-            this.routerExtensions.navigate(["/home"], {
-                transition: {
-                    name: "fade"
-                }
-            });
+            console.log(response.statusCode);
+            if(response.statusCode === 201){
+                console.log("logged in");
+                console.log(response.content.toString());
+                (global as any).username = username;
+                console.log((global as any).username);
+                this._activatedUrl = "/home";
+                this.routerExtensions.navigate(["/home"], {
+                    transition: {
+                        name: "fade"
+                    }
+                });
+            } else if (response.statusCode === 400){
+                this.taken = true;
+            }
         });
     }
 
