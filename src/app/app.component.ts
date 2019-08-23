@@ -4,7 +4,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { DrawerTransitionBase, RadSideDrawer, SlideInOnTopTransition } from "nativescript-ui-sidedrawer";
 import { filter } from "rxjs/operators";
 import * as app from "tns-core-modules/application";
-import { configureOAuthProviders } from "../auth-service";
+// import { configureOAuthProviders } from "../auth-service";
 import * as imagepicker from "nativescript-imagepicker";
 import { knownFolders, Folder, File } from "tns-core-modules/file-system";
 import { fromObject, fromObjectRecursive, Observable, PropertyChangeData } from "tns-core-modules/data/observable";
@@ -38,7 +38,7 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        configureOAuthProviders();
+        // configureOAuthProviders();
         console.log(this.username);
         this._activatedUrl = "/login";
         this._sideDrawerTransition = new SlideInOnTopTransition();
@@ -111,12 +111,13 @@ export class AppComponent implements OnInit {
                     .then(() => file.readText())
                     .then((res) => {
                         vm.set("writtenContent", res);
-        
+
                         request({
-                            url: `https://b35c6d0e.ngrok.io/logout`,
+                            url: `http://ceabe4e9.ngrok.io/logout`,
                             method: "PATCH",
                             headers: {
-                                "Content-Type": "application/json"
+                                "Content-Type":
+                                    "application/json"
                             },
                             content: JSON.stringify({
                                 token: res
