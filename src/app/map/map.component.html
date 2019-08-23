@@ -10,17 +10,31 @@
 <ScrollView>
     <Page xmlns:maps="nativescript-google-maps-sdk" xmlns="http://schemas.nativescript.org/tns.xsd" class="body">
         <StackLayout orientation="vertical" width="100%" height="95%">
-            <TextField #searchPlace id="searchBox" text="" backgroundColor="white" width="95%" height="100"
+            <TextField #searchPlace id="searchBox" text="" backgroundColor="white" width="95%" height="15%"
             (returnPress)="getPlaces(searchPlace.text)" hint="Search Places" fontSize="25"></TextField>
-            <maps:mapView width="95%" height=400 [latitude]="latitude" [longitude]="longitude" mapAnimationsEnabled="{{ mapAnimationsEnabled }}"
+            <maps:mapView width="95%" height="400" [latitude]="latitude" [longitude]="longitude" mapAnimationsEnabled="{{ mapAnimationsEnabled }}"
                 [zoom]="zoom" padding="{{padding}}" (mapReady)="onMapReady($event)" (markerSelect)="onMarkerPick($event)" (coordinateTapped)="removeGetDirections()">
             </maps:mapView>
             <Button width="95%" height="10%" text="Display Hazards" (tap)="displayHazards()" class="map-buttons"></Button>
             <Button *ngIf=markerSelected width="95%" height="11%" [text]=bottomButtonText (tap)="getDirections()" class="map-buttons"></Button>
-            <StackLayout *ngFor="let step of turnByList" class="map-info-line" height="75">
-                <Label [text]="step[0]" height="40" textWrap="true"></Label>
-                <Label [text]="step[1]" height="20" textWrap="true"></Label>
+                <FlexboxLayout *ngIf="showDirections" align-items="stretch" flexDirection="row" justifyContent="space-between">
+                    <Button *ngIf="!safest" width="50%" height="10%" text="Safest" class="map-buttons-select" ></Button>
+                    <Button *ngIf="safest" width="50%" height="10%" text="Safest" class="map-buttons" (tap)="onRouteTap('safest')"></Button>
+                    <Button *ngIf="shortest" width="50%" height="10%" text="Shortest" class="map-buttons" (tap)="onRouteTap('shortest')"></Button>
+                    <Button *ngIf="!shortest" width="50%" height="10%" text="Shortest" class="map-buttons-select"></Button>
+                </FlexboxLayout>
+                <StackLayout *ngIf="!shortest">
+                    <StackLayout *ngFor="let step of turnByList" class="map-info-line" height="75">
+                        <Label [text]="step[0]" height="40" textWrap="true"></Label>
+                        <Label [text]="step[1]" height="20" textWrap="true"></Label>
+                    </StackLayout>
+                    </StackLayout> 
+                     <FlexboxLayout *ngIf="shortest" align-items="stretch" flexDirection="column" justifyContent="space-between">
+                    <StackLayout *ngFor="let safe of safeTurnByList" class="map-info-line" height="75">
+                        <Label [text]="safe[0]" height="40" textWrap="true"></Label>
+                        <Label [text]="safe[1]" height="20" textWrap="true"></Label>
+                    </StackLayout>
+                </FlexboxLayout>
             </StackLayout>
-        </StackLayout>
     </Page>
 </ScrollView>

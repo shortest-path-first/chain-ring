@@ -30,7 +30,11 @@ export class StatsComponent implements OnInit {
 
     pieSource: Array<{ Speed: string, Amount: number }> = [];
 
+<<<<<<< HEAD
     readonly ROOT_URL = "https://97864893.ngrok.io";
+=======
+    readonly ROOT_URL = "https://6b409c5a.ngrok.io";
+>>>>>>> 3ed0e5e622a8197a2997131da2eb505434ffb24e
 
     storedStats: Observable<Array<storedStats>>;
 
