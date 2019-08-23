@@ -33,8 +33,13 @@ export class LoginComponent implements OnInit {
         console.log("LOGIN");
         this.file.readText()
             .then((res) => {
-                this.vm.set("writtenContent", res);
                 console.log(res);
+                if(res){
+                    this.vm.set("writtenContent", res);
+                }
+                if(res.indexOf("Bad") !== -1){
+                    res = "";
+                }
                 const options = {
                     url: `http://b35c6d0e.ngrok.io/login/${res}`,
                     method: "GET",
@@ -42,7 +47,7 @@ export class LoginComponent implements OnInit {
                         "Content-Type": "application/json"
                     }
                 };
-
+                console.log(options);
                 request(options)
                     .then((isLoggedIn) => {
                         console.log(isLoggedIn.content);

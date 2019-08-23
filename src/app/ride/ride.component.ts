@@ -90,7 +90,7 @@ export class RideComponent implements OnInit {
     direct = false;
     steps;
     
-    readonly ROOT_URL = "https://a2880c74.ngrok.io";
+    readonly ROOT_URL = "https://6b409c5a.ngrok.io";
 
     // tslint:disable-next-line: max-line-length
     constructor(private http: HttpClient, private router: Router,
@@ -102,6 +102,7 @@ export class RideComponent implements OnInit {
             const peterInfo = JSON.parse(parsedPeter);
             polylineHolder = polyLine;
             this.steps = peterInfo;
+            console.log(params);
         });
         paramSubscription.unsubscribe();
     }
@@ -275,7 +276,7 @@ export class RideComponent implements OnInit {
         // this.allDirectionWords.push(step['html_instructions'].replace(/<\/?[^>]+(>|$)/g, " "))
         this.turnPoints.push(step["end_location"]);
         });
-
+        console.log(this.directionWords[0])
     }
 
     onReroute(): void {
@@ -725,6 +726,7 @@ export class RideComponent implements OnInit {
 
         const line = polylineHolder;
         // const line = "yd}uDhjsdPfBG@P@\\`CInCKnFQdGSAW@VJhEL`Fy@BkBFuK^H`FtDM"
+        console.log(this.directedRide);
         if (line !== undefined) {
             this.directedRide = true;
             let flightPlanCoordinates = decodePolyline(line);
@@ -759,6 +761,8 @@ export class RideComponent implements OnInit {
             this.mapView.latitude = flightPlanCoordinates[0].lat;
             this.mapView.longitude = flightPlanCoordinates[0].lng;
             this.mapView.addPolyline(this.polyline);
+        } else {
+            this.directedRide = false;
         }
 
         this.mapView.mapAnimationsEnabled = true;
@@ -784,6 +788,8 @@ export class RideComponent implements OnInit {
                 console.error("Get location error:", err);
             });
         this.drawUserPath();
-        this.directionsParser();
+        if(this.steps){
+            this.directionsParser();
+        }
     }
 }
