@@ -64,18 +64,13 @@ export class MapComponent implements OnInit {
     shortest = true;
     safeRidePolyline;
     
-
-    readonly ROOT_URL = "https://6b409c5a.ngrok.io";
     potholeIcon = null;
     closeIcon = null;
     avoidIcon = null;
     crashIcon = null;
     stolenIcon = null;
 
-<<<<<<< HEAD
     readonly ROOT_URL = "https://97864893.ngrok.io";
-=======
->>>>>>> 3ed0e5e622a8197a2997131da2eb505434ffb24e
 
     places: Observable<Array<Place>>;
 
@@ -299,8 +294,8 @@ export class MapComponent implements OnInit {
                 //}
 
               
-                path.visible = true;
-                safePathPolyLine.visible = false;
+                path.visible = false;
+                safePathPolyLine.visible = true;
                 //wayPointPath.visible = true;
                 path.width = 10;
                 safePathPolyLine.width = 10;
