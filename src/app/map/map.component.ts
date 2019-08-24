@@ -70,7 +70,7 @@ export class MapComponent implements OnInit {
     crashIcon = null;
     stolenIcon = null;
 
-    readonly ROOT_URL = "https://97864893.ngrok.io";
+    readonly ROOT_URL = "http://ceabe4e9.ngrok.io";
 
     places: Observable<Array<Place>>;
 

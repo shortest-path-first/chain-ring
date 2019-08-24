@@ -41,7 +41,7 @@ export class LoginComponent implements OnInit {
                     res = "";
                 }
                 const options = {
-                    url: `https://97864893.ngrok.io/login/${res}`,
+                    url: `http://ceabe4e9.ngrok.io/login/${res}`,
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -137,4 +137,4 @@ export class LoginComponent implements OnInit {
         sideDrawer.showDrawer();
     }
 }
-// https://97864893.ngrok.io
+// http://ceabe4e9.ngrok.io
