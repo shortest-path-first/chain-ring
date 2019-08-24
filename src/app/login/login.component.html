@@ -20,6 +20,13 @@
 
 </ActionBar>
 
+
 <GridLayout class="body">
-    <Button class="button" text="Login" (tap)="onLoginTap()"></Button>
+    <StackLayout>
+        <Label class="wrong" *ngIf=incorrect text="Incorrect Username or Password"></Label>
+        <TextField #username text="" backgroundColor="white" width="95%" height="100" hint="Enter Username"  autocorrect="false" fontSize="25"></TextField>
+        <TextField #userpass text="" backgroundColor="white" width="95%" height="100" hint="Enter Password" autocorrect="false" fontSize="25" secure="true"></TextField>
+        <Button class="button" text="Login" (tap)="onLoginTap(username.text, userpass.text)"></Button>
+        <Label class="login-redirect" text="Don't have an account? Sign-up Here" (tap) = "signup()"></Label>
+    </StackLayout>
 </GridLayout>

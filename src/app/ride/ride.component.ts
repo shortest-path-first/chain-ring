@@ -15,6 +15,9 @@ import { Image } from "tns-core-modules/ui/image";
 import { ImageSource } from "tns-core-modules/image-source";
 import { Place } from "../map/map";
 import * as utils from "tns-core-modules/utils/utils";
+import { knownFolders, Folder, File } from "tns-core-modules/file-system";
+import * as Obser from "tns-core-modules/data/observable";
+import { start } from "repl";
 
 declare var com: any;
 
@@ -27,6 +30,8 @@ const decodePolyline = require("decode-google-map-polyline");
 const polylineEncoder = require("google-polyline");
 let rideMarkers = {markers: []};
 let polylineHolder;
+let topSpeedHolder;
+let startTimeHolder;
 
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
@@ -36,7 +41,6 @@ registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView
     templateUrl: "./ride.component.html"
 })
 export class RideComponent implements OnInit {
-
     mapView;
     watchId;
     show;
@@ -70,9 +74,32 @@ export class RideComponent implements OnInit {
     straight;
     vibrator = new Vibrate();
     colorCount = 0;
-    colorArray = ["#393ef9", "#4638f1", "#6036ea", "#7335e2", "#8533da", "#9532d2", "#9330ca", "#b02fc3",
-    "#bb2dbb", "#b32ca2", "#ab2a8a", "#a42974", "#9c2760", "#a42974", "#ab2a8a", "#b32ca2", "#bb2dbb",
-    "#b02fc3", "#9330ca", "#9532d2", "#8533da", "#7335e2", "#6036ea", "#4638f1"];
+    colorArray = [
+        "#393ef9",
+        "#4638f1",
+        "#6036ea",
+        "#7335e2",
+        "#8533da",
+        "#9532d2",
+        "#9330ca",
+        "#b02fc3",
+        "#bb2dbb",
+        "#b32ca2",
+        "#ab2a8a",
+        "#a42974",
+        "#9c2760",
+        "#a42974",
+        "#ab2a8a",
+        "#b32ca2",
+        "#bb2dbb",
+        "#b02fc3",
+        "#9330ca",
+        "#9532d2",
+        "#8533da",
+        "#7335e2",
+        "#6036ea",
+        "#4638f1"
+    ];
     directedRide = false;
     destLat;
     destLng;
@@ -89,16 +116,27 @@ export class RideComponent implements OnInit {
     stolenIcon;
     direct = false;
     steps;
-    
-    readonly ROOT_URL = "https://6b409c5a.ngrok.io";
+
+    vm = new Obser.Observable();
+    documents: Folder = knownFolders.documents();
+    folder: Folder = this.documents.getFolder(this.vm.get("src") || "src");
+    file: File = this.folder.getFile(
+        `${this.vm.get("token") || "token"}` + `.txt`
+    );
+
+    readonly ROOT_URL = "http://ceabe4e9.ngrok.io";
 
     // tslint:disable-next-line: max-line-length
-    constructor(private http: HttpClient, private router: Router,
-                private routerExtensions: RouterExtensions, private route: ActivatedRoute,
-                private zone: NgZone) {
+    constructor(
+        private http: HttpClient,
+        private router: Router,
+        private routerExtensions: RouterExtensions,
+        private route: ActivatedRoute,
+        private zone: NgZone
+    ) {
         // Use the component constructor to inject providers.
         const paramSubscription = this.route.queryParams.subscribe((params) => {
-            const {polyLine, parsedPeter} = params;
+            const { polyLine, parsedPeter } = params;
             const peterInfo = JSON.parse(parsedPeter);
             polylineHolder = polyLine;
             this.steps = peterInfo;
@@ -109,7 +147,7 @@ export class RideComponent implements OnInit {
 
     ngOnInit(): void {
         // Init your component properties here.
-        this.startTime = new Date();
+        startTimeHolder = new Date();
         for (let i = 0; i < 100; i++) {
             clearInterval(i);
             geolocation.clearWatch(i);
@@ -123,7 +161,6 @@ export class RideComponent implements OnInit {
         this.zone.runOutsideAngular(() => {
             this.listenIntervalId = setInterval(() => {
                 if (this.listen === false) {
-                    
                     this.speechRecognition.available().then(
                         (available: boolean) => {
                             this.handleSpeech();
@@ -184,8 +221,13 @@ export class RideComponent implements OnInit {
      */
     onPinSelect(pinType): void {
         this.pinClicked = false;
-       
-        geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
+
+        geolocation
+            .getCurrentLocation({
+                desiredAccuracy: Accuracy.high,
+                maximumAge: 5000,
+                timeout: 20000
+            })
             .then((result) => {
                 const marker = new mapsModule.Marker();
                 if (pinType === "pothole") {
@@ -199,10 +241,17 @@ export class RideComponent implements OnInit {
                 } else if (pinType === "stolen") {
                     marker.icon = this.stolenIcon;
                 }
-            
-                marker.position = mapsModule.Position.positionFromLatLng(result.latitude, result.longitude);
+
+                marker.position = mapsModule.Position.positionFromLatLng(
+                    result.latitude,
+                    result.longitude
+                );
                 this.mapView.addMarker(marker);
-                rideMarkers.markers.push({markerLat: result.latitude, markerLon: result.longitude, type: pinType});
+                rideMarkers.markers.push({
+                    markerLat: result.latitude,
+                    markerLon: result.longitude,
+                    type: pinType
+                });
             });
     }
 
@@ -211,7 +260,6 @@ export class RideComponent implements OnInit {
      *  Clears all intervals and resets booleans to false.
      */
     onHomeTap(): void {
-
         geolocation.clearWatch(this.watchId);
         clearInterval(this.listenIntervalId);
         this.left = false;
@@ -222,8 +270,8 @@ export class RideComponent implements OnInit {
             transition: {
                 name: "fade"
             }
-    });
-}
+        });
+    }
 
     /**
      *  Function to calculate the distance between two coordinates
@@ -236,26 +284,29 @@ export class RideComponent implements OnInit {
      * @returns {number} distance in miles overland between coordinates
      */
     calculateDistance(lat1, lon1, lat2, lon2): number {
-        if ((lat1 == lat2) && (lon1 == lon2)) {
+        if (lat1 == lat2 && lon1 == lon2) {
             const dist = 0;
 
             return dist;
         } else {
-            const radlat1 = Math.PI * lat1 / 180;
-            const radlat2 = Math.PI * lat2 / 180;
+            const radlat1 = (Math.PI * lat1) / 180;
+            const radlat2 = (Math.PI * lat2) / 180;
             const theta = lon1 - lon2;
-            const radtheta = Math.PI * theta / 180;
+            const radtheta = (Math.PI * theta) / 180;
             // tslint:disable-next-line: max-line-length
-            let dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+            let dist =
+                Math.sin(radlat1) * Math.sin(radlat2) +
+                Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
             if (dist > 1) {
                 dist = 1;
             }
             dist = Math.acos(dist);
-            dist = dist * 180 / Math.PI;
+            dist = (dist * 180) / Math.PI;
             dist = dist * 60 * 1.1515;
             return Number(dist.toFixed(2));
+        }
     }
-}
+
     /**
      * Function to find the portion of the ride spent at less than 25% of the top speed, 
      * between 25% and 50% of the top speed, 50% to 75% of the top speed, and between
@@ -267,19 +318,19 @@ export class RideComponent implements OnInit {
      */
     findSpeedBreakdown(speeds): Array<any> {
         const breakdown = speeds.reduce((tally, speed) => {
-            if (speed < .25 * this.topSpeed) {
+            if (speed < 0.25 * topSpeedHolder) {
                 if (tally["0"] === undefined) {
                     tally["0"] = 1;
                 } else {
                     tally["0"]++;
                 }
-            } else if (speed < .50 * this.topSpeed) {
+            } else if (speed < 0.5 * topSpeedHolder) {
                 if (tally["1"] === undefined) {
                     tally["1"] = 1;
                 } else {
                     tally["1"]++;
                 }
-            } else if (speed < .75 * this.topSpeed) {
+            } else if (speed < 0.75 * topSpeedHolder) {
                 if (tally["2"] === undefined) {
                     tally["2"] = 1;
                 } else {
@@ -312,41 +363,53 @@ export class RideComponent implements OnInit {
     }
 
     onReroute(): void {
-    
         const lastLat = this.newPathCoords[this.newPathCoords.length - 1].lat;
         const lastLng = this.newPathCoords[this.newPathCoords.length - 1].long;
-        const params = new HttpParams().set("place", `${this.destLat},${this.destLng}`).set("userLoc", `${lastLat},${lastLng}`);
-        const rerouteSubscription = this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
-            // reassigns response to variable to avoid dealing with "<Place[]>"
-            this.directionsResponse = response;
-            const { rerouteHTML, rerouteEndLoc, rerouteDistance, polyLine } = this.directionsResponse;
-            this.turnPoints = rerouteEndLoc;
-            this.directionDistances = rerouteDistance;
-            this.directionWords = rerouteHTML;
-            const newRoute = decodePolyline(polyLine);
-            const reroutePolyline = new mapsModule.Polyline();
-            for (let i = 0; i < newRoute.length; i++) {
-                const coord = newRoute[i];
-                reroutePolyline.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
-            }
-            reroutePolyline.visible = true;
-            reroutePolyline.width = 10;
-            reroutePolyline.geodesic = false;
-            reroutePolyline.color = new Color("#393ef9");
-            this.mapView.removeAllPolylines();
-            this.mapView.latitude = newRoute[0].lat;
-            this.mapView.longitude = newRoute[0].lng;
-            this.mapView.addPolyline(reroutePolyline);
-            rerouteSubscription.unsubscribe();
-        });
+        const params = new HttpParams()
+            .set("place", `${this.destLat},${this.destLng}`)
+            .set("userLoc", `${lastLat},${lastLng}`);
+        const rerouteSubscription = this.http
+            .get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params })
+            .subscribe((response) => {
+                // reassigns response to variable to avoid dealing with "<Place[]>"
+                this.directionsResponse = response;
+                const {
+                    rerouteHTML,
+                    rerouteEndLoc,
+                    rerouteDistance,
+                    polyLine
+                } = this.directionsResponse;
+                this.turnPoints = rerouteEndLoc;
+                this.directionDistances = rerouteDistance;
+                this.directionWords = rerouteHTML;
+                const newRoute = decodePolyline(polyLine);
+                const reroutePolyline = new mapsModule.Polyline();
+                for (let i = 0; i < newRoute.length; i++) {
+                    const coord = newRoute[i];
+                    reroutePolyline.addPoint(
+                        mapsModule.Position.positionFromLatLng(
+                            coord.lat,
+                            coord.lng
+                        )
+                    );
+                }
+                reroutePolyline.visible = true;
+                reroutePolyline.width = 10;
+                reroutePolyline.geodesic = false;
+                reroutePolyline.color = new Color("#393ef9");
+                this.mapView.removeAllPolylines();
+                this.mapView.latitude = newRoute[0].lat;
+                this.mapView.longitude = newRoute[0].lng;
+                this.mapView.addPolyline(reroutePolyline);
+                rerouteSubscription.unsubscribe();
+            });
     }
 
     onDirectionsTap(): void {
-            
-            this.directionWords = this.directionWords.slice(1);
-            this.directionDistances = this.directionDistances.slice(1);
-            this.turnPoints = this.turnPoints.slice(1);
-            this.checkForManeuver(29.9778246, -90.0801914);
+        this.directionWords = this.directionWords.slice(1);
+        this.directionDistances = this.directionDistances.slice(1);
+        this.turnPoints = this.turnPoints.slice(1);
+        this.checkForManeuver(29.9778246, -90.0801914);
     }
 
     onStopTap(): void {
@@ -355,53 +418,83 @@ export class RideComponent implements OnInit {
         geolocation.clearWatch(this.watchId);
         this.speechRecognition.stopListening();
         clearInterval(this.listenIntervalId);
-      
+
         this.listen = false;
         this.left = false;
         this.right = false;
         this.straight = false;
 
         insomnia.allowSleepAgain().then(function() {
-        // console.log("Insomnia is inactive, good night!");
+            // console.log("Insomnia is inactive, good night!");
         });
-        const avgSpeed = (this.speed * 2.23694) / this.allSpeeds.length;
+        let avgSpeed = (this.speed * 2.23694) / this.allSpeeds.length;
         const speedBreakdown = this.findSpeedBreakdown(this.allSpeeds);
         const pathPolyline = polylineEncoder.encode(this.newPathCoords);
         const first = this.newPathCoords[0];
         const last = this.newPathCoords[this.newPathCoords.length - 1];
-        
-        let duration = this.stopTime.getTime() - this.startTime.getTime();
+
+        let duration = this.stopTime.getTime() - startTimeHolder.getTime();
         duration = duration / 10000;
         // console.log("duration", duration);
-        const markerSubscription = this.http.post(this.ROOT_URL + "/marker", rideMarkers, {
-            headers: new HttpHeaders({
-                "Content-Type": "application/json"
-            })})
+        const markerSubscription = this.http
+            .post(this.ROOT_URL + "/marker", rideMarkers, {
+                headers: new HttpHeaders({
+                    "Content-Type": "application/json"
+                })
+            })
             .subscribe(() => {
                 console.log("success");
             });
         markerSubscription.unsubscribe();
-        const info = {pathPolyline, first, last, avgSpeed, duration, speedBreakdown,
-                      topSpeed: this.topSpeed, totalDistance: this.totalDistance};
-        const rideSubscription = this.http.post(this.ROOT_URL + "/ride", info, {
-            headers: new HttpHeaders({
-                "Content-Type": "application/json"
-            })
-        })
-        .subscribe(() => {
-            console.log("ride");
+        const info = {
+            pathPolyline,
+            first,
+            last,
+            avgSpeed,
+            duration,
+            speedBreakdown,
+            topSpeed: topSpeedHolder,
+            totalDistance: this.totalDistance
+        };
+        const year = startTimeHolder.getFullYear();
+        const month = startTimeHolder.getMonth();
+        const day = startTimeHolder.getDate();
+        const hour = startTimeHolder.getHours();
+        const minutes = startTimeHolder.getMinutes();
+        this.file.readText()
+            .then((res) => {
+                const dbParams = new HttpParams()
+                    .set(`polyLine`, `${pathPolyline}`)
+                    .set(`average`, `${avgSpeed}`)
+                    .set(`duration`, `${duration}`)
+                    .set(`breakdown`, `${JSON.stringify(speedBreakdown)}`)
+                    .set(`totalDistance`, `${this.totalDistance}`)
+                    .set(`topSpeed`, `${topSpeedHolder}`)
+                    .set(`token`, `${res}`)
+                    .set(`rideTime`, `${hour}:${minutes} ${month}/${day}/${year}`);
+
+                const rideSubscription = this.http
+                    .post(this.ROOT_URL + "/ride", info, {
+                        headers: new HttpHeaders({
+                        "Content-Type": "application/json"
+                    }),
+                        params: dbParams
+                })
+                    .subscribe(() => {
+                    console.log("ride");
+                });
+                rideSubscription.unsubscribe();
         });
-        rideSubscription.unsubscribe();
         const params: NavigationExtras = {
-                queryParams: {
-                    polyLine: pathPolyline,
-                    average: avgSpeed,
-                    duration,
-                    breakdown: speedBreakdown,
-                    totalDistance: this.totalDistance,
-                    topSpeed: this.topSpeed
-                }
-            };
+            queryParams: {
+                polyLine: pathPolyline,
+                average: avgSpeed,
+                duration,
+                breakdown: speedBreakdown,
+                totalDistance: this.totalDistance,
+                topSpeed: topSpeedHolder
+            }
+        };
 
         this.mapView = null;
         this.watchId = null;
@@ -411,7 +504,7 @@ export class RideComponent implements OnInit {
         this.maneuvers = null;
         this.listen = null;
         this.speed = null;
-        this.topSpeed = null;
+        topSpeedHolder = null;
         this.allSpeeds = null;
         this.callCount = null;
         this.currentSpeed = null;
@@ -427,7 +520,7 @@ export class RideComponent implements OnInit {
         this.polyline = null;
         this.startZoom = null;
         this.speechRecognition = null;
-        this.startTime = null;
+        startTimeHolder = null;
         this.stopTime = null;
         this.left = null;
         this.right = null;
@@ -458,9 +551,8 @@ export class RideComponent implements OnInit {
     }
 
     onSpeedTap(): void {
-        
-    console.log("Speed Called");
-    if (this.show === undefined) {
+        console.log("Speed Called");
+        if (this.show === undefined) {
             this.show = true;
         } else {
             this.show = !this.show;
@@ -470,66 +562,74 @@ export class RideComponent implements OnInit {
     checkForManeuver(lat, long) {
         // check to make sure there are turnPoints
         if (this.turnPoints.length) {
-        // if the user's position is within .0001 latitude or longitude show signal
-        if (lat >= this.turnPoints[0].lat - .001 && lat <= this.turnPoints[0].lat + .001
-            && long >= this.turnPoints[0].lng - .001 && long <= this.turnPoints[0].lng + .001) {
-        if (this.directionWords[0].indexOf("left") !== -1) {
-                this.left = true;
-                this.right = false;
-                this.straight = false;
-                this.vibrator.vibrate(3000);
-            } else if (this.directionWords[0].indexOf("right") !== -1) {
-                this.right = true;
-                this.left = false;
-                this.straight = false;
-                this.vibrator.vibrate(3000);
-            } else if (this.directionWords[0].indexOf("straight") !== -1) {
-                this.straight = true;
-                this.right = false;
-                this.left = false;
+            // if the user's position is within .0001 latitude or longitude show signal
+            if (
+                lat >= this.turnPoints[0].lat - 0.001 &&
+                lat <= this.turnPoints[0].lat + 0.001 &&
+                long >= this.turnPoints[0].lng - 0.001 &&
+                long <= this.turnPoints[0].lng + 0.001
+            ) {
+                if (this.directionWords[0].indexOf("left") !== -1) {
+                    this.left = true;
+                    this.right = false;
+                    this.straight = false;
+                    this.vibrator.vibrate(3000);
+                } else if (this.directionWords[0].indexOf("right") !== -1) {
+                    this.right = true;
+                    this.left = false;
+                    this.straight = false;
+                    this.vibrator.vibrate(3000);
+                } else if (this.directionWords[0].indexOf("straight") !== -1) {
+                    this.straight = true;
+                    this.right = false;
+                    this.left = false;
+                } else {
+                    this.left = false;
+                    this.right = false;
+                    this.straight = false;
+                }
             } else {
-                this.left = false;
-                this.right = false;
-                this.straight = false;
+                // This is only for demo purposes
+                if (this.directionWords[0].indexOf("left") !== -1) {
+                    this.left = true;
+                    this.right = false;
+                    this.straight = false;
+                } else if (this.directionWords[0].indexOf("right") !== -1) {
+                    this.right = true;
+                    this.left = false;
+                    this.straight = false;
+                } else if (this.directionWords[0].indexOf("straight") !== -1) {
+                    this.straight = true;
+                    this.right = false;
+                    this.left = false;
+                } else {
+                    this.left = false;
+                    this.right = false;
+                    this.straight = false;
+                }
             }
-        } else {
-            // This is only for demo purposes
-            if (this.directionWords[0].indexOf("left") !== -1) {
-                this.left = true;
-                this.right = false;
-                this.straight = false;
-            
-            } else if (this.directionWords[0].indexOf("right") !== -1) {
-                this.right = true;
-                this.left = false;
-                this.straight = false;
-            
-            } else if (this.directionWords[0].indexOf("straight") !== -1) {
-                this.straight = true;
-                this.right = false;
-                this.left = false;
-            } else {
-                this.left = false;
-                this.right = false;
-                this.straight = false;
-            }
-        }
 
-        // if the user location is within .0001 degrees show next direction
-        if (lat >= this.turnPoints[0].lat - .0003 && lat <= this.turnPoints[0].lat + .0003
-            && long >= this.turnPoints[0].lng - .0003 && long <= this.turnPoints[0].lng + .0003) {
+            // if the user location is within .0001 degrees show next direction
+            if (
+                lat >= this.turnPoints[0].lat - 0.0003 &&
+                lat <= this.turnPoints[0].lat + 0.0003 &&
+                long >= this.turnPoints[0].lng - 0.0003 &&
+                long <= this.turnPoints[0].lng + 0.0003
+            ) {
                 this.directionWords.shift();
                 this.directionDistances.shift();
                 this.turnPoints.shift();
-            
             }
         }
         // fail safe for two consecutive turns
         if (this.turnPoints.length) {
             // if the user's position is within .0001 latitude or longitude show signal
-            if (lat >= this.turnPoints[1].lat - .001 && lat <= this.turnPoints[1].lat + .001
-                && long >= this.turnPoints[1].lng - .001 && long <= this.turnPoints[1].lng + .001) {
-
+            if (
+                lat >= this.turnPoints[1].lat - 0.001 &&
+                lat <= this.turnPoints[1].lat + 0.001 &&
+                long >= this.turnPoints[1].lng - 0.001 &&
+                long <= this.turnPoints[1].lng + 0.001
+            ) {
                 if (this.directionWords[1].indexOf("left") !== -1) {
                     this.left = true;
                     this.right = false;
@@ -552,8 +652,12 @@ export class RideComponent implements OnInit {
             }
 
             // if the user location is within .0001 degrees show next direction
-            if (lat >= this.turnPoints[1].lat - .0003 && lat <= this.turnPoints[1].lat + .0003
-                && long >= this.turnPoints[1].lng - .0003 && long <= this.turnPoints[1].lng + .0003) {
+            if (
+                lat >= this.turnPoints[1].lat - 0.0003 &&
+                lat <= this.turnPoints[1].lat + 0.0003 &&
+                long >= this.turnPoints[1].lng - 0.0003 &&
+                long <= this.turnPoints[1].lng + 0.0003
+            ) {
                 this.directionWords = this.directionWords.slice(2);
                 this.directionDistances = this.directionWords.slice(2);
                 this.turnPoints = this.turnPoints.slice(2);
@@ -563,21 +667,31 @@ export class RideComponent implements OnInit {
 
     drawUserPath(): void {
         insomnia.keepAwake().then(function() {
-        console.log("Insomnia is active");
+            console.log("Insomnia is active");
         });
-        
-        this.watchId = geolocation.watchLocation((loc) => {
-                    const newPath = new mapsModule.Polyline();
-                    if (loc && this.mapView !== null || loc && this.mapView !== undefined) {
-                
+
+        this.watchId = geolocation.watchLocation(
+            (loc) => {
+                const newPath = new mapsModule.Polyline();
+                if (
+                    (loc && this.mapView !== null) ||
+                    (loc && this.mapView !== undefined)
+                ) {
                     this.currentSpeed = loc.speed * 2.23694;
-                    this.speedString = this.currentSpeed.toFixed(1).slice(0, -2);
-                    this.speedStringDecimal = this.currentSpeed.toFixed(1).slice(-1);
-                
-                    if (this.currentSpeed > this.topSpeed) {
-                        this.topSpeed = this.currentSpeed;
+                    this.speedString = this.currentSpeed
+                        .toFixed(1)
+                        .slice(0, -2);
+                    this.speedStringDecimal = this.currentSpeed
+                        .toFixed(1)
+                        .slice(-1);
+
+                    if (this.currentSpeed > topSpeedHolder) {
+                        topSpeedHolder = this.currentSpeed;
                     }
-                    if (this.currentSpeed < 4 && this.allSpeeds[this.allSpeeds.length - 1] > 10) {
+                    if (
+                        this.currentSpeed < 4 &&
+                        this.allSpeeds[this.allSpeeds.length - 1] > 10
+                    ) {
                         this.onPinSelect("close");
                     }
                     this.allSpeeds.push(this.currentSpeed);
@@ -585,52 +699,87 @@ export class RideComponent implements OnInit {
                     const lat = loc.latitude;
                     const long = loc.longitude;
                     this.checkForManeuver(lat, long);
-    
+
                     if (this.newPathCoords.length === 0) {
-                        this.newPathCoords.push({ lat, long});
+                        this.newPathCoords.push({ lat, long });
                         this.mapView.latitude = lat;
                         this.mapView.longitude = long;
                         this.mapView.bearing = loc.direction;
-                    // tslint:disable-next-line: max-line-length
-                    } else if (this.newPathCoords[this.newPathCoords.length - 1].lat !== lat && this.newPathCoords[this.newPathCoords.length - 1].long !== long) {
-                        const lastLat = this.newPathCoords[this.newPathCoords.length - 1].lat;
-                        const lastLng = this.newPathCoords[this.newPathCoords.length - 1].long;
+                        // tslint:disable-next-line: max-line-length
+                    } else if (
+                        this.newPathCoords[this.newPathCoords.length - 1]
+                            .lat !== lat &&
+                        this.newPathCoords[this.newPathCoords.length - 1]
+                            .long !== long
+                    ) {
+                        const lastLat = this.newPathCoords[
+                            this.newPathCoords.length - 1
+                        ].lat;
+                        const lastLng = this.newPathCoords[
+                            this.newPathCoords.length - 1
+                        ].long;
                         if (this.newPathCoords.length > 2) {
-                        this.totalDistance += this.calculateDistance(lat, long, lastLat, lastLng);
+                            this.totalDistance += this.calculateDistance(
+                                lat,
+                                long,
+                                lastLat,
+                                lastLng
+                            );
                         }
-                        this.distanceString = this.totalDistance.toFixed(1).slice(0, -2);
-                        this.distanceStringDecimal = this.totalDistance.toFixed(1).slice(-1);
-                        
-                        this.newPathCoords.push({ lat, long});
-                        newPath.addPoint(mapsModule.Position.positionFromLatLng(lastLat, lastLng));
-                        newPath.addPoint(mapsModule.Position.positionFromLatLng(lat, long));
+                        this.distanceString = this.totalDistance
+                            .toFixed(1)
+                            .slice(0, -2);
+                        this.distanceStringDecimal = this.totalDistance
+                            .toFixed(1)
+                            .slice(-1);
+
+                        this.newPathCoords.push({ lat, long });
+                        newPath.addPoint(
+                            mapsModule.Position.positionFromLatLng(
+                                lastLat,
+                                lastLng
+                            )
+                        );
+                        newPath.addPoint(
+                            mapsModule.Position.positionFromLatLng(lat, long)
+                        );
                         newPath.visible = true;
                         newPath.width = 10;
                         newPath.geodesic = false;
                         if (this.colorCount <= this.colorArray.length - 1) {
-                            newPath.color = new Color(this.colorArray[this.colorCount]);
+                            newPath.color = new Color(
+                                this.colorArray[this.colorCount]
+                            );
                             this.colorCount++;
-                        } else if (this.colorCount > this.colorArray.length - 1) {
+                        } else if (
+                            this.colorCount >
+                            this.colorArray.length - 1
+                        ) {
                             this.colorCount = 0;
-                            newPath.color = new Color(this.colorArray[this.colorCount]);
+                            newPath.color = new Color(
+                                this.colorArray[this.colorCount]
+                            );
                         }
                         // newPath.color = new Color("red");
                         if (this.mapView) {
-                        this.mapView.addPolyline(newPath);
+                            this.mapView.addPolyline(newPath);
                         }
                         this.mapView.latitude = lat;
                         this.mapView.longitude = long;
                         this.mapView.bearing = loc.direction;
                     }
-        }
-            }, (e) => {
+                }
+            },
+            (e) => {
                 console.log("Error: " + e.message);
-            }, {
-                    desiredAccuracy: Accuracy.high,
-                    updateTime: 0,
-                    updateDistance: 0.1,
-                    minimumUpdateTime: 1000
-                });
+            },
+            {
+                desiredAccuracy: Accuracy.high,
+                updateTime: 0,
+                updateDistance: 0.1,
+                minimumUpdateTime: 1000
+            }
+        );
         console.log("start", this.watchId, typeof this.watchId);
     }
 
@@ -638,48 +787,66 @@ export class RideComponent implements OnInit {
         this.callCount++;
         // console.log("speech:", this.callCount, new Date());
         if (this.speechRecognition !== null) {
-            this.speechRecognition.startListening(
-                {
+            this.speechRecognition
+                .startListening({
                     // optional, uses the device locale by default
                     locale: "en-US",
                     // set to true to get results back continuously
                     returnPartialResults: false,
                     // this callback will be invoked repeatedly during recognition
-                    onResult: (transcription: SpeechRecognitionTranscription) => {
-                    
+                    onResult: (
+                        transcription: SpeechRecognitionTranscription
+                    ) => {
                         // console.log('Getting results');
-                        this.zone.run(() => this.recognizedText = transcription.text);
-                        if (transcription.text.includes("speedometer") && this.recognized === false) {
-                                this.recognized = true;
-                                this.zone.run(() => {
-                                    this.onSpeedTap();
-                                });
-                                this.recognizedTimeoutId = setTimeout(() => {
-                                    this.recognized = false;
-                                    clearTimeout(this.recognizedTimeoutId);
-                                }, 5000);
-                        } else if (transcription.text.includes("pothole") && this.recognized === false) {
+                        this.zone.run(
+                            () => (this.recognizedText = transcription.text)
+                        );
+                        if (
+                            transcription.text.includes("speedometer") &&
+                            this.recognized === false
+                        ) {
+                            this.recognized = true;
+                            this.zone.run(() => {
+                                this.onSpeedTap();
+                            });
+                            this.recognizedTimeoutId = setTimeout(() => {
+                                this.recognized = false;
+                                clearTimeout(this.recognizedTimeoutId);
+                            }, 5000);
+                        } else if (
+                            transcription.text.includes("pothole") &&
+                            this.recognized === false
+                        ) {
                             this.recognized = true;
                             this.onPinSelect("pothole");
                             this.recognizedTimeoutId = setTimeout(() => {
                                 this.recognized = false;
                                 clearTimeout(this.recognizedTimeoutId);
                             }, 5000);
-                        } else if (transcription.text.includes("avoid") && this.recognized === false) {
+                        } else if (
+                            transcription.text.includes("avoid") &&
+                            this.recognized === false
+                        ) {
                             this.recognized = true;
                             this.onPinSelect("avoid");
                             this.recognizedTimeoutId = setTimeout(() => {
                                 this.recognized = false;
                                 clearTimeout(this.recognizedTimeoutId);
                             }, 5000);
-                        } else if (transcription.text.includes("close call") && this.recognized === false) {
+                        } else if (
+                            transcription.text.includes("close call") &&
+                            this.recognized === false
+                        ) {
                             this.recognized = true;
                             this.onPinSelect("close");
                             this.recognizedTimeoutId = setTimeout(() => {
                                 this.recognized = false;
                                 clearTimeout(this.recognizedTimeoutId);
                             }, 5000);
-                        } else if (transcription.text.includes("zoom in") && this.recognized === false) {
+                        } else if (
+                            transcription.text.includes("zoom in") &&
+                            this.recognized === false
+                        ) {
                             this.recognized = true;
                             this.startZoom += 1;
                             this.mapView.zoom = this.startZoom;
@@ -687,7 +854,10 @@ export class RideComponent implements OnInit {
                                 this.recognized = false;
                                 clearTimeout(this.recognizedTimeoutId);
                             }, 3000);
-                        } else if (transcription.text.includes("zoom out") && this.recognized === false) {
+                        } else if (
+                            transcription.text.includes("zoom out") &&
+                            this.recognized === false
+                        ) {
                             this.recognized = true;
                             this.startZoom -= 1;
                             this.mapView.zoom = this.startZoom;
@@ -695,7 +865,10 @@ export class RideComponent implements OnInit {
                                 this.recognized = false;
                                 clearTimeout(this.recognizedTimeoutId);
                             }, 3000);
-                        } else if (transcription.text.includes("stop ride") && this.recognized === false) {
+                        } else if (
+                            transcription.text.includes("stop ride") &&
+                            this.recognized === false
+                        ) {
                             this.recognized = true;
                             this.zone.run(() => {
                                 this.onStopTap();
@@ -704,7 +877,10 @@ export class RideComponent implements OnInit {
                                 this.recognized = false;
                                 clearTimeout(this.recognizedTimeoutId);
                             }, 5000);
-                        } else if (transcription.text.includes("lost") && this.recognized === false) {
+                        } else if (
+                            transcription.text.includes("lost") &&
+                            this.recognized === false
+                        ) {
                             this.recognized = true;
                             this.zone.run(() => {
                                 this.onReroute();
@@ -726,21 +902,21 @@ export class RideComponent implements OnInit {
                         // - Android: A 'number', referencing an 'ERROR_*' constant from https://developer.android.com/reference/android/speech/SpeechRecognizer.
                         //            If that code is either 6 or 7 you may want to restart listening.
                     }
-                }
-            ).then(
-                (started) => {
-                // console.log(`started listening`)
-                this.zone.run(() => {
-                    this.listen = true;
-                });
-            },
-                (errorMessage) => {
-                    // console.log(`Listen Error: ${errorMessage}`);
-                    this.zone.run(() => {
-                        this.listen = false;
-                    });
-                }
-            )
+                })
+                .then(
+                    (started) => {
+                        // console.log(`started listening`)
+                        this.zone.run(() => {
+                            this.listen = true;
+                        });
+                    },
+                    (errorMessage) => {
+                        // console.log(`Listen Error: ${errorMessage}`);
+                        this.zone.run(() => {
+                            this.listen = false;
+                        });
+                    }
+                )
                 .catch((error) => {
                     // same as the 'onError' handler, but this may not return if the error occurs after listening has successfully started (because that resolves the promise,
                     // hence the' onError' handler was created.
@@ -749,10 +925,9 @@ export class RideComponent implements OnInit {
                         this.listen = false;
                     });
                 });
-            }
-     
-}
-    
+        }
+    }
+
     onMapReady(args) {
         this.mapView = args.object;
         this.mapView.setStyle(style);
@@ -761,23 +936,27 @@ export class RideComponent implements OnInit {
         console.log(this.directedRide);
         if (line !== undefined) {
             this.directedRide = true;
-            let flightPlanCoordinates = decodePolyline(line);
+            const flightPlanCoordinates = decodePolyline(line);
             this.polyline = new mapsModule.Polyline();
             for (let i = 0; i < flightPlanCoordinates.length; i++) {
                 const coord = flightPlanCoordinates[i];
-                this.polyline.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
+                this.polyline.addPoint(
+                    mapsModule.Position.positionFromLatLng(coord.lat, coord.lng)
+                );
             }
         
             // let latLng = new com.google.android.gms.maps.model.LatLng(29.9688625, -90.0544055);
             // const decoded = com.google.maps.android.PolyUtil.decode(line);
             // com.google.maps.android.PolyUtil.isLocationOnEdge(latLng, decoded, true, 10e-1);
 
-            this.destLat = flightPlanCoordinates[flightPlanCoordinates.length - 1].lat;
-            this.destLng = flightPlanCoordinates[flightPlanCoordinates.length - 1].lng;
+            this.destLat =
+                flightPlanCoordinates[flightPlanCoordinates.length - 1].lat;
+            this.destLng =
+                flightPlanCoordinates[flightPlanCoordinates.length - 1].lng;
             this.polyline.visible = true;
             this.polyline.width = 10;
             this.polyline.geodesic = false;
-            
+
             this.mapView.latitude = flightPlanCoordinates[0].lat;
             this.mapView.longitude = flightPlanCoordinates[0].lng;
             this.mapView.addPolyline(this.polyline);
@@ -788,16 +967,26 @@ export class RideComponent implements OnInit {
         this.mapView.mapAnimationsEnabled = true;
         this.startZoom = 18;
         this.mapView.zoom = 18;
-        
+
         this.mapView.tilt = 10;
         this.mapView.gMap.setMyLocationEnabled(true);
         const uiSettings = this.mapView.gMap.getUiSettings();
         uiSettings.setMyLocationButtonEnabled(true);
-        geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
+        geolocation
+            .getCurrentLocation({
+                desiredAccuracy: Accuracy.high,
+                maximumAge: 5000,
+                timeout: 20000
+            })
             .then((result) => {
                 const marker = new mapsModule.Marker();
                 // tslint:disable-next-line: max-line-length
-                marker.position = mapsModule.Position.positionFromLatLng(result.latitude, result.longitude);
+                // var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+                // marker.icon = image;
+                marker.position = mapsModule.Position.positionFromLatLng(
+                    result.latitude,
+                    result.longitude
+                );
                 this.mapView.addMarker(marker);
                 this.mapView.latitude = result.latitude;
                 this.mapView.longitude = result.longitude;
@@ -806,7 +995,7 @@ export class RideComponent implements OnInit {
                 console.error("Get location error:", err);
             });
         this.drawUserPath();
-        if(this.steps){
+        if (this.steps) {
             this.directionsParser();
         }
     }

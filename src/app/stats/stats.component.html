@@ -12,7 +12,7 @@
         <Label *ngIf=notRecentView row="1" col="0" colSpan="12" rowSpan="1" class="stats-info-line" text="Average Speed: {{displayedAverageSpeed}} mph"></Label>
         <Label *ngIf=notRecentView row="2" col="0" colSpan="12" rowSpan="1" class="stats-info-line" text="Total Distance: {{displayedTotalDistance}} miles"></Label>
         <Label *ngIf=notRecentView row="3" col="0" colSpan="12" rowSpan="1" class="stats-info-line" text="Duration: {{displayedDuration}}"></Label>
-        <GridLayout *ngIf=notRecentView row="5" col="0" colSpan="12" rowSpan="3" height="100%" width="100%">
+        <GridLayout *ngIf=displayPie row="5" col="0" colSpan="12" rowSpan="3" height="100%" width="100%">
             <chart:RadPieChart allowAnimation="true" row="0" class="stats-pie-line">
                 <chart:PieSeries tkPieSeries selectionMode="DataPoint" [items]="pieSource" valueProperty="Amount" legendLabel="Speed" color="white">
                     <chart:PointLabelStyle tkPieLabelStyle textColor="white"></chart:PointLabelStyle>                    
@@ -33,7 +33,7 @@
         <Label row="0" col="4" rowSpan="1" colSpan="4" class="stats-header" (tap)="recentRideTap()" text="Recent"></Label>
         <Label row="0" col="8" rowSpan="1" colSpan="4" class="stats-header" (tap)="totalRideTap()" text="Total"></Label>
         <StackLayout row="1" col="0" rowSpan="10" colSpan="12"  class="stats-recent-line" height="100%">
-            <Label  *ngFor="let ride of statHolder; let i = index" #index [text]="ride.text" [avgSpeed]="ride.avgSpeed" [totalDistance]="ride.totalDistance" [pieChart]="ride.pieChart" [duration]="ride.duration" height="20%" textWrap="true" (tap)="statDisplayer(index.text, index.avgSpeed, index.totalDistance, index.pieChart, index.duration)"></Label>
+            <Label  *ngFor="let ride of statHolder; let i = index" #index [text]="ride.rideTime" [avgSpeed]="ride.avgSpeed" [totalDistance]="ride.totalDistance" [duration]="ride.duration" height="20%" textWrap="true" (tap)="statDisplayer(index.text, index.avgSpeed, index.totalDistance, index.pieChart, index.duration)"></Label>
             
         </StackLayout>
     </GridLayout>

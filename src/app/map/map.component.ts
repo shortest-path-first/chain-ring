@@ -42,7 +42,6 @@ registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView
     templateUrl: "./map.component.html"
 })
 export class MapComponent implements OnInit {
-    
     showDirections = false;
     compPoly;
     latitude = 30;
@@ -56,35 +55,46 @@ export class MapComponent implements OnInit {
     readyToRide = false;
     turnByList: Array<object> = [];
     safeTurnByList: Array<object> = [];
-    userAvoidMarkers = [{ lat: 29.971742, lng: -90.066258 }, {lat: 29.973568, lng: -90.057576}];
+    userAvoidMarkers = [
+        { lat: 29.971742, lng: -90.066258 },
+        { lat: 29.973568, lng: -90.057576 }
+    ];
     latLng;
     selectedRoute;
     safePoly;
     safest = false;
     shortest = true;
     safeRidePolyline;
-    
 
-    readonly ROOT_URL = "https://6b409c5a.ngrok.io";
     potholeIcon = null;
     closeIcon = null;
     avoidIcon = null;
     crashIcon = null;
     stolenIcon = null;
 
+    readonly ROOT_URL = "http://ceabe4e9.ngrok.io";
 
     places: Observable<Array<Place>>;
 
-    constructor(private http: HttpClient, private router: Router, private routerExtensions: RouterExtensions) {
+    constructor(
+        private http: HttpClient,
+        private router: Router,
+        private routerExtensions: RouterExtensions
+    ) {
         // Use the component constructor to inject providers.
     }
 
     ngOnInit(): void {
         // Init your component properties here.
-       
+
         geolocation.enableLocationRequest();
-        geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
-            .then((result) => {
+        geolocation
+            .getCurrentLocation({
+                desiredAccuracy: Accuracy.high,
+                maximumAge: 5000,
+                timeout: 20000
+            })
+            .then(result => {
                 // console.log(result);
                 this.latitude = result.latitude;
                 this.longitude = result.longitude;
@@ -114,54 +124,71 @@ export class MapComponent implements OnInit {
         stolenImageSource.loadFromFile("~/app/images/mapStolen.png");
         this.stolenIcon.imageSource = stolenImageSource;
     }
-    
+
     onDrawerButtonTap(): void {
         const sideDrawer = <RadSideDrawer>app.getRootView();
         sideDrawer.showDrawer();
     }
-    
+
     getPlaces(text) {
         // search params from search bar
         this.readyToRide = false;
-        
-        
-        const params = new HttpParams().set("place", text).set("userLoc", `${this.latitude},${this.longitude}`);
-        const headers = new HttpHeaders().set("Access-Control-Allow-Origin", "*");
-        const stuff = { params, headers};
-        
-        this.markers.forEach((marker) => {marker.visible = false; });
+
+        const params = new HttpParams()
+            .set("place", text)
+            .set("userLoc", `${this.latitude},${this.longitude}`);
+        const headers = new HttpHeaders().set(
+            "Access-Control-Allow-Origin",
+            "*"
+        );
+        const stuff = { params, headers };
+
+        this.markers.forEach(marker => {
+            marker.visible = false;
+        });
         this.markers = [];
         markers = [];
-        
+
         // http request using the text provided
-        this.http.get<Array<Place>>(this.ROOT_URL + "/mapSearch", stuff).subscribe((response) => {
-            // assigning response info to markers array and then placing each marker on our map
-            this.markers = response;
-            const padding = 150;
-            const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
-            this.markers.forEach((place) => {
-                const {lat, lng} = place[0];
-                console.log("marker added");
-                const marker = new mapsModule.Marker({});
-                marker.position = mapsModule.Position.positionFromLatLng(lat, lng);
-                marker.title = place[1];
-                marker.snippet = place[2];
-                this.markers.push(marker);
-                markers.push(marker);
-                builder.include(marker.android.getPosition());
-                actualMap.addMarker(marker);
-            });
-            // recenter map over choices
-            const bounds = builder.build();
-            const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(bounds, padding);
-            actualMap.gMap.animateCamera(newBounds);
-        }, (err) => {
-            console.log(err);
-        }, () => {
-            console.log("completed");
-        });
+        this.http
+            .get<Array<Place>>(this.ROOT_URL + "/mapSearch", stuff)
+            .subscribe(
+                response => {
+                    // assigning response info to markers array and then placing each marker on our map
+                    this.markers = response;
+                    const padding = 150;
+                    const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
+                    this.markers.forEach(place => {
+                        const { lat, lng } = place[0];
+                        console.log("marker added");
+                        const marker = new mapsModule.Marker({});
+                        marker.position = mapsModule.Position.positionFromLatLng(
+                            lat,
+                            lng
+                        );
+                        marker.title = place[1];
+                        marker.snippet = place[2];
+                        this.markers.push(marker);
+                        markers.push(marker);
+                        builder.include(marker.android.getPosition());
+                        actualMap.addMarker(marker);
+                    });
+                    // recenter map over choices
+                    const bounds = builder.build();
+                    const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(
+                        bounds,
+                        padding
+                    );
+                    actualMap.gMap.animateCamera(newBounds);
+                },
+                err => {
+                    console.log(err);
+                },
+                () => {
+                    console.log("completed");
+                }
+            );
     }
-    
 
     onMarkerPick(args) {
         // sets marker selected to marker on component
@@ -171,26 +198,26 @@ export class MapComponent implements OnInit {
         this.readyToRide = false;
         this.bottomButtonText = "Get Directions";
     }
-    
+
     removeGetDirections() {
-       
         this.markerSelected = false;
-        this.markers.forEach((marker) => { marker.visible = false; });
+        this.markers.forEach(marker => {
+            marker.visible = false;
+        });
         this.markers = [];
         markers = [];
         this.showDirections = false;
         if (this.compPoly) {
             this.compPoly.visible = false;
         }
-        if (this.safePoly){
+        if (this.safePoly) {
             this.safePoly.visible = false;
         }
         this.turnByList = [];
         this.safeTurnByList = [];
         this.selectedRoute = null;
-        
     }
-    
+
     onMapReady(args) {
         // assigns the map to acutalMap on component
         console.log("map reassign");
@@ -204,21 +231,28 @@ export class MapComponent implements OnInit {
         uiSettings.setCompassEnabled(true);
         gMap.setMyLocationEnabled(true);
     }
-    
-    getAlternative(){
-        const params = new HttpParams().set("place", `${markerLat},${markerLng}`).set("userLoc", `${this.latitude},${this.longitude}`).set("wayPoint", `${this.userAvoidMarkers[1].lat -.003}, ${this.userAvoidMarkers[1].lng - .003}`);
-        this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
-            let alternativeResponse = response;
-        
-        });
+
+    getAlternative() {
+        const params = new HttpParams()
+            .set("place", `${markerLat},${markerLng}`)
+            .set("userLoc", `${this.latitude},${this.longitude}`)
+            .set(
+                "wayPoint",
+                `${this.userAvoidMarkers[1].lat - 0.003}, ${this
+                    .userAvoidMarkers[1].lng - 0.003}`
+            );
+        this.http
+            .get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params })
+            .subscribe(response => {
+                let alternativeResponse = response;
+            });
     }
 
-    onRouteTap(str){
-      
+    onRouteTap(str) {
         this.selectedRoute = str;
-        this.safest = !this.safest
-        this.shortest = !this.shortest
-        if(this.shortest === true){
+        this.safest = !this.safest;
+        this.shortest = !this.shortest;
+        if (this.shortest === true) {
             this.safePoly.visible = true;
             this.compPoly.visible = false;
             console.log(this.selectedRoute);
@@ -235,7 +269,9 @@ export class MapComponent implements OnInit {
             this.showDirections = true;
             // params are set to the marker selected, info coming from component
             // tslint:disable-next-line: max-line-length
-            const params = new HttpParams().set("place", `${markerLat},${markerLng}`).set("userLoc", `${this.latitude},${this.longitude}`);
+            const params = new HttpParams()
+                .set("place", `${markerLat},${markerLng}`)
+                .set("userLoc", `${this.latitude},${this.longitude}`);
             // http request to get directions between user point and marker selected
             
             this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
@@ -345,16 +381,16 @@ export class MapComponent implements OnInit {
         } else if (this.readyToRide === true) {
             console.log("tapped");
             let { polyLine, peterRide } = directionsResponse;
-            if(this.selectedRoute === "shortest"){
+            if (this.selectedRoute === "shortest") {
                 let parsedPeter = JSON.stringify(peterInfo);
                 const params: NavigationExtras = {
                     queryParams: {
                         polyLine,
                         parsedPeter
                     }
-                }
+                };
                 this.routerExtensions.navigate(["/ride"], params);
-            } else if (this.selectedRoute === "safest"){
+            } else if (this.selectedRoute === "safest") {
                 let parsedPeter = JSON.stringify(this.safeRideFlat);
                 const { safePolyline } = directionsResponse;
                 polyLine = this.safeRidePolyline;
@@ -364,10 +400,10 @@ export class MapComponent implements OnInit {
                         polyLine,
                         parsedPeter
                     }
+                };
+                this.routerExtensions.navigate(["/ride"], params);
             }
-            this.routerExtensions.navigate(["/ride"], params);
-        };
-    }
+        }
     }
 
     homeTap(navItemRoute: string): void {
@@ -378,47 +414,56 @@ export class MapComponent implements OnInit {
         });
     }
 
-    displayHazards(){
+    displayHazards() {
         console.log("yes");
-        this.http.get<Array<Place>>(this.ROOT_URL + "/marker").subscribe((response) => {
-            // assigning response info to markers array and then placing each marker on our map
-            this.hazards = response;
-            console.log(this.hazards);
-            console.log("<==================>");
-            const padding = 150;
-            const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
+        this.http.get<Array<Place>>(this.ROOT_URL + "/marker").subscribe(
+            response => {
+                // assigning response info to markers array and then placing each marker on our map
+                this.hazards = response;
+                console.log(this.hazards);
+                console.log("<==================>");
+                const padding = 150;
+                const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
 
-            this.hazards.forEach((hazard) => {
-                const lat = hazard.markerLat;
-                const lng = hazard.markerLon;
-                const pinType = hazard.type;
-                console.log(lat, lng, pinType);
-                const marker = new mapsModule.Marker({});
-                marker.position = mapsModule.Position.positionFromLatLng(lat, lng);
-                if (pinType === "pothole") {
-                    marker.icon = this.potholeIcon;
-                } else if (pinType === "close") {
-                    marker.icon = this.closeIcon;
-                } else if (pinType === "avoid") {
-                    marker.icon = this.avoidIcon;
-                } else if (pinType === "crash") {
-                    marker.icon = this.crashIcon;
-                } else if (pinType === "stolen") {
-                    marker.icon = this.stolenIcon;
-                }
-                builder.include(marker.android.getPosition());
-                actualMap.addMarker(marker);
-            });
-            // recenter map over choices
-            const bounds = builder.build();
-            console.log("<====******====>");
-            const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(bounds, padding);
-            actualMap.gMap.animateCamera(newBounds);
-            
-        }, (err) => {
-            console.log(err);
-        }, () => {
-            console.log("completed");
-        });
+                this.hazards.forEach(hazard => {
+                    const lat = hazard.markerLat;
+                    const lng = hazard.markerLon;
+                    const pinType = hazard.type;
+                    console.log(lat, lng, pinType);
+                    const marker = new mapsModule.Marker({});
+                    marker.position = mapsModule.Position.positionFromLatLng(
+                        lat,
+                        lng
+                    );
+                    if (pinType === "pothole") {
+                        marker.icon = this.potholeIcon;
+                    } else if (pinType === "close") {
+                        marker.icon = this.closeIcon;
+                    } else if (pinType === "avoid") {
+                        marker.icon = this.avoidIcon;
+                    } else if (pinType === "crash") {
+                        marker.icon = this.crashIcon;
+                    } else if (pinType === "stolen") {
+                        marker.icon = this.stolenIcon;
+                    }
+                    builder.include(marker.android.getPosition());
+                    actualMap.addMarker(marker);
+                });
+                // recenter map over choices
+                const bounds = builder.build();
+                console.log("<====******====>");
+                const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(
+                    bounds,
+                    padding
+                );
+                actualMap.gMap.animateCamera(newBounds);
+            },
+            err => {
+                console.log(err);
+            },
+            () => {
+                console.log("completed");
+            }
+        );
     }
 }
