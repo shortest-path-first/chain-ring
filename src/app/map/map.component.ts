@@ -243,6 +243,7 @@ export class MapComponent implements OnInit {
                 directionsResponse = response;
                 const { turnByTurn, peterRide, safePath, wayPointArr, safePolyline, safeRide, safeTurnByTurn} = directionsResponse;
                 let { polyLine } = directionsResponse;
+        
                 this.safeRidePolyline = safePolyline;
                 this.safeRideFlat = safeRide.flat();
                 safeTurnBy = safeTurnByTurn.flat();
@@ -260,7 +261,7 @@ export class MapComponent implements OnInit {
                 this.safeTurnByList = Array.from(safeTurnBy);
                 const bikePath = decodePolyline(polyLine);
                 const safePathPoints = decodePolyline(safePolyline)
-                
+                console.log(safePathPoints);
                 const path = new mapsModule.Polyline();
                 const safePathPolyLine = new mapsModule.Polyline();
                 this.safePoly = safePathPolyLine; 
@@ -296,7 +297,7 @@ export class MapComponent implements OnInit {
 
               
                 path.visible = true;
-                safePathPolyLine.visible = false;
+                safePathPolyLine.visible = true;
                 //wayPointPath.visible = true;
                 path.width = 10;
                 safePathPolyLine.width = 10;

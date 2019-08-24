@@ -116,6 +116,8 @@ export class RideComponent implements OnInit {
         }
         this.listen = false;
         this.recognized = false;
+
+        // this function starts the speech recognition interval
         this.zone.runOutsideAngular(() => {
             this.listenIntervalId = setInterval(() => {
                 if (this.listen === false) {
