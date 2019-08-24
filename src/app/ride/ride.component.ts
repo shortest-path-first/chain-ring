@@ -17,6 +17,7 @@ import { Place } from "../map/map";
 import * as utils from "tns-core-modules/utils/utils";
 import { knownFolders, Folder, File } from "tns-core-modules/file-system";
 import * as Obser from "tns-core-modules/data/observable";
+import { start } from "repl";
 
 declare var com: any;
 
@@ -29,6 +30,8 @@ const decodePolyline = require("decode-google-map-polyline");
 const polylineEncoder = require("google-polyline");
 let rideMarkers = {markers: []};
 let polylineHolder;
+let topSpeedHolder;
+let startTimeHolder;
 
 registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
@@ -132,7 +135,7 @@ export class RideComponent implements OnInit {
         private zone: NgZone
     ) {
         // Use the component constructor to inject providers.
-        const paramSubscription = this.route.queryParams.subscribe(params => {
+        const paramSubscription = this.route.queryParams.subscribe((params) => {
             const { polyLine, parsedPeter } = params;
             const peterInfo = JSON.parse(parsedPeter);
             polylineHolder = polyLine;
@@ -144,7 +147,7 @@ export class RideComponent implements OnInit {
 
     ngOnInit(): void {
         // Init your component properties here.
-        this.startTime = new Date();
+        startTimeHolder = new Date();
         for (let i = 0; i < 100; i++) {
             clearInterval(i);
             geolocation.clearWatch(i);
@@ -213,7 +216,7 @@ export class RideComponent implements OnInit {
                 maximumAge: 5000,
                 timeout: 20000
             })
-            .then(result => {
+            .then((result) => {
                 const marker = new mapsModule.Marker();
                 if (pinType === "pothole") {
                     marker.icon = this.potholeIcon;
@@ -280,19 +283,19 @@ export class RideComponent implements OnInit {
 
     findSpeedBreakdown(speeds): Array<any> {
         const breakdown = speeds.reduce((tally, speed) => {
-            if (speed < 0.25 * this.topSpeed) {
+            if (speed < 0.25 * topSpeedHolder) {
                 if (tally["0"] === undefined) {
                     tally["0"] = 1;
                 } else {
                     tally["0"]++;
                 }
-            } else if (speed < 0.5 * this.topSpeed) {
+            } else if (speed < 0.5 * topSpeedHolder) {
                 if (tally["1"] === undefined) {
                     tally["1"] = 1;
                 } else {
                     tally["1"]++;
                 }
-            } else if (speed < 0.75 * this.topSpeed) {
+            } else if (speed < 0.75 * topSpeedHolder) {
                 if (tally["2"] === undefined) {
                     tally["2"] = 1;
                 } else {
@@ -317,13 +320,13 @@ export class RideComponent implements OnInit {
     }
 
     directionsParser(): void {
-        this.steps.forEach(step => {
+        this.steps.forEach((step) => {
             this.directionDistances.push(step.distance.text);
             this.directionWords.push(
-                step["html_instructions"].replace(/<\/?[^>]+(>|$)/g, " ")
+                step.html_instructions.replace(/<\/?[^>]+(>|$)/g, " ")
             );
             // this.allDirectionWords.push(step['html_instructions'].replace(/<\/?[^>]+(>|$)/g, " "))
-            this.turnPoints.push(step["end_location"]);
+            this.turnPoints.push(step.end_location);
         });
         console.log(this.directionWords[0]);
     }
@@ -336,7 +339,7 @@ export class RideComponent implements OnInit {
             .set("userLoc", `${lastLat},${lastLng}`);
         const rerouteSubscription = this.http
             .get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params })
-            .subscribe(response => {
+            .subscribe((response) => {
                 // reassigns response to variable to avoid dealing with "<Place[]>"
                 this.directionsResponse = response;
                 const {
@@ -393,13 +396,13 @@ export class RideComponent implements OnInit {
         insomnia.allowSleepAgain().then(function() {
             // console.log("Insomnia is inactive, good night!");
         });
-        const avgSpeed = (this.speed * 2.23694) / this.allSpeeds.length;
+        let avgSpeed = (this.speed * 2.23694) / this.allSpeeds.length;
         const speedBreakdown = this.findSpeedBreakdown(this.allSpeeds);
         const pathPolyline = polylineEncoder.encode(this.newPathCoords);
         const first = this.newPathCoords[0];
         const last = this.newPathCoords[this.newPathCoords.length - 1];
 
-        let duration = this.stopTime.getTime() - this.startTime.getTime();
+        let duration = this.stopTime.getTime() - startTimeHolder.getTime();
         duration = duration / 10000;
         // console.log("duration", duration);
         const markerSubscription = this.http
@@ -419,9 +422,14 @@ export class RideComponent implements OnInit {
             avgSpeed,
             duration,
             speedBreakdown,
-            topSpeed: this.topSpeed,
+            topSpeed: topSpeedHolder,
             totalDistance: this.totalDistance
         };
+        const year = startTimeHolder.getFullYear();
+        const month = startTimeHolder.getMonth();
+        const day = startTimeHolder.getDate();
+        const hour = startTimeHolder.getHours();
+        const minutes = startTimeHolder.getMinutes();
         this.file.readText()
             .then((res) => {
                 const dbParams = new HttpParams()
@@ -430,21 +438,22 @@ export class RideComponent implements OnInit {
                     .set(`duration`, `${duration}`)
                     .set(`breakdown`, `${JSON.stringify(speedBreakdown)}`)
                     .set(`totalDistance`, `${this.totalDistance}`)
-                    .set(`topSpeed`, `${this.topSpeed}`)
-                    .set(`token`, `${res}`);
+                    .set(`topSpeed`, `${topSpeedHolder}`)
+                    .set(`token`, `${res}`)
+                    .set(`rideTime`, `${hour}:${minutes} ${month}/${day}/${year}`);
 
                 const rideSubscription = this.http
                     .post(this.ROOT_URL + "/ride", info, {
                         headers: new HttpHeaders({
                         "Content-Type": "application/json"
                     }),
-                    params: dbParams
+                        params: dbParams
                 })
                     .subscribe(() => {
                     console.log("ride");
                 });
                 rideSubscription.unsubscribe();
-        })
+        });
         const params: NavigationExtras = {
             queryParams: {
                 polyLine: pathPolyline,
@@ -452,7 +461,7 @@ export class RideComponent implements OnInit {
                 duration,
                 breakdown: speedBreakdown,
                 totalDistance: this.totalDistance,
-                topSpeed: this.topSpeed
+                topSpeed: topSpeedHolder
             }
         };
 
@@ -464,7 +473,7 @@ export class RideComponent implements OnInit {
         this.maneuvers = null;
         this.listen = null;
         this.speed = null;
-        this.topSpeed = null;
+        topSpeedHolder = null;
         this.allSpeeds = null;
         this.callCount = null;
         this.currentSpeed = null;
@@ -480,7 +489,7 @@ export class RideComponent implements OnInit {
         this.polyline = null;
         this.startZoom = null;
         this.speechRecognition = null;
-        this.startTime = null;
+        startTimeHolder = null;
         this.stopTime = null;
         this.left = null;
         this.right = null;
@@ -631,7 +640,7 @@ export class RideComponent implements OnInit {
         });
 
         this.watchId = geolocation.watchLocation(
-            loc => {
+            (loc) => {
                 const newPath = new mapsModule.Polyline();
                 if (
                     (loc && this.mapView !== null) ||
@@ -645,8 +654,8 @@ export class RideComponent implements OnInit {
                         .toFixed(1)
                         .slice(-1);
 
-                    if (this.currentSpeed > this.topSpeed) {
-                        this.topSpeed = this.currentSpeed;
+                    if (this.currentSpeed > topSpeedHolder) {
+                        topSpeedHolder = this.currentSpeed;
                     }
                     if (
                         this.currentSpeed < 4 &&
@@ -730,7 +739,7 @@ export class RideComponent implements OnInit {
                     }
                 }
             },
-            e => {
+            (e) => {
                 console.log("Error: " + e.message);
             },
             {
@@ -854,7 +863,7 @@ export class RideComponent implements OnInit {
                             this.listen = false;
                         });
                     },
-                    onError: error => {
+                    onError: (error) => {
                         this.zone.run(() => {
                             this.listen = false;
                         });
@@ -864,20 +873,20 @@ export class RideComponent implements OnInit {
                     }
                 })
                 .then(
-                    started => {
+                    (started) => {
                         // console.log(`started listening`)
                         this.zone.run(() => {
                             this.listen = true;
                         });
                     },
-                    errorMessage => {
+                    (errorMessage) => {
                         // console.log(`Listen Error: ${errorMessage}`);
                         this.zone.run(() => {
                             this.listen = false;
                         });
                     }
                 )
-                .catch(error => {
+                .catch((error) => {
                     // same as the 'onError' handler, but this may not return if the error occurs after listening has successfully started (because that resolves the promise,
                     // hence the' onError' handler was created.
                     console.error("Where's the error", error);
@@ -896,7 +905,7 @@ export class RideComponent implements OnInit {
         console.log(this.directedRide);
         if (line !== undefined) {
             this.directedRide = true;
-            let flightPlanCoordinates = decodePolyline(line);
+            const flightPlanCoordinates = decodePolyline(line);
             this.polyline = new mapsModule.Polyline();
             for (let i = 0; i < flightPlanCoordinates.length; i++) {
                 const coord = flightPlanCoordinates[i];
@@ -910,7 +919,7 @@ export class RideComponent implements OnInit {
             // this.mapView.set(bikeLayer);
             const myLatLng = { lat: 29.9688625, lng: -90.0544055 };
 
-            let latLng = new com.google.android.gms.maps.model.LatLng(
+            const latLng = new com.google.android.gms.maps.model.LatLng(
                 29.9688625,
                 -90.0544055
             );
@@ -958,7 +967,7 @@ export class RideComponent implements OnInit {
                 maximumAge: 5000,
                 timeout: 20000
             })
-            .then(result => {
+            .then((result) => {
                 const marker = new mapsModule.Marker();
                 // tslint:disable-next-line: max-line-length
                 // var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
@@ -971,7 +980,7 @@ export class RideComponent implements OnInit {
                 this.mapView.latitude = result.latitude;
                 this.mapView.longitude = result.longitude;
             })
-            .catch(err => {
+            .catch((err) => {
                 console.error("Get location error:", err);
             });
         this.drawUserPath();

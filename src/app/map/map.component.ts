@@ -66,12 +66,13 @@ export class MapComponent implements OnInit {
     shortest = true;
     safeRidePolyline;
 
-    readonly ROOT_URL = "http://ceabe4e9.ngrok.io";
     potholeIcon = null;
     closeIcon = null;
     avoidIcon = null;
     crashIcon = null;
     stolenIcon = null;
+
+    readonly ROOT_URL = "http://ceabe4e9.ngrok.io";
 
     places: Observable<Array<Place>>;
 
