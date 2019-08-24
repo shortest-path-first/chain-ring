@@ -280,6 +280,17 @@ $sidedrawer-list-icon-size: 20;
     text-align: center;
     font-family: Roboto-Medium;
 }
+
+.wrong {
+    color: red;
+    margin: 10px 10px;
+    text-align: center;
+}
+
+.login-redirect {
+    color: white;
+    text-align: center;
+}
 .map-buttons{
     background-color: black;
     color: white;

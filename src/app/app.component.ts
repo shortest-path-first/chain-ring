@@ -4,7 +4,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { DrawerTransitionBase, RadSideDrawer, SlideInOnTopTransition } from "nativescript-ui-sidedrawer";
 import { filter } from "rxjs/operators";
 import * as app from "tns-core-modules/application";
-import { configureOAuthProviders } from "../auth-service";
+// import { configureOAuthProviders } from "../auth-service";
 import * as imagepicker from "nativescript-imagepicker";
 import { knownFolders, Folder, File } from "tns-core-modules/file-system";
 import { fromObject, fromObjectRecursive, Observable, PropertyChangeData } from "tns-core-modules/data/observable";
@@ -25,6 +25,7 @@ export class AppComponent implements OnInit {
     showIcon = true;
     showProPic = false;
     imagePath = "";
+    username = (global as any).username;
 
     private _activatedUrl: string;
     private _sideDrawerTransition: DrawerTransitionBase;
@@ -37,7 +38,8 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        configureOAuthProviders();
+        // configureOAuthProviders();
+        console.log(this.username);
         this._activatedUrl = "/login";
         this._sideDrawerTransition = new SlideInOnTopTransition();
 
@@ -102,7 +104,15 @@ export class AppComponent implements OnInit {
         const documents: Folder = knownFolders.documents();
         const folder: Folder = documents.getFolder(vm.get("src") || "src");
         const file: File = folder.getFile(`${vm.get("token") || "token"}` + `.txt`);
+        file.readText()
+            .then((resp) => {
+                console.log("Written token", resp);
+                file.writeText("")
+                    .then(() => file.readText())
+                    .then((res) => {
+                        vm.set("writtenContent", res);
 
+<<<<<<< HEAD
         file.writeText("")
             .then(() => file.readText())
             .then((res) => {
@@ -120,7 +130,22 @@ export class AppComponent implements OnInit {
                     })
                 }).then(httpResponse => {
                     this.onNavItemTap("/login");
+=======
+                        request({
+                            url: `http://ceabe4e9.ngrok.io/logout`,
+                            method: "PATCH",
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+                            content: JSON.stringify({
+                                token: res
+                            })
+                        }).then(httpResponse => {
+                            this.onNavItemTap("/login");
+                        });
+>>>>>>> f335bf38239f2032a205fbaf85e228d7d7e6f048
                 });
-        });
+            });
     }
 }

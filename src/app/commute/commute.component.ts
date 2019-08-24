@@ -18,7 +18,6 @@ const user = "francoappss@gmail.com";
     templateUrl: "./commute.component.html"
 })
 export class CommuteComponent implements OnInit {
-
     latitude = 30;
     longitude = -90;
 
@@ -34,7 +33,10 @@ export class CommuteComponent implements OnInit {
 
     // tslint:disable-next-line: max-line-length
 
-    constructor(private http: HttpClient, private routerExtensions: RouterExtensions) {
+    constructor(
+        private http: HttpClient,
+        private routerExtensions: RouterExtensions
+    ) {
         // Use the component constructor to inject providers.
     }
 
@@ -46,8 +48,13 @@ export class CommuteComponent implements OnInit {
 
     getUserLoc() {
         geolocation.enableLocationRequest();
-        geolocation.getCurrentLocation({ desiredAccuracy: Accuracy.high, maximumAge: 5000, timeout: 20000 })
-            .then((result) => {
+        geolocation
+            .getCurrentLocation({
+                desiredAccuracy: Accuracy.high,
+                maximumAge: 5000,
+                timeout: 20000
+            })
+            .then(result => {
                 // console.log(result);
                 this.latitude = result.latitude;
                 this.longitude = result.longitude;
@@ -61,43 +68,56 @@ export class CommuteComponent implements OnInit {
 
     routeToRide(lat, lng) {
         console.log(lat, lng);
-            // tslint:disable-next-line: max-line-length
-        const params = new HttpParams().set("place", `${lat},${lng}`).set("userLoc", `${this.latitude},${this.longitude}`);
-            // http request to get directions between user point and marker selected
-        this.http.get<Array<Commute>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
-                // reassigns response to variable to avoid dealing with "<Place[]>"
-                directionsResponse = response;
-                const { polyLine, peterRide } = directionsResponse;
-                peterInfo = peterRide;
-                const parsedPeter = JSON.stringify(peterInfo);
-                const param: NavigationExtras = {
-                    queryParams: {
-                        polyLine,
-                        parsedPeter
-                    }
-                };
-                this.routerExtensions.navigate(["/ride"], param);
-                
-            }, (err) => {
-                console.log("error", err.message);
-            }, () => {
-                console.log("completed");
-            });
+        // tslint:disable-next-line: max-line-length
+        const params = new HttpParams()
+            .set("place", `${lat},${lng}`)
+            .set("userLoc", `${this.latitude},${this.longitude}`);
+        // http request to get directions between user point and marker selected
+        this.http
+            .get<Array<Commute>>(this.ROOT_URL + "/mapPolyline", { params })
+            .subscribe(
+                response => {
+                    // reassigns response to variable to avoid dealing with "<Place[]>"
+                    directionsResponse = response;
+                    const { polyLine, peterRide } = directionsResponse;
+                    peterInfo = peterRide;
+                    const parsedPeter = JSON.stringify(peterInfo);
+                    const param: NavigationExtras = {
+                        queryParams: {
+                            polyLine,
+                            parsedPeter
+                        }
+                    };
+                    this.routerExtensions.navigate(["/ride"], param);
+                },
+                err => {
+                    console.log("error", err.message);
+                },
+                () => {
+                    console.log("completed");
+                }
+            );
     }
 
     getLocations(userEmail) {
         // tslint:disable-next-line: max-line-length
         const params = new HttpParams().set("userEmail", `${userEmail}`);
         // http request to get directions between user point and marker selected
-        this.http.get<Array<Commute>>(this.ROOT_URL + "/locations", { params }).subscribe((response) => {
-            // reassigns response to variable to avoid dealing with "<Place[]>"
-            console.log(response);
-            this.locationList = response;
-        }, (err) => {
-            console.log("error", err.message);
-        }, () => {
-            console.log("completed");
-        });
+        this.http
+            .get<Array<Commute>>(this.ROOT_URL + "/locations", { params })
+            .subscribe(
+                response => {
+                    // reassigns response to variable to avoid dealing with "<Place[]>"
+                    console.log(response);
+                    this.locationList = response;
+                },
+                err => {
+                    console.log("error", err.message);
+                },
+                () => {
+                    console.log("completed");
+                }
+            );
     }
 
     addLocation() {
@@ -116,5 +136,4 @@ export class CommuteComponent implements OnInit {
             }
         });
     }
-    
 }
