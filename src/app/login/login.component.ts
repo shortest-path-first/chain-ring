@@ -36,8 +36,13 @@ export class LoginComponent implements OnInit {
         console.log("LOGIN");
         this.file.readText()
             .then((res) => {
-                this.vm.set("writtenContent", res);
                 console.log(res);
+                if(res){
+                    this.vm.set("writtenContent", res);
+                }
+                if(res.indexOf("Bad") !== -1){
+                    res = "";
+                }
                 const options = {
                     url: `http://ceabe4e9.ngrok.io/login/${res}`,
                     method: "GET",

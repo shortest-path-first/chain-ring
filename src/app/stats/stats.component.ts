@@ -19,42 +19,49 @@ export class StatsComponent implements OnInit {
     displayedTotalDistance;
     speedBreakdown;
     moneySaved = 90000;
-    stationaryTime = 5;
+    duration = 5;
     statTotalHolder;
     // tslint:disable-next-line: max-line-length
     statRecentHolder;
     statHolder: Array<object> = [];
     notRecentView = true;
     recentView = false;
+    indieView = false;
 
-    pieSource: Array<{ Speed: string, Amount: number }> = [];
+    pieSource: Array<{ Speed: string; Amount: number }> = [];
 
-    readonly ROOT_URL = "https://54ec740b.ngrok.io";
+    readonly ROOT_URL = "http://ceabe4e9.ngrok.io";
 
     storedStats: Observable<Array<storedStats>>;
 
     // tslint:disable-next-line: max-line-length
-    constructor(private http: HttpClient, private router: Router, private route: ActivatedRoute, private routerExtensions: RouterExtensions) {
+    constructor(
+        private http: HttpClient,
+        private router: Router,
+        private route: ActivatedRoute,
+        private routerExtensions: RouterExtensions
+    ) {
         // Use the component constructor to inject providers.
 
         this.userTotalStats();
         this.userRecentStats();
-        this.route.queryParams.subscribe((params) => {
-         
+        this.route.queryParams.subscribe(params => {
             this.displayedAverageSpeed = params.average.toFixed(1);
             this.displayedTotalDistance = params.totalDistance;
             if (this.displayedTotalDistance.indexOf(".") !== -1) {
                 const decimalIndex = this.displayedTotalDistance.indexOf(".");
                 this.displayedTotalDistance.slice(0, decimalIndex + 1);
             }
-            this.displayedDuration = this.durationParser(Number(params.duration));
+            this.displayedDuration = this.durationParser(
+                Number(params.duration)
+            );
             this.speedBreakdown = params.speedBreakdown;
             this.lastRideTap();
         });
     }
     ngOnInit(): void {
         // Init your component properties here.
-        for(let i = 0; i < 100; i++){
+        for (let i = 0; i < 100; i++) {
             geolocation.clearWatch(i);
             clearInterval(i);
         }
@@ -98,40 +105,58 @@ export class StatsComponent implements OnInit {
         }
         time = `${hours}:${minutes}:${seconds}`;
         console.log(time);
+
         return time;
     }
 
     userTotalStats() {
         const name = "Franco";
         const params = new HttpParams().set("name", name);
-        this.http.get<Array<storedStats>>(this.ROOT_URL + "/userTotals", { params }).subscribe((response) => {
-            this.statTotalHolder = response;
-            const { avgSpeed, totalDistance, costSavings, stationaryTime, pieChart } = this.statTotalHolder;
-            this.displayedAverageSpeed = avgSpeed;
-            this.displayedTotalDistance = totalDistance;
-            this.moneySaved = costSavings;
-            this.stationaryTime = stationaryTime;
-            this.pieSource = pieChart;
-            this.displayedDuration = "5 Hours 16 minutes";
-
-        }, (err) => {
-            console.log(err.message);
-        }, () => {
-            console.log("completed");
-        });
+        this.http
+            .get<Array<storedStats>>(this.ROOT_URL + "/userTotals", { params })
+            .subscribe(
+                response => {
+                    this.statTotalHolder = response;
+                    const {
+                        avgSpeed,
+                        totalDistance,
+                        costSavings,
+                        duration,
+                        pieChart
+                    } = this.statTotalHolder;
+                    this.displayedAverageSpeed = avgSpeed;
+                    this.displayedTotalDistance = totalDistance;
+                    this.moneySaved = costSavings;
+                    this.duration = duration;
+                    this.pieSource = pieChart;
+                    this.displayedDuration = "5 Hours 16 minutes";
+                },
+                err => {
+                    console.log(err.message);
+                },
+                () => {
+                    console.log("completed");
+                }
+            );
     }
 
     userRecentStats() {
         const name = "Franco";
         const params = new HttpParams().set("name", name);
-        this.http.get<Array<storedStats>>(this.ROOT_URL + "/userStats", { params }).subscribe((response) => {
-            this.statRecentHolder = response;
-            this.statHolder = response;
-        }, (err) => {
-            console.log(err.message);
-        }, () => {
-            console.log("completed");
-        });
+        this.http
+            .get<Array<storedStats>>(this.ROOT_URL + "/userStats", { params })
+            .subscribe(
+                response => {
+                    this.statRecentHolder = response;
+                    this.statHolder = response;
+                },
+                err => {
+                    console.log(err.message);
+                },
+                () => {
+                    console.log("completed");
+                }
+            );
     }
 
     homeTap(navItemRoute: string): void {
@@ -149,7 +174,7 @@ export class StatsComponent implements OnInit {
         this.displayedAverageSpeed = this.statRecentHolder[0].avgSpeed || null;
         this.displayedTotalDistance = this.statRecentHolder[0].totalDistance;
         this.moneySaved = this.statRecentHolder[0].costSavings;
-        this.stationaryTime = this.statRecentHolder[0].stationaryTime;
+        this.duration = this.statRecentHolder[0].duration;
         this.pieSource = this.statRecentHolder[0].pieChart;
         this.displayedDuration = "20 minutes";
     }
@@ -157,6 +182,7 @@ export class StatsComponent implements OnInit {
     recentRideTap() {
         console.log("get recent ride stats");
         this.notRecentView = false;
+        this.indieView = false;
         this.recentView = true;
         this.displayedDuration = "20 minutes";
     }
@@ -165,12 +191,23 @@ export class StatsComponent implements OnInit {
         console.log("get total ride stats");
         this.notRecentView = true;
         this.recentView = false;
+        this.indieView = false;
         this.displayedAverageSpeed = this.statTotalHolder.avgSpeed;
         this.displayedTotalDistance = this.statTotalHolder.totalDistance;
         this.moneySaved = this.statTotalHolder.costSavings;
-        this.stationaryTime = this.statTotalHolder.stationaryTime;
+        this.duration = this.statTotalHolder.duration;
         this.pieSource = this.statTotalHolder.pieChart;
         this.displayedDuration = "15 Hours 5 minutes";
+    }
 
+    statDisplayer(text, avgSpeed, totalDistance, pieChart, duration) {
+        console.log(pieChart);
+        this.notRecentView = false;
+        this.notRecentView = false;
+        this.indieView = true;
+        this.displayedAverageSpeed = avgSpeed;
+        this.displayedTotalDistance = totalDistance;
+        this.displayedDuration = duration;
+        this.pieSource = pieChart;
     }
 }

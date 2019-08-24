@@ -179,7 +179,6 @@ $sidedrawer-list-icon-size: 20;
     font-size: 22%;
     text-align: center;
     font-family: Roboto-Regular;
-
 }
 .stats-info-line{
     background-color: black;
@@ -190,9 +189,24 @@ $sidedrawer-list-icon-size: 20;
     border-width: 10px;
     margin: 5px 5px;
     max-width: 30%;
-    height: 18%;
+    height: 13%;
     opacity: .5;
-    font-size: 18%;
+    font-size: 23%;
+    text-align: center;
+    font-family: Roboto-Medium;
+}
+.stats-recent-line{
+    background-color: black;
+    color: white;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: white;
+    border-width: 10px;
+    margin: 20px 5px;
+    max-width: 30%;
+    height: 13%;
+    opacity: .5;
+    font-size: 23%;
     text-align: center;
     font-family: Roboto-Medium;
 }
@@ -276,4 +290,33 @@ $sidedrawer-list-icon-size: 20;
 .login-redirect {
     color: white;
     text-align: center;
+}
+.map-buttons{
+    background-color: black;
+    color: white;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: white;
+    border-width: 10px;
+    width: 95%;
+    height: 100%;
+    font-size: 25%;
+    text-align: center;
+    font-family: Roboto-Regular;
+    margin: 15px;
+}
+
+.map-buttons-select{
+      background-color: white;
+    color: black;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: black;
+    border-width: 10px;
+    width: 95%;
+    height: 100%;
+    font-size: 25%;
+    text-align: center;
+    font-family: Roboto-Regular;
+    margin: 15px;
 }
