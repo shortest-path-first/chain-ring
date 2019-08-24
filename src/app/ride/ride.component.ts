@@ -18,7 +18,7 @@ import * as utils from "tns-core-modules/utils/utils";
 
 declare var com: any;
 
-// const style = require("../../../App_Resources/style.json")
+const style = require("../../../App_Resources/style.json")
 
 const insomnia = require("nativescript-insomnia");
 const mapsModule = require("nativescript-google-maps-sdk");
@@ -46,7 +46,7 @@ export class RideComponent implements OnInit {
     listen;
     speed = 0;
     topSpeed = 0;
-    allSpeeds = [];
+    allSpeeds = []
     callCount = 0;
     currentSpeed = 0;
     speedString = "0";
@@ -117,7 +117,9 @@ export class RideComponent implements OnInit {
         this.listen = false;
         this.recognized = false;
 
-        // this function starts the speech recognition interval
+       /**
+        * This function starts the speech recognition interval
+        */
         this.zone.runOutsideAngular(() => {
             this.listenIntervalId = setInterval(() => {
                 if (this.listen === false) {
@@ -132,6 +134,8 @@ export class RideComponent implements OnInit {
                 }
             }, 2000);
         });
+
+        // Load custom icon files
         const potholeImageSource = new ImageSource();
         this.potholeIcon = new Image();
         potholeImageSource.loadFromFile("~/app/images/mapPotHole.png");
@@ -172,6 +176,12 @@ export class RideComponent implements OnInit {
         this.pinClicked = !this.pinClicked;
     }
 
+    /**
+     * Drops corresponding icon image on the map at the user's
+     *  current locationwhen the pin is either selected from 
+     * the pin options or through voice command
+     * @param {string} pinType - 
+     */
     onPinSelect(pinType): void {
         this.pinClicked = false;
        
@@ -196,6 +206,10 @@ export class RideComponent implements OnInit {
             });
     }
 
+    /**
+     *  Function triggered by the touching the home icon.
+     *  Clears all intervals and resets booleans to false.
+     */
     onHomeTap(): void {
 
         geolocation.clearWatch(this.watchId);
@@ -211,6 +225,16 @@ export class RideComponent implements OnInit {
     });
 }
 
+    /**
+     *  Function to calculate the distance between two coordinates
+     * 
+     * @param {number} lat1 - Number representing the first position's latitude
+     * @param {number} lon1 - Number representing the first position's longitude
+     * @param {number} lat2 - Number representing the second position's latitude
+     * @param {number} lng2 - Number representing the second position's longitude
+     * 
+     * @returns {number} distance in miles overland between coordinates
+     */
     calculateDistance(lat1, lon1, lat2, lon2): number {
         if ((lat1 == lat2) && (lon1 == lon2)) {
             const dist = 0;
@@ -232,7 +256,15 @@ export class RideComponent implements OnInit {
             return Number(dist.toFixed(2));
     }
 }
-
+    /**
+     * Function to find the portion of the ride spent at less than 25% of the top speed, 
+     * between 25% and 50% of the top speed, 50% to 75% of the top speed, and between
+     * 75% and 100% of the top speed. The information is then passed to the database and 
+     * the stats page.
+     * @param {Array} speeds - An array of all the speeds recorded when the user's position
+     * is checked by the watchInterval.
+     * @returns {Object} breakdown - returns object with the tally for each speed range
+     */
     findSpeedBreakdown(speeds): Array<any> {
         const breakdown = speeds.reduce((tally, speed) => {
             if (speed < .25 * this.topSpeed) {
@@ -262,23 +294,21 @@ export class RideComponent implements OnInit {
             }
             return tally;
         }, {});
-        // const portions = [];
-        // if(breakdown){
-        //     for (let key in breakdown) {
-        //         portions.push((breakdown[key] / speeds.length * 100).toFixed(1));
-        //     }
-        // }
         return breakdown;
     }
 
+    /**
+     * Function that parses the directions from the Google Directions API. Removes
+     * the html tags from the instructions. Pushes each batch of info into their
+     * designated arrays.
+     */
     directionsParser(): void {
         this.steps.forEach((step) => {
         this.directionDistances.push(step.distance.text);
         this.directionWords.push(step["html_instructions"].replace(/<\/?[^>]+(>|$)/g, " "));
-        // this.allDirectionWords.push(step['html_instructions'].replace(/<\/?[^>]+(>|$)/g, " "))
         this.turnPoints.push(step["end_location"]);
         });
-        console.log(this.directionWords[0])
+       
     }
 
     onReroute(): void {
@@ -725,9 +755,9 @@ export class RideComponent implements OnInit {
     
     onMapReady(args) {
         this.mapView = args.object;
-
+        this.mapView.setStyle(style);
         const line = polylineHolder;
-        // const line = "yd}uDhjsdPfBG@P@\\`CInCKnFQdGSAW@VJhEL`Fy@BkBFuK^H`FtDM"
+  
         console.log(this.directedRide);
         if (line !== undefined) {
             this.directedRide = true;
@@ -737,22 +767,10 @@ export class RideComponent implements OnInit {
                 const coord = flightPlanCoordinates[i];
                 this.polyline.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
             }
-            // let bikeLayer = new google.maps.BicyclingLayer()
-            // let bikeLayer = new mapsModule.L
-            // kayer.BicyclingLayer();
-            // this.mapView.set(bikeLayer);
-            const myLatLng = { lat: 29.9688625, lng: -90.0544055 };
         
-            let latLng = new com.google.android.gms.maps.model.LatLng(29.9688625, -90.0544055);
-            const decoded = com.google.maps.android.PolyUtil.decode(line);
-            com.google.maps.android.PolyUtil.isLocationOnEdge(latLng, decoded, true, 10e-1);
-          
-            // let bicyclingLayer = com.google.maps.android.data.Layer;
-            // console.log(bicyclingLayer);
-            // let KML = new com.google.maps.android.data.kml.KmlLayer(this.mapView, {
-            //     url: "https://data.nola.gov/api/geospatial/8npz-j6vy?method=export&format=KML",
-            //     map: this.mapView,
-            // }, getApplicationContext());
+            // let latLng = new com.google.android.gms.maps.model.LatLng(29.9688625, -90.0544055);
+            // const decoded = com.google.maps.android.PolyUtil.decode(line);
+            // com.google.maps.android.PolyUtil.isLocationOnEdge(latLng, decoded, true, 10e-1);
 
             this.destLat = flightPlanCoordinates[flightPlanCoordinates.length - 1].lat;
             this.destLng = flightPlanCoordinates[flightPlanCoordinates.length - 1].lng;
@@ -779,8 +797,6 @@ export class RideComponent implements OnInit {
             .then((result) => {
                 const marker = new mapsModule.Marker();
                 // tslint:disable-next-line: max-line-length
-                // var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
-                // marker.icon = image;
                 marker.position = mapsModule.Position.positionFromLatLng(result.latitude, result.longitude);
                 this.mapView.addMarker(marker);
                 this.mapView.latitude = result.latitude;
