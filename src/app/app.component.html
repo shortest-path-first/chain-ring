@@ -8,8 +8,8 @@ https://docs.nativescript.org/angular/ui/professional-ui-components/ng-SideDrawe
         <StackLayout row="0" class="sidedrawer-header">
             <Label *ngIf=showIcon class="sidedrawer-header-image fa" text="&#xf2bd;" (tap)="onDrawerIconTap()" ></Label>
             <Image *ngIf=showProPic class="sidedrawer-header-image" src={{imagePath}} stretch="aspectFill"></Image>
-            <!-- <Label class="sidedrawer-header-brand" text="User Name"></Label>
-            <Label class="footnote" text="username@mail.com"></Label> -->
+            <!-- <Label class="sidedrawer-header-brand" text="{{username}}"></Label> -->
+            <!-- <Label class="footnote" text="username@mail.com"></Label> -->
         </StackLayout>
 
         <ScrollView row="1" class="sidedrawer-content">
