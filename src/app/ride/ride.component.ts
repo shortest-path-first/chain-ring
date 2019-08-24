@@ -350,7 +350,7 @@ export class RideComponent implements OnInit {
     }
 
     onStopTap(): void {
-        console.log("stop:", this.watchId);
+  
         this.stopTime = new Date();
         geolocation.clearWatch(this.watchId);
         this.speechRecognition.stopListening();
