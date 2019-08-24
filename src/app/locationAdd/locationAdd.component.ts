@@ -20,7 +20,10 @@ let markerLat;
 let markerLng;
 let userEmail;
 
-registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
+registerElement(
+    "MapView",
+    () => require("nativescript-google-maps-sdk").MapView
+);
 
 @Component({
     selector: "LocationAdd",
@@ -37,7 +40,7 @@ export class LocationAddComponent implements OnInit {
     bottomButtonText = "Save Location";
     locName = "";
 
-    readonly ROOT_URL = "http://ceabe4e9.ngrok.io";
+    readonly ROOT_URL = "https://97864893.ngrok.io";
 
     places: Observable<Array<Place>>;
 
