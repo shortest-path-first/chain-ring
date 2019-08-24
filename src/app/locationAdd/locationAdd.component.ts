@@ -4,11 +4,14 @@ import * as app from "tns-core-modules/application";
 import { registerElement } from "nativescript-angular/element-registry";
 import { Observable } from "rxjs";
 import { Place } from "./locationAdd";
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import * as geolocation from "nativescript-geolocation";
 import { Accuracy } from "tns-core-modules/ui/enums";
 import { ActivatedRoute } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
+import * as Obser from "tns-core-modules/data/observable";
+import { knownFolders, Folder, File } from "tns-core-modules/file-system";
+
 
 declare var com: any;
 
@@ -40,7 +43,14 @@ export class LocationAddComponent implements OnInit {
     bottomButtonText = "Save Location";
     locName = "";
 
-    readonly ROOT_URL = "https://97864893.ngrok.io";
+    vm = new Obser.Observable();
+    documents: Folder = knownFolders.documents();
+    folder: Folder = this.documents.getFolder(this.vm.get("src") || "src");
+    file: File = this.folder.getFile(
+        `${this.vm.get("token") || "token"}` + `.txt`
+    );
+
+    readonly ROOT_URL = "http://ceabe4e9.ngrok.io";
 
     places: Observable<Array<Place>>;
 
@@ -50,7 +60,7 @@ export class LocationAddComponent implements OnInit {
         private routerExtensions: RouterExtensions
     ) {
         // Use the component constructor to inject providers.
-        this.route.queryParams.subscribe(params => {
+        this.route.queryParams.subscribe((params) => {
             const { user } = params;
             userEmail = user;
         });
@@ -65,7 +75,7 @@ export class LocationAddComponent implements OnInit {
                 maximumAge: 5000,
                 timeout: 20000
             })
-            .then(result => {
+            .then((result) => {
                 // console.log(result);
                 this.latitude = result.latitude;
                 this.longitude = result.longitude;
@@ -83,7 +93,7 @@ export class LocationAddComponent implements OnInit {
         const params = new HttpParams()
             .set("place", text)
             .set("userLoc", `${this.latitude},${this.longitude}`);
-        this.markers.forEach(marker => {
+        this.markers.forEach((marker) => {
             marker.visible = false;
         });
         this.markers = [];
@@ -93,12 +103,12 @@ export class LocationAddComponent implements OnInit {
         this.http
             .get<Array<Place>>(this.ROOT_URL + "/mapSearch", { params })
             .subscribe(
-                response => {
+                (response) => {
                     // assigning response info to markers array and then placing each marker on our map
                     this.markers = response;
                     const padding = 150;
                     const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
-                    this.markers.forEach(place => {
+                    this.markers.forEach((place) => {
                         const { lat, lng } = place[0];
                         console.log("marker added");
                         const marker = new mapsModule.Marker({});
@@ -121,7 +131,7 @@ export class LocationAddComponent implements OnInit {
                     );
                     actualMap.gMap.animateCamera(newBounds);
                 },
-                err => {
+                (err) => {
                     console.log(err.message);
                 },
                 () => {
@@ -155,7 +165,7 @@ export class LocationAddComponent implements OnInit {
     removeGetDirections() {
         this.markerSelected = false;
         this.readyToRide = false;
-        this.markers.forEach(marker => {
+        this.markers.forEach((marker) => {
             marker.visible = false;
         });
         this.markers = [];
@@ -165,6 +175,24 @@ export class LocationAddComponent implements OnInit {
     saveLocation() {
         console.log("button press");
         console.log(markerLat, markerLng, this.locName);
+        const info = {};
+        this.file.readText()
+            .then((res) => {
+                // tslint:disable-next-line: max-line-length
+                const words = new HttpParams().set("token", `${res}`).set(`lat`, `${markerLat}`).set(`lng`, `${markerLng}`).set(`loc`, `${this.locName}`);
+                
+                const rideSubscription = this.http
+                    .post(this.ROOT_URL + "/location", info, {
+                        headers: new HttpHeaders({
+                            "Content-Type": "application/json"
+                        }),
+                        params: words
+                    })
+                    .subscribe(() => {
+                        console.log("ride");
+                    });
+                rideSubscription.unsubscribe();
+            });
     }
 
     homeTap(navItemRoute: string): void {
@@ -174,4 +202,5 @@ export class LocationAddComponent implements OnInit {
             }
         });
     }
+    
 }

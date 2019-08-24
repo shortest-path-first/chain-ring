@@ -7,6 +7,8 @@ import { Observable } from "rxjs";
 import { ActivatedRoute, Router, NavigationExtras } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
 import * as geolocation from "nativescript-geolocation";
+import * as Obser from "tns-core-modules/data/observable";
+import { knownFolders, Folder, File } from "tns-core-modules/file-system";
 
 @Component({
     selector: "Stats",
@@ -27,12 +29,18 @@ export class StatsComponent implements OnInit {
     notRecentView = true;
     recentView = false;
     indieView = false;
+    displayPie = false;
+
+    vm = new Obser.Observable();
+    documents: Folder = knownFolders.documents();
+    folder: Folder = this.documents.getFolder(this.vm.get("src") || "src");
+    file: File = this.folder.getFile(
+        `${this.vm.get("token") || "token"}` + `.txt`
+    );
 
     pieSource: Array<{ Speed: string; Amount: number }> = [];
 
     readonly ROOT_URL = "http://ceabe4e9.ngrok.io";
-
-
 
     storedStats: Observable<Array<storedStats>>;
 
@@ -47,7 +55,7 @@ export class StatsComponent implements OnInit {
 
         this.userTotalStats();
         this.userRecentStats();
-        this.route.queryParams.subscribe(params => {
+        this.route.queryParams.subscribe((params) => {
             this.displayedAverageSpeed = params.average.toFixed(1);
             this.displayedTotalDistance = params.totalDistance;
             if (this.displayedTotalDistance.indexOf(".") !== -1) {
@@ -112,53 +120,59 @@ export class StatsComponent implements OnInit {
     }
 
     userTotalStats() {
-        const name = "Franco";
-        const params = new HttpParams().set("name", name);
-        this.http
-            .get<Array<storedStats>>(this.ROOT_URL + "/userTotals", { params })
-            .subscribe(
-                response => {
-                    this.statTotalHolder = response;
-                    const {
-                        avgSpeed,
-                        totalDistance,
-                        costSavings,
-                        duration,
-                        pieChart
-                    } = this.statTotalHolder;
-                    this.displayedAverageSpeed = avgSpeed;
-                    this.displayedTotalDistance = totalDistance;
-                    this.moneySaved = costSavings;
-                    this.duration = duration;
-                    this.pieSource = pieChart;
-                    this.displayedDuration = "5 Hours 16 minutes";
-                },
-                err => {
-                    console.log(err.message);
-                },
-                () => {
-                    console.log("completed");
-                }
-            );
+        this.file.readText()
+        .then((res) => {
+            const params = new HttpParams().set("token", `${res}`);
+            this.http
+                .get<Array<storedStats>>(this.ROOT_URL + "/userTotals", { params })
+                .subscribe(
+                    (response) => {
+                        this.statTotalHolder = response;
+                        const {
+                            avgSpeed,
+                            totalDistance,
+                            totalDuration
+                        } = this.statTotalHolder;
+                        this.displayedAverageSpeed = avgSpeed;
+                        this.displayedTotalDistance = totalDistance;
+                        const timer = (time) => {
+                            const minutes = Math.floor(time / 60);
+                            const seconds = time % 60;
+                            this.displayedDuration = `${minutes} Minutes and ${seconds} Seconds`;
+                            this.statTotalHolder.totalDuration = `${minutes} Minutes and ${seconds} Seconds`;
+                        };
+                        timer(totalDuration);
+                    },
+                    (err) => {
+                        console.log(err.message);
+                    },
+                    () => {
+                        console.log("completed");
+                    }
+
+                    );
+        });
     }
 
     userRecentStats() {
-        const name = "Franco";
-        const params = new HttpParams().set("name", name);
-        this.http
+        this.file.readText()
+        .then((res) => {
+            const params = new HttpParams().set("token", res);
+            this.http
             .get<Array<storedStats>>(this.ROOT_URL + "/userStats", { params })
-            .subscribe(
-                response => {
-                    this.statRecentHolder = response;
-                    this.statHolder = response;
+            .subscribe((response) => {
+                console.log(response);
+                this.statRecentHolder = response;
+                this.statHolder = response;
                 },
-                err => {
+                (err) => {
                     console.log(err.message);
                 },
                 () => {
                     console.log("completed");
                 }
-            );
+                );
+            });
     }
 
     homeTap(navItemRoute: string): void {
@@ -176,9 +190,15 @@ export class StatsComponent implements OnInit {
         this.displayedAverageSpeed = this.statRecentHolder[0].avgSpeed || null;
         this.displayedTotalDistance = this.statRecentHolder[0].totalDistance;
         this.moneySaved = this.statRecentHolder[0].costSavings;
-        this.duration = this.statRecentHolder[0].duration;
         this.pieSource = this.statRecentHolder[0].pieChart;
-        this.displayedDuration = "20 minutes";
+
+        const timer = (time) => {
+            const minutes = Math.floor(time / 60);
+            const seconds = time % 60;
+            this.displayedDuration = `${minutes} Minutes and ${seconds} Seconds`;
+        };
+        timer(this.statRecentHolder[0].duration);
+        this.displayPie = true;
     }
 
     recentRideTap() {
@@ -197,9 +217,8 @@ export class StatsComponent implements OnInit {
         this.displayedAverageSpeed = this.statTotalHolder.avgSpeed;
         this.displayedTotalDistance = this.statTotalHolder.totalDistance;
         this.moneySaved = this.statTotalHolder.costSavings;
-        this.duration = this.statTotalHolder.duration;
+        this.displayedDuration = this.statTotalHolder.totalDuration;
         this.pieSource = this.statTotalHolder.pieChart;
-        this.displayedDuration = "15 Hours 5 minutes";
     }
 
     statDisplayer(text, avgSpeed, totalDistance, pieChart, duration) {

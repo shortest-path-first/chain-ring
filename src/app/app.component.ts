@@ -112,25 +112,6 @@ export class AppComponent implements OnInit {
                     .then((res) => {
                         vm.set("writtenContent", res);
 
-<<<<<<< HEAD
-        file.writeText("")
-            .then(() => file.readText())
-            .then((res) => {
-                vm.set("writtenContent", res);
-                console.log("Written token", res);
-
-                request({
-                    url: `http://ceabe4e9.ngrok.io/logout/${res}`,
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    content: JSON.stringify({
-                        token: res
-                    })
-                }).then(httpResponse => {
-                    this.onNavItemTap("/login");
-=======
                         request({
                             url: `http://ceabe4e9.ngrok.io/logout`,
                             method: "PATCH",
@@ -144,7 +125,6 @@ export class AppComponent implements OnInit {
                         }).then(httpResponse => {
                             this.onNavItemTap("/login");
                         });
->>>>>>> f335bf38239f2032a205fbaf85e228d7d7e6f048
                 });
             });
     }

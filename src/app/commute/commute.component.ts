@@ -3,10 +3,12 @@ import { RadSideDrawer } from "nativescript-ui-sidedrawer";
 import * as app from "tns-core-modules/application";
 import * as geolocation from "nativescript-geolocation";
 import { Accuracy } from "tns-core-modules/ui/enums";
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import { Commute } from "./commute";
 import { Router, NavigationExtras } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
+import * as Obser from "tns-core-modules/data/observable";
+import { knownFolders, Folder, File } from "tns-core-modules/file-system";
 
 let directionsResponse;
 let peterInfo;
@@ -29,6 +31,13 @@ export class CommuteComponent implements OnInit {
     workLat;
     workLng;
 
+    vm = new Obser.Observable();
+    documents: Folder = knownFolders.documents();
+    folder: Folder = this.documents.getFolder(this.vm.get("src") || "src");
+    file: File = this.folder.getFile(
+        `${this.vm.get("token") || "token"}` + `.txt`
+    );
+
     readonly ROOT_URL = "http://ceabe4e9.ngrok.io";
 
     // tslint:disable-next-line: max-line-length
@@ -42,8 +51,8 @@ export class CommuteComponent implements OnInit {
 
     ngOnInit(): void {
         // Init your component properties here.
+        this.getLocations();
         this.getUserLoc();
-        this.getLocations(user);
     }
 
     getUserLoc() {
@@ -75,8 +84,7 @@ export class CommuteComponent implements OnInit {
         // http request to get directions between user point and marker selected
         this.http
             .get<Array<Commute>>(this.ROOT_URL + "/mapPolyline", { params })
-            .subscribe(
-                response => {
+            .subscribe((response) => {
                     // reassigns response to variable to avoid dealing with "<Place[]>"
                     directionsResponse = response;
                     const { polyLine, peterRide } = directionsResponse;
@@ -99,25 +107,22 @@ export class CommuteComponent implements OnInit {
             );
     }
 
-    getLocations(userEmail) {
+    getLocations() {
         // tslint:disable-next-line: max-line-length
-        const params = new HttpParams().set("userEmail", `${userEmail}`);
-        // http request to get directions between user point and marker selected
-        this.http
-            .get<Array<Commute>>(this.ROOT_URL + "/locations", { params })
-            .subscribe(
-                response => {
-                    // reassigns response to variable to avoid dealing with "<Place[]>"
-                    console.log(response);
-                    this.locationList = response;
-                },
-                err => {
-                    console.log("error", err.message);
-                },
-                () => {
-                    console.log("completed");
-                }
-            );
+        this.file.readText()
+            .then((res) => {
+                // tslint:disable-next-line: max-line-length
+                const params = new HttpParams().set("token", `${res}`);
+                this.http
+                    .get<Array<Commute>>(this.ROOT_URL + "/location", { params })
+                    .subscribe((response) => {
+                        this.locationList = response;
+                    },
+                    (err) => {
+                        console.log("error", err);
+                    }
+                    );
+            });
     }
 
     addLocation() {
