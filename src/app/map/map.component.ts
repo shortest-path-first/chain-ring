@@ -273,147 +273,111 @@ export class MapComponent implements OnInit {
                 .set("place", `${markerLat},${markerLng}`)
                 .set("userLoc", `${this.latitude},${this.longitude}`);
             // http request to get directions between user point and marker selected
+            
+            this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
+                // reassigns response to variable to avoid dealing with "<Place[]>"
+                directionsResponse = response;
+                const { turnByTurn, peterRide, safePath, wayPointArr, safePolyline, safeRide, safeTurnByTurn} = directionsResponse;
+                let { polyLine } = directionsResponse;
+        
+                this.safeRidePolyline = safePolyline;
+                this.safeRideFlat = safeRide.flat();
+                safeTurnBy = safeTurnByTurn.flat();
+                // let decoded = com.google.maps.android.PolyUtil.decode(polyLine);
+                //let decodedSafe = com.google.maps.android.PolyUtil.decode(safePolyline);
+                //console.log("SafePath:", safePolyline);
 
-            this.http
-                .get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params })
-                .subscribe(
-                    response => {
-                        // reassigns response to variable to avoid dealing with "<Place[]>"
-                        directionsResponse = response;
-                        const {
-                            turnByTurn,
-                            peterRide,
-                            safePath,
-                            wayPointArr,
-                            safePolyline,
-                            safeRide,
-                            safeTurnByTurn
-                        } = directionsResponse;
-                        let { polyLine } = directionsResponse;
-                        this.safeRidePolyline = safePolyline;
-                        this.safeRideFlat = safeRide.flat();
-                        safeTurnBy = safeTurnByTurn.flat();
-                        // let decoded = com.google.maps.android.PolyUtil.decode(polyLine);
-                        //let decodedSafe = com.google.maps.android.PolyUtil.decode(safePolyline);
-                        //console.log("SafePath:", safePolyline);
+                // if (com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, decoded, true, 75)){
+                //     this.getAlternative();
+                // }
+                //console.log("Overlap:", com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, decoded, true, 75));
+                peterInfo = peterRide;
+                turnBy = turnByTurn;
+                this.turnByList = turnBy;
+                this.safeTurnByList = Array.from(safeTurnBy);
+                const bikePath = decodePolyline(polyLine);
+                const safePathPoints = decodePolyline(safePolyline)
+                console.log(safePathPoints);
+                const path = new mapsModule.Polyline();
+                const safePathPolyLine = new mapsModule.Polyline();
+                this.safePoly = safePathPolyLine; 
+                const wayPointPath = new mapsModule.Polyline();
+                this.compPoly = path;
+               
+                // tslint:disable-next-line: prefer-for-of
+                for (let i = 0; i < bikePath.length; i++) {
+                    const coord = bikePath[i];
+                    path.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
+                }
+             
+                for (let i = 0; i < safePathPoints.length; i++){
+                    const coord = safePathPoints[i];
+                    safePathPolyLine.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
+                }
 
-                        // if (com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, decoded, true, 75)){
-                        //     this.getAlternative();
-                        // }
-                        //console.log("Overlap:", com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, decoded, true, 75));
-                        peterInfo = peterRide;
-                        turnBy = turnByTurn;
-                        this.turnByList = turnBy;
-                        this.safeTurnByList = Array.from(safeTurnBy);
-                        const bikePath = decodePolyline(polyLine);
-                        const safePathPoints = decodePolyline(safePolyline);
+                for (let i = 0; safePath.length; i++) {
+                    const coord = safePath[i];
+                    wayPointPath.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
+                }
+                // let wayPointLatLngs = [];
+                // if(wayPointArr){
+                //     wayPointArr.forEach((waypoint)=>{
+                //     wayPointLatLngs.push(new com.google.android.gms.maps.model.LatLng(waypoint[0], waypoint[1]));
+                //     //let locObj = {location: "", stopover: false};
+                //     //locObj.location = latlng;
+                //     //console.log(locObj);
+                  
+                //     })
+                 //   console.log("waypoints:", wayPointLatLngs);
+                //}
 
-                        const path = new mapsModule.Polyline();
-                        const safePathPolyLine = new mapsModule.Polyline();
-                        this.safePoly = safePathPolyLine;
-                        const wayPointPath = new mapsModule.Polyline();
-                        this.compPoly = path;
-
-                        // tslint:disable-next-line: prefer-for-of
-                        for (let i = 0; i < bikePath.length; i++) {
-                            const coord = bikePath[i];
-                            path.addPoint(
-                                mapsModule.Position.positionFromLatLng(
-                                    coord.lat,
-                                    coord.lng
-                                )
-                            );
-                        }
-
-                        for (let i = 0; i < safePathPoints.length; i++) {
-                            const coord = safePathPoints[i];
-                            safePathPolyLine.addPoint(
-                                mapsModule.Position.positionFromLatLng(
-                                    coord.lat,
-                                    coord.lng
-                                )
-                            );
-                        }
-
-                        for (let i = 0; safePath.length; i++) {
-                            const coord = safePath[i];
-                            wayPointPath.addPoint(
-                                mapsModule.Position.positionFromLatLng(
-                                    coord.lat,
-                                    coord.lng
-                                )
-                            );
-                        }
-                        // let wayPointLatLngs = [];
-                        // if(wayPointArr){
-                        //     wayPointArr.forEach((waypoint)=>{
-                        //     wayPointLatLngs.push(new com.google.android.gms.maps.model.LatLng(waypoint[0], waypoint[1]));
-                        //     //let locObj = {location: "", stopover: false};
-                        //     //locObj.location = latlng;
-                        //     //console.log(locObj);
-
-                        //     })
-                        //   console.log("waypoints:", wayPointLatLngs);
-                        //}
-
-                        path.visible = true;
-                        safePathPolyLine.visible = false;
-                        //wayPointPath.visible = true;
-                        path.width = 10;
-                        safePathPolyLine.width = 10;
-                        //wayPointPath.visible = true;
-                        path.geodesic = false;
-                        safePathPolyLine.geodesic = false;
-                        wayPointPath.geodesic = false;
-                        const padding = 150;
-
-                        const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
-                        const start = new mapsModule.Marker({});
-                        // tslint:disable-next-line: max-line-length
-                        start.position = mapsModule.Position.positionFromLatLng(
-                            bikePath[0].lat,
-                            bikePath[0].lng
-                        );
-                        start.title = "Start";
-                        start.snippet = "3, 2, 1, GO";
-                        start.color = "green";
-                        this.markers.push(start);
-                        builder.include(start.android.getPosition());
-                        actualMap.addMarker(start);
-                        const finish = new mapsModule.Marker({});
-                        // tslint:disable-next-line: max-line-length
-                        finish.position = mapsModule.Position.positionFromLatLng(
-                            bikePath[bikePath.length - 1].lat,
-                            bikePath[bikePath.length - 1].lng
-                        );
-                        finish.title = "End";
-                        finish.snippet = "Your Final Destination";
-                        this.markers.push(finish);
-                        builder.include(finish.android.getPosition());
-                        path.color = new Color("black");
-                        safePathPolyLine.color = new Color("red");
-                        //wayPointPath.color = new Color("pink");
-                        actualMap.addMarker(finish);
-                        actualMap.addPolyline(path);
-                        actualMap.addPolyline(safePathPolyLine);
-                        actualMap.addPolyline(wayPointPath);
-                        const bounds = builder.build();
-                        const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(
-                            bounds,
-                            padding
-                        );
-                        actualMap.gMap.animateCamera(newBounds);
-                        this.readyToRide = true;
-                        this.markerSelected = true;
-                        this.bottomButtonText = "Go Now!";
-                    },
-                    err => {
-                        console.log("error", err.message);
-                    },
-                    () => {
-                        console.log("completed");
-                    }
-                );
+              
+                path.visible = true;
+                safePathPolyLine.visible = true;
+                //wayPointPath.visible = true;
+                path.width = 10;
+                safePathPolyLine.width = 10;
+                //wayPointPath.visible = true;
+                path.geodesic = false;
+                safePathPolyLine.geodesic = false;
+                wayPointPath.geodesic = false;
+                const padding = 150;
+                
+                const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
+                const start = new mapsModule.Marker({});
+                // tslint:disable-next-line: max-line-length
+                start.position = mapsModule.Position.positionFromLatLng(bikePath[0].lat, bikePath[0].lng);
+                start.title = "Start";
+                start.snippet = "3, 2, 1, GO";
+                start.color = "green";
+                this.markers.push(start);
+                builder.include(start.android.getPosition());
+                actualMap.addMarker(start);
+                const finish = new mapsModule.Marker({});
+                // tslint:disable-next-line: max-line-length
+                finish.position = mapsModule.Position.positionFromLatLng(bikePath[bikePath.length - 1].lat, bikePath[bikePath.length - 1].lng);
+                finish.title = "End";
+                finish.snippet = "Your Final Destination";
+                this.markers.push(finish);
+                builder.include(finish.android.getPosition());
+                path.color = new Color("black");
+                safePathPolyLine.color = new Color("red");
+                //wayPointPath.color = new Color("pink");
+                actualMap.addMarker(finish);
+                actualMap.addPolyline(path);
+                actualMap.addPolyline(safePathPolyLine);
+                actualMap.addPolyline(wayPointPath);
+                const bounds = builder.build();
+                const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                actualMap.gMap.animateCamera(newBounds);
+                this.readyToRide = true;
+                this.markerSelected = true;
+                this.bottomButtonText = "Go Now!";
+            }, (err) => {
+                console.log("error", err.message);
+            }, () => {
+                console.log("completed");
+            });
         } else if (this.readyToRide === true) {
             console.log("tapped");
             let { polyLine, peterRide } = directionsResponse;
