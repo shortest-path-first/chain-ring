@@ -161,7 +161,6 @@ export class StatsComponent implements OnInit {
             this.http
             .get<Array<storedStats>>(this.ROOT_URL + "/userStats", { params })
             .subscribe((response) => {
-                console.log(response);
                 this.statRecentHolder = response;
                 this.statHolder = response;
                 },
@@ -190,7 +189,7 @@ export class StatsComponent implements OnInit {
         this.displayedAverageSpeed = this.statRecentHolder[0].avgSpeed || null;
         this.displayedTotalDistance = this.statRecentHolder[0].totalDistance;
         this.moneySaved = this.statRecentHolder[0].costSavings;
-        this.pieSource = this.statRecentHolder[0].pieChart;
+        this.lastPieChart();
 
         const timer = (time) => {
             const minutes = Math.floor(time / 60);
@@ -206,7 +205,6 @@ export class StatsComponent implements OnInit {
         this.notRecentView = false;
         this.indieView = false;
         this.recentView = true;
-        this.displayedDuration = "20 minutes";
     }
 
     totalRideTap() {
@@ -221,14 +219,71 @@ export class StatsComponent implements OnInit {
         this.pieSource = this.statTotalHolder.pieChart;
     }
 
-    statDisplayer(text, avgSpeed, totalDistance, pieChart, duration) {
-        console.log(pieChart);
+    statDisplayer(text, avgSpeed, totalDistance, pieChart, duration, breakdown, topSpeed) {
         this.notRecentView = false;
         this.notRecentView = false;
         this.indieView = true;
         this.displayedAverageSpeed = avgSpeed;
         this.displayedTotalDistance = totalDistance;
         this.displayedDuration = duration;
-        this.pieSource = pieChart;
+        const speed = JSON.parse(breakdown);
+        const pieHolder = [];
+        for (const key in speed) {
+            const speedSection = parseInt(key);
+            if (speedSection === 0) {
+                const speedRange = topSpeed * .25;
+                pieHolder.push({ Speed: `0 - ${speedRange}mph`, Amount: speed[key] });
+            }
+            if (speedSection === 1) {
+                const rangeBot = topSpeed * .25;
+                const rangeTop = topSpeed * .50;
+                pieHolder.push({ Speed: `${rangeBot} - ${rangeTop}mph`, Amount: speed[key] });
+
+            }
+            if (speedSection === 2) {
+                const rangeBot = topSpeed * .50;
+                const rangeTop = topSpeed * .75;
+                pieHolder.push({ Speed: `${rangeBot} - ${rangeTop}mph`, Amount: speed[key] });
+
+            }
+            if (speedSection === 3) {
+                const rangeBot = topSpeed * .75;
+                pieHolder.push({ Speed: `${rangeBot} - ${topSpeed}mph`, Amount: speed[key] });
+
+            }
+        }
+        this.pieSource = pieHolder;
+    }
+
+    lastPieChart() {
+        console.log(this.statRecentHolder);
+        const { breakdown, topSpeed} = this.statRecentHolder[0];
+        const speed = JSON.parse(breakdown);
+        const pieHolder = [];
+        for (const key in speed) {
+            const speedSection = parseInt(key);
+            if (speedSection === 0) {
+                const speedRange = topSpeed * .25;
+                pieHolder.push({ Speed: `0 - ${speedRange}mph`, Amount: speed[key] });
+            }
+            if (speedSection === 1) {
+                const rangeBot = topSpeed * .25;
+                const rangeTop = topSpeed * .50;
+                pieHolder.push({ Speed: `${rangeBot} - ${rangeTop}mph`, Amount: speed[key] });
+
+            }
+            if (speedSection === 2) {
+                const rangeBot = topSpeed * .50;
+                const rangeTop = topSpeed * .75;
+                pieHolder.push({ Speed: `${rangeBot} - ${rangeTop}mph`, Amount: speed[key] });
+
+            }
+            if (speedSection === 3) {
+                const rangeBot = topSpeed * .75;
+                pieHolder.push({ Speed: `${rangeBot} - ${topSpeed}mph`, Amount: speed[key] });
+
+            }
+        }
+        this.pieSource = pieHolder;
     }
 }
