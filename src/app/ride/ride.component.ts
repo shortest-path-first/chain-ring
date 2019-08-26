@@ -17,11 +17,11 @@ import { Place } from "../map/map";
 import * as utils from "tns-core-modules/utils/utils";
 import { knownFolders, Folder, File } from "tns-core-modules/file-system";
 import * as Obser from "tns-core-modules/data/observable";
-import { start } from "repl";
+//import { start } from "repl";
 
 declare var com: any;
 
-// const style = require("../../../App_Resources/style.json")
+const style = require("../../../App_Resources/style.json")
 
 const insomnia = require("nativescript-insomnia");
 const mapsModule = require("nativescript-google-maps-sdk");
@@ -50,7 +50,7 @@ export class RideComponent implements OnInit {
     listen;
     speed = 0;
     topSpeed = 0;
-    allSpeeds = [];
+    allSpeeds = []
     callCount = 0;
     currentSpeed = 0;
     speedString = "0";
@@ -154,6 +154,10 @@ export class RideComponent implements OnInit {
         }
         this.listen = false;
         this.recognized = false;
+
+       /**
+        * This function starts the speech recognition interval
+        */
         this.zone.runOutsideAngular(() => {
             this.listenIntervalId = setInterval(() => {
                 if (this.listen === false) {
@@ -167,6 +171,8 @@ export class RideComponent implements OnInit {
                 }
             }, 2000);
         });
+
+        // Load custom icon files
         const potholeImageSource = new ImageSource();
         this.potholeIcon = new Image();
         potholeImageSource.loadFromFile("~/app/images/mapPotHole.png");
@@ -207,6 +213,12 @@ export class RideComponent implements OnInit {
         this.pinClicked = !this.pinClicked;
     }
 
+    /**
+     * Drops corresponding icon image on the map at the user's
+     *  current location when the pin is either selected from 
+     * the pin options or through voice command
+     * @param {string} pinType - 
+     */
     onPinSelect(pinType): void {
         this.pinClicked = false;
 
@@ -243,6 +255,10 @@ export class RideComponent implements OnInit {
             });
     }
 
+    /**
+     *  Function triggered by the touching the home icon.
+     *  Clears all intervals and resets booleans to false.
+     */
     onHomeTap(): void {
         geolocation.clearWatch(this.watchId);
         clearInterval(this.listenIntervalId);
@@ -257,6 +273,16 @@ export class RideComponent implements OnInit {
         });
     }
 
+    /**
+     *  Function to calculate the distance between two coordinates
+     * 
+     * @param {number} lat1 - Number representing the first position's latitude
+     * @param {number} lon1 - Number representing the first position's longitude
+     * @param {number} lat2 - Number representing the second position's latitude
+     * @param {number} lng2 - Number representing the second position's longitude
+     * 
+     * @returns {number} distance in miles overland between coordinates
+     */
     calculateDistance(lat1, lon1, lat2, lon2): number {
         if (lat1 == lat2 && lon1 == lon2) {
             const dist = 0;
@@ -281,6 +307,15 @@ export class RideComponent implements OnInit {
         }
     }
 
+    /**
+     * Function to find the portion of the ride spent at less than 25% of the top speed, 
+     * between 25% and 50% of the top speed, 50% to 75% of the top speed, and between
+     * 75% and 100% of the top speed. The information is then passed to the database and 
+     * the stats page.
+     * @param {Array} speeds - An array of all the speeds recorded when the user's position
+     * is checked by the watchInterval.
+     * @returns {Object} breakdown - returns object with the tally for each speed range
+     */
     findSpeedBreakdown(speeds): Array<any> {
         const breakdown = speeds.reduce((tally, speed) => {
             if (speed < 0.25 * topSpeedHolder) {
@@ -310,27 +345,27 @@ export class RideComponent implements OnInit {
             }
             return tally;
         }, {});
-        // const portions = [];
-        // if(breakdown){
-        //     for (let key in breakdown) {
-        //         portions.push((breakdown[key] / speeds.length * 100).toFixed(1));
-        //     }
-        // }
         return breakdown;
     }
 
+    /**
+     * Function to parse the directions from the Google Directions API. Removes
+     * the html tags from the instructions. Pushes each batch of info into their
+     * designated arrays.
+     */
     directionsParser(): void {
         this.steps.forEach((step) => {
-            this.directionDistances.push(step.distance.text);
-            this.directionWords.push(
-                step.html_instructions.replace(/<\/?[^>]+(>|$)/g, " ")
-            );
-            // this.allDirectionWords.push(step['html_instructions'].replace(/<\/?[^>]+(>|$)/g, " "))
-            this.turnPoints.push(step.end_location);
+        this.directionDistances.push(step.distance.text);
+        this.directionWords.push(step["html_instructions"].replace(/<\/?[^>]+(>|$)/g, " "));
+        this.turnPoints.push(step["end_location"]);
         });
-        console.log(this.directionWords[0]);
+       
     }
 
+    /**
+     *  Function that gets new directions to the destination based on the user's last
+     * recorded location. Reassigns all directional variables with the new info.
+     */
     onReroute(): void {
         const lastLat = this.newPathCoords[this.newPathCoords.length - 1].lat;
         const lastLng = this.newPathCoords[this.newPathCoords.length - 1].long;
@@ -381,8 +416,14 @@ export class RideComponent implements OnInit {
         this.checkForManeuver(29.9778246, -90.0801914);
     }
 
+    /**
+     * Function triggered by tapping the stop button or the user saying "stop ride".
+     * The function clears all the intervals, resets booleans to false, and nullifies 
+     * all closure variables. The function then calculate and gathers all pertinent 
+     * information from the ride and sends it to the database and stats page.
+     */
     onStopTap(): void {
-        console.log("stop:", this.watchId);
+  
         this.stopTime = new Date();
         geolocation.clearWatch(this.watchId);
         this.speechRecognition.stopListening();
@@ -404,7 +445,7 @@ export class RideComponent implements OnInit {
 
         let duration = this.stopTime.getTime() - startTimeHolder.getTime();
         duration = duration / 10000;
-        // console.log("duration", duration);
+        
         const markerSubscription = this.http
             .post(this.ROOT_URL + "/marker", rideMarkers, {
                 headers: new HttpHeaders({
@@ -519,15 +560,28 @@ export class RideComponent implements OnInit {
         this.routerExtensions.navigate(["/stats"], params);
     }
 
+    /**
+     * Function toggles speedometer on and off. Triggered by tapping the
+     * speedometer icon or the user saying "speedometer".
+     */
     onSpeedTap(): void {
-        console.log("Speed Called");
+    
         if (this.show === undefined) {
             this.show = true;
         } else {
             this.show = !this.show;
         }
     }
-
+    
+    /**
+     * Function checks the user's proximity to their next turning point. If the
+     * user is roughly within a block of a turn, their device will vibrate and
+     * an icon indicating the direction of the turn will appear. When the user 
+     * is close enough to the turn, the next set of instructions will appear.
+     * 
+     * @param lat {number} - the latitude of user's current location
+     * @param long {number} - the longitude of the user's current location
+     */
     checkForManeuver(lat, long) {
         // check to make sure there are turnPoints
         if (this.turnPoints.length) {
@@ -634,6 +688,13 @@ export class RideComponent implements OnInit {
         }
     }
 
+    /**
+     * Function that triggers monitoring of movement and sets up function calls for
+     * each time the location is checked. Each interval the current location, speed, 
+     * bearing, and distance are updated. The new coordinates and bearing are then used
+     * to update the polyline on the map and recenter the map's view to the user's new
+     * location.
+     */
     drawUserPath(): void {
         insomnia.keepAwake().then(function() {
             console.log("Insomnia is active");
@@ -752,6 +813,11 @@ export class RideComponent implements OnInit {
         console.log("start", this.watchId, typeof this.watchId);
     }
 
+    /**
+     * Function called on interval to turn on the speech recognition. If 
+     * key phrases are recognized and match text cues, functions will 
+     * trigger. 
+     */
     handleSpeech() {
         this.callCount++;
         // console.log("speech:", this.callCount, new Date());
@@ -897,12 +963,16 @@ export class RideComponent implements OnInit {
         }
     }
 
+    /**
+     * Callback triggered when the Google Map has fully loaded. 
+     * 
+     * @param args - Instance of the Google map.
+     */
     onMapReady(args) {
         this.mapView = args.object;
-
+        this.mapView.setStyle(style);
         const line = polylineHolder;
-        // const line = "yd}uDhjsdPfBG@P@\\`CInCKnFQdGSAW@VJhEL`Fy@BkBFuK^H`FtDM"
-        console.log(this.directedRide);
+    
         if (line !== undefined) {
             this.directedRide = true;
             const flightPlanCoordinates = decodePolyline(line);
@@ -913,30 +983,10 @@ export class RideComponent implements OnInit {
                     mapsModule.Position.positionFromLatLng(coord.lat, coord.lng)
                 );
             }
-            // let bikeLayer = new google.maps.BicyclingLayer()
-            // let bikeLayer = new mapsModule.L
-            // kayer.BicyclingLayer();
-            // this.mapView.set(bikeLayer);
-            const myLatLng = { lat: 29.9688625, lng: -90.0544055 };
-
-            const latLng = new com.google.android.gms.maps.model.LatLng(
-                29.9688625,
-                -90.0544055
-            );
-            const decoded = com.google.maps.android.PolyUtil.decode(line);
-            com.google.maps.android.PolyUtil.isLocationOnEdge(
-                latLng,
-                decoded,
-                true,
-                10e-1
-            );
-
-            // let bicyclingLayer = com.google.maps.android.data.Layer;
-            // console.log(bicyclingLayer);
-            // let KML = new com.google.maps.android.data.kml.KmlLayer(this.mapView, {
-            //     url: "https://data.nola.gov/api/geospatial/8npz-j6vy?method=export&format=KML",
-            //     map: this.mapView,
-            // }, getApplicationContext());
+        
+            // let latLng = new com.google.android.gms.maps.model.LatLng(29.9688625, -90.0544055);
+            // const decoded = com.google.maps.android.PolyUtil.decode(line);
+            // com.google.maps.android.PolyUtil.isLocationOnEdge(latLng, decoded, true, 10e-1);
 
             this.destLat =
                 flightPlanCoordinates[flightPlanCoordinates.length - 1].lat;
@@ -970,8 +1020,7 @@ export class RideComponent implements OnInit {
             .then((result) => {
                 const marker = new mapsModule.Marker();
                 // tslint:disable-next-line: max-line-length
-                // var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
-                // marker.icon = image;
+              
                 marker.position = mapsModule.Position.positionFromLatLng(
                     result.latitude,
                     result.longitude
