@@ -17,7 +17,7 @@ import { Place } from "../map/map";
 import * as utils from "tns-core-modules/utils/utils";
 import { knownFolders, Folder, File } from "tns-core-modules/file-system";
 import * as Obser from "tns-core-modules/data/observable";
-import { start } from "repl";
+//import { start } from "repl";
 
 declare var com: any;
 
@@ -215,7 +215,7 @@ export class RideComponent implements OnInit {
 
     /**
      * Drops corresponding icon image on the map at the user's
-     *  current locationwhen the pin is either selected from 
+     *  current location when the pin is either selected from 
      * the pin options or through voice command
      * @param {string} pinType - 
      */
@@ -349,7 +349,7 @@ export class RideComponent implements OnInit {
     }
 
     /**
-     * Function that parses the directions from the Google Directions API. Removes
+     * Function to parse the directions from the Google Directions API. Removes
      * the html tags from the instructions. Pushes each batch of info into their
      * designated arrays.
      */
@@ -362,6 +362,10 @@ export class RideComponent implements OnInit {
        
     }
 
+    /**
+     *  Function that gets new directions to the destination based on the user's last
+     * recorded location. Reassigns all directional variables with the new info.
+     */
     onReroute(): void {
         const lastLat = this.newPathCoords[this.newPathCoords.length - 1].lat;
         const lastLng = this.newPathCoords[this.newPathCoords.length - 1].long;
@@ -412,6 +416,12 @@ export class RideComponent implements OnInit {
         this.checkForManeuver(29.9778246, -90.0801914);
     }
 
+    /**
+     * Function triggered by tapping the stop button or the user saying "stop ride".
+     * The function clears all the intervals, resets booleans to false, and nullifies 
+     * all closure variables. The function then calculate and gathers all pertinent 
+     * information from the ride and sends it to the database and stats page.
+     */
     onStopTap(): void {
   
         this.stopTime = new Date();
@@ -435,7 +445,7 @@ export class RideComponent implements OnInit {
 
         let duration = this.stopTime.getTime() - startTimeHolder.getTime();
         duration = duration / 10000;
-        // console.log("duration", duration);
+        
         const markerSubscription = this.http
             .post(this.ROOT_URL + "/marker", rideMarkers, {
                 headers: new HttpHeaders({
@@ -550,15 +560,28 @@ export class RideComponent implements OnInit {
         this.routerExtensions.navigate(["/stats"], params);
     }
 
+    /**
+     * Function toggles speedometer on and off. Triggered by tapping the
+     * speedometer icon or the user saying "speedometer".
+     */
     onSpeedTap(): void {
-        console.log("Speed Called");
+    
         if (this.show === undefined) {
             this.show = true;
         } else {
             this.show = !this.show;
         }
     }
-
+    
+    /**
+     * Function checks the user's proximity to their next turning point. If the
+     * user is roughly within a block of a turn, their device will vibrate and
+     * an icon indicating the direction of the turn will appear. When the user 
+     * is close enough to the turn, the next set of instructions will appear.
+     * 
+     * @param lat {number} - the latitude of user's current location
+     * @param long {number} - the longitude of the user's current location
+     */
     checkForManeuver(lat, long) {
         // check to make sure there are turnPoints
         if (this.turnPoints.length) {
@@ -665,6 +688,13 @@ export class RideComponent implements OnInit {
         }
     }
 
+    /**
+     * Function that triggers monitoring of movement and sets up function calls for
+     * each time the location is checked. Each interval the current location, speed, 
+     * bearing, and distance are updated. The new coordinates and bearing are then used
+     * to update the polyline on the map and recenter the map's view to the user's new
+     * location.
+     */
     drawUserPath(): void {
         insomnia.keepAwake().then(function() {
             console.log("Insomnia is active");
@@ -783,6 +813,11 @@ export class RideComponent implements OnInit {
         console.log("start", this.watchId, typeof this.watchId);
     }
 
+    /**
+     * Function called on interval to turn on the speech recognition. If 
+     * key phrases are recognized and match text cues, functions will 
+     * trigger. 
+     */
     handleSpeech() {
         this.callCount++;
         // console.log("speech:", this.callCount, new Date());
@@ -928,12 +963,16 @@ export class RideComponent implements OnInit {
         }
     }
 
+    /**
+     * Callback triggered when the Google Map has fully loaded. 
+     * 
+     * @param args - Instance of the Google map.
+     */
     onMapReady(args) {
         this.mapView = args.object;
         this.mapView.setStyle(style);
         const line = polylineHolder;
-  
-        console.log(this.directedRide);
+    
         if (line !== undefined) {
             this.directedRide = true;
             const flightPlanCoordinates = decodePolyline(line);
@@ -981,8 +1020,7 @@ export class RideComponent implements OnInit {
             .then((result) => {
                 const marker = new mapsModule.Marker();
                 // tslint:disable-next-line: max-line-length
-                // var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
-                // marker.icon = image;
+              
                 marker.position = mapsModule.Position.positionFromLatLng(
                     result.latitude,
                     result.longitude
