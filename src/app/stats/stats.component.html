@@ -33,7 +33,7 @@
         <Label row="0" col="4" rowSpan="1" colSpan="4" class="stats-header" (tap)="recentRideTap()" text="Recent"></Label>
         <Label row="0" col="8" rowSpan="1" colSpan="4" class="stats-header" (tap)="totalRideTap()" text="Total"></Label>
         <StackLayout row="1" col="0" rowSpan="10" colSpan="12"  class="stats-recent-line" height="100%">
-            <Label  *ngFor="let ride of statHolder; let i = index" #index [text]="ride.rideTime" [avgSpeed]="ride.avgSpeed" [totalDistance]="ride.totalDistance" [duration]="ride.duration" height="20%" textWrap="true" (tap)="statDisplayer(index.text, index.avgSpeed, index.totalDistance, index.pieChart, index.duration)"></Label>
+            <Label  *ngFor="let ride of statHolder; let i = index" #index [text]="ride.rideTime" [avgSpeed]="ride.avgSpeed" [totalDistance]="ride.totalDistance" [duration]="ride.duration" [breakdown]="ride.breakdown" [topSpeed]="ride.topSpeed" height="20%" textWrap="true" (tap)="statDisplayer(index.text, index.avgSpeed, index.totalDistance, index.pieChart, index.duration, index.breakdown, index.topSpeed)"></Label>
             
         </StackLayout>
     </GridLayout>
