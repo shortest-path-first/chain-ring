@@ -53,7 +53,7 @@ export class SignupComponent implements OnInit {
                 this.vm.set("writtenContent", res);
                 console.log(res);
                 const options = {
-                    url: `http://ceabe4e9.ngrok.io/login/${res}`,
+                    url: `https://6b409c5a.ngrok.io/login/${res}`,
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -88,7 +88,7 @@ export class SignupComponent implements OnInit {
         console.log("username", username);
         console.log("password", password);
         request({
-            url: `http://ceabe4e9.ngrok.io/userInfo`,
+            url: `https://6b409c5a.ngrok.io/userInfo`,
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

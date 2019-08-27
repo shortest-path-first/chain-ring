@@ -64,7 +64,7 @@ export function tnsOauthLogin(providerType) {
                 );
 
                 const options = {
-                    url: "http://ceabe4e9.ngrok.io/userInfo",
+                    url: "https://6b409c5a.ngrok.io/userInfo",
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

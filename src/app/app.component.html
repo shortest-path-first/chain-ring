@@ -6,8 +6,10 @@ https://docs.nativescript.org/angular/ui/professional-ui-components/ng-SideDrawe
 <RadSideDrawer [drawerTransition]="sideDrawerTransition">
     <GridLayout tkDrawerContent rows="auto, *" class="sidedrawer sidedrawer-left">
         <StackLayout row="0" class="sidedrawer-header">
-            <Label *ngIf=showIcon class="sidedrawer-header-image fa" text="&#xf2bd;" (tap)="onDrawerIconTap()" ></Label>
-            <Image *ngIf=showProPic class="sidedrawer-header-image" src={{imagePath}} stretch="aspectFill"></Image>
+            <!-- <Label *ngIf=showIcon class="sidedrawer-header-image fa" text="&#xf2bd;" (tap)="onDrawerIconTap()" ></Label> -->
+            <!-- <Image *ngIf=showProPic class="sidedrawer-header-image" src={{imagePath}} stretch="aspectFill"></Image> -->
+            <Label style="font-family: PermanentMarker-Regular; color: white; font-size: 50rem; text-align: center;" text="Chainring"></Label>
+            <Label class="footnote" style="font-family: Roboto-Medium; font-size: 15rem; text-align: center;" text="Use hands-free navigation with these voice commands:" textWrap="true"></Label>
             <!-- <Label class="sidedrawer-header-brand" text="{{username}}"></Label> -->
             <!-- <Label class="footnote" text="username@mail.com"></Label> -->
         </StackLayout>
@@ -15,11 +17,11 @@ https://docs.nativescript.org/angular/ui/professional-ui-components/ng-SideDrawe
         <ScrollView row="1" class="sidedrawer-content">
             <StackLayout>
                 <GridLayout columns="auto, *" class="sidedrawer-list-item" [class.selected]="isComponentSelected('/home')" (tap)="onNavItemTap('/home')">
-                    <Label col="0" text="&#xf015;" class="fa"></Label>
-                    <Label col="1" text="Home" class="p-r-10"></Label>
+                    <Label col="0" class="fas" text="&#xf276;" style="font-size: 10rem;"></Label>
+                    <Label col="1" text="Pin Drop Commands" class="p-r-10"></Label>
                 </GridLayout>
 
-                <GridLayout columns="auto, *" class="sidedrawer-list-item" [class.selected]="isComponentSelected('/stats')" (tap)="onNavItemTap('/stats')">
+                <GridLayout columns="auto, *" class="sidedrawer-list-item">
                     <Label col="0" text="&#xf080;" class="fas"></Label>
                     <Label col="1" text="    Stats" class="p-r-10"></Label>
                 </GridLayout>
