@@ -444,7 +444,7 @@ export class RideComponent implements OnInit {
         const last = this.newPathCoords[this.newPathCoords.length - 1];
 
         let duration = this.stopTime.getTime() - startTimeHolder.getTime();
-        duration = duration / 10000;
+        duration = duration / 1000;
         
         const markerSubscription = this.http
             .post(this.ROOT_URL + "/marker", rideMarkers, {
