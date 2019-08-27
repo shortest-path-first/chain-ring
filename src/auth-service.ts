@@ -64,7 +64,7 @@ export function tnsOauthLogin(providerType) {
                 );
 
                 const options = {
-                    url: "http://ceabe4e9.ngrok.io/userInfo",
+                    url: "https://9d8d6231.ngrok.io/userInfo",
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -107,7 +107,7 @@ export function tnsOauthLogin(providerType) {
                                     vm.set("isItemVisible", true);
 
                                     // request({
-                                    //     url: `http://ceabe4e9.ngrok.io/login/${res || "noexist"}`,
+                                    //     url: `https://9d8d6231.ngrok.io/login/${res || "noexist"}`,
                                     //     method: "Patch",
                                     //     headers: {
                                     //         "Content-Type":
