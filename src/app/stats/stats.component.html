@@ -12,7 +12,7 @@
         <Label *ngIf=notRecentView row="1" col="0" colSpan="12" rowSpan="1" class="stats-info-line" text="Average Speed: {{displayedAverageSpeed}} mph"></Label>
         <Label *ngIf=notRecentView row="2" col="0" colSpan="12" rowSpan="1" class="stats-info-line" text="Total Distance: {{displayedTotalDistance}} miles"></Label>
         <Label *ngIf=notRecentView row="3" col="0" colSpan="12" rowSpan="1" class="stats-info-line" text="Duration: {{displayedDuration}}"></Label>
-        <GridLayout *ngIf=displayPie row="5" col="0" colSpan="12" rowSpan="3" height="100%" width="100%">
+        <GridLayout *ngIf=displayPie row="4" col="0" colSpan="12" rowSpan="3" height="100%" width="100%">
             <chart:RadPieChart allowAnimation="true" row="0" class="stats-pie-line">
                 <chart:PieSeries tkPieSeries selectionMode="DataPoint" [items]="pieSource" valueProperty="Amount" legendLabel="Speed" color="white">
                     <chart:PointLabelStyle tkPieLabelStyle textColor="white"></chart:PointLabelStyle>                    
@@ -26,6 +26,10 @@
                 <chart:RadLegendView tkPieLegend position="Right" title="Speeds (based on max speed)" offsetOrigin="TopRight" width="150" enableSelection="true"></chart:RadLegendView>
             </chart:RadPieChart>
         </GridLayout>
+        <maps:mapView *ngIf=displayPie width="95%" height="400" row="7" col="0" rowSpan="3" colSpan="12"[latitude]="latitude" [longitude]="longitude"
+            mapAnimationsEnabled="{{ mapAnimationsEnabled }}" [zoom]="zoom" padding="{{padding}}"
+            (mapReady)="onMapReady($event)">
+        </maps:mapView>
     </GridLayout>
 
     <GridLayout columns="*, *, *, *, *, *, *, *, *, *, *, *" rows="*, *, *, *, *, *, *, *, *, *" width="95%" height="95%" *ngIf=recentView>
@@ -58,6 +62,10 @@
                 <chart:RadLegendView tkPieLegend position="Right" title="Speeds (based on max speed)" offsetOrigin="TopRight" width="150" enableSelection="true"></chart:RadLegendView>
             </chart:RadPieChart>
         </GridLayout>
+        <maps:mapView width="95%" height="400" [latitude]="latitude" [longitude]="longitude"
+            mapAnimationsEnabled="{{ mapAnimationsEnabled }}" [zoom]="zoom" padding="{{padding}}"
+            (mapReady)="onMapReady($event)" (markerSelect)="onMarkerPick($event)" (coordinateTapped)="removeGetDirections()">
+        </maps:mapView>
     </GridLayout>
 </Page>
 

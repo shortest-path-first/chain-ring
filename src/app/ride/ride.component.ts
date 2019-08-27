@@ -124,7 +124,7 @@ export class RideComponent implements OnInit {
         `${this.vm.get("token") || "token"}` + `.txt`
     );
 
-    readonly ROOT_URL = "http://ceabe4e9.ngrok.io";
+    readonly ROOT_URL = "https://9d8d6231.ngrok.io";
 
     // tslint:disable-next-line: max-line-length
     constructor(
@@ -729,9 +729,8 @@ export class RideComponent implements OnInit {
                     const lat = loc.latitude;
                     const long = loc.longitude;
                     this.checkForManeuver(lat, long);
-
                     if (this.newPathCoords.length === 0) {
-                        this.newPathCoords.push({ lat, long });
+                        this.newPathCoords.push([lat, long]);
                         this.mapView.latitude = lat;
                         this.mapView.longitude = long;
                         this.mapView.bearing = loc.direction;
@@ -763,7 +762,7 @@ export class RideComponent implements OnInit {
                             .toFixed(1)
                             .slice(-1);
 
-                        this.newPathCoords.push({ lat, long });
+                        this.newPathCoords.push([lat, long]);
                         newPath.addPoint(
                             mapsModule.Position.positionFromLatLng(
                                 lastLat,

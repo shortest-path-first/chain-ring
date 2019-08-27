@@ -9,6 +9,18 @@ import { RouterExtensions } from "nativescript-angular/router";
 import * as geolocation from "nativescript-geolocation";
 import * as Obser from "tns-core-modules/data/observable";
 import { knownFolders, Folder, File } from "tns-core-modules/file-system";
+import { registerElement } from "nativescript-angular/element-registry";
+import { Color } from "tns-core-modules/color/color";
+
+const decodePolyline = require("decode-google-map-polyline");
+const mapsModule = require("nativescript-google-maps-sdk");
+const polylineEncoder = require("google-polyline");
+
+declare var com: any;
+
+let actualMap;
+
+registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView);
 
 @Component({
     selector: "Stats",
@@ -30,6 +42,10 @@ export class StatsComponent implements OnInit {
     recentView = false;
     indieView = false;
     displayPie = false;
+    markers = [];
+    latitude = 30;
+    longitude = -90.15;
+    zoom = 13;
 
     vm = new Obser.Observable();
     documents: Folder = knownFolders.documents();
@@ -40,7 +56,7 @@ export class StatsComponent implements OnInit {
 
     pieSource: Array<{ Speed: string; Amount: number }> = [];
 
-    readonly ROOT_URL = "http://ceabe4e9.ngrok.io";
+    readonly ROOT_URL = "https://9d8d6231.ngrok.io";
 
     storedStats: Observable<Array<storedStats>>;
 
@@ -188,9 +204,10 @@ export class StatsComponent implements OnInit {
 
     lastRideTap() {
         console.log("get last ride stats");
+        console.log(this.statRecentHolder[0]);
         this.notRecentView = true;
         this.recentView = false;
-        this.displayedAverageSpeed = this.statRecentHolder[0].avgSpeed || null;
+        this.displayedAverageSpeed = this.statRecentHolder[0].avgSpeed || 0;
         this.displayedTotalDistance = this.statRecentHolder[0].totalDistance;
         this.lastPieChart();
         const timer = (time) => {
@@ -200,6 +217,7 @@ export class StatsComponent implements OnInit {
         };
         timer(this.statRecentHolder[0].duration);
         this.displayPie = true;
+
     }
 
     recentRideTap() {
@@ -293,5 +311,53 @@ export class StatsComponent implements OnInit {
             }
         }
         this.pieSource = pieHolder;
+    }
+    onMapReady(args) {
+        console.log ("map reassign");
+        actualMap = args.object;
+        const gMap = actualMap.gMap;
+        const uiSettings = gMap.getUiSettings();
+        uiSettings.setMyLocationButtonEnabled(true);
+        uiSettings.setCompassEnabled(true);
+        uiSettings.setMapToolbarEnabled(false);
+        uiSettings.setZoomControlsEnabled(true);
+        uiSettings.setCompassEnabled(true);
+        gMap.setMyLocationEnabled(true);
+        if(this.notRecentView){
+            const { polyLine } = this.statRecentHolder[0];
+            const bikePath = decodePolyline(polyLine);
+            const path = new mapsModule.Polyline();
+            for (let i = 0; i < bikePath.length; i++) {
+                const coord = bikePath[i];
+                path.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
+            }
+            path.visible = true;
+            path.width = 10;
+            path.geodesic = false;
+            const padding = 150;
+            const builder = new com.google.android.gms.maps.model.LatLngBounds.Builder();
+            const start = new mapsModule.Marker({});
+            // tslint:disable-next-line: max-line-length
+            start.position = mapsModule.Position.positionFromLatLng(bikePath[0].lat, bikePath[0].lng);
+            start.title = "Start";
+            start.snippet = "3, 2, 1, GO";
+            start.color = "green";
+            this.markers.push(start);
+            builder.include(start.android.getPosition());
+            actualMap.addMarker(start);
+            const finish = new mapsModule.Marker({});
+            // tslint:disable-next-line: max-line-length
+            finish.position = mapsModule.Position.positionFromLatLng(bikePath[bikePath.length - 1].lat, bikePath[bikePath.length - 1].lng);
+            finish.title = "End";
+            finish.snippet = "Your Final Destination";
+            this.markers.push(finish);
+            builder.include(finish.android.getPosition());
+            path.color = new Color("black");
+            actualMap.addMarker(finish);
+            actualMap.addPolyline(path);
+            const bounds = builder.build();
+            const newBounds = com.google.android.gms.maps.CameraUpdateFactory.newLatLngBounds(bounds, padding);
+            actualMap.gMap.animateCamera(newBounds);
+        }
     }
 }
