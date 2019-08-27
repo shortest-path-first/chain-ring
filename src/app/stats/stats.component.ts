@@ -312,6 +312,7 @@ export class StatsComponent implements OnInit {
         }
         this.pieSource = pieHolder;
     }
+    
     onMapReady(args) {
         console.log ("map reassign");
         actualMap = args.object;
