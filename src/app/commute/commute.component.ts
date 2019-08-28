@@ -38,7 +38,7 @@ export class CommuteComponent implements OnInit {
         `${this.vm.get("token") || "token"}` + `.txt`
     );
 
-    readonly ROOT_URL = "https://9d8d6231.ngrok.io";
+    readonly ROOT_URL = "https://6b409c5a.ngrok.io";
 
     // tslint:disable-next-line: max-line-length
 
