@@ -31,6 +31,7 @@ export class CommuteComponent implements OnInit {
     workLat;
     workLng;
 
+    // code below allows us to access the user token to get db info
     vm = new Obser.Observable();
     documents: Folder = knownFolders.documents();
     folder: Folder = this.documents.getFolder(this.vm.get("src") || "src");
@@ -38,21 +39,18 @@ export class CommuteComponent implements OnInit {
         `${this.vm.get("token") || "token"}` + `.txt`
     );
 
-    readonly ROOT_URL = "https://9d8d6231.ngrok.io";
-
-    // tslint:disable-next-line: max-line-length
+    readonly ROOT_URL = "http://3.17.64.34:3000";
 
     constructor(
         private http: HttpClient,
         private routerExtensions: RouterExtensions
-    ) {
-        // Use the component constructor to inject providers.
-    }
+    ) {}
 
     ngOnInit(): void {
-        // Init your component properties here.
-        this.getLocations();
+        // request to save users location
         this.getUserLoc();
+        // get the users saved commute locations
+        this.getLocations();
     }
 
     getUserLoc() {
@@ -76,8 +74,7 @@ export class CommuteComponent implements OnInit {
     }
 
     routeToRide(lat, lng) {
-        console.log(lat, lng);
-        // tslint:disable-next-line: max-line-length
+        // sets new params to get the route to pass to ride screen.
         const params = new HttpParams()
             .set("place", `${lat},${lng}`)
             .set("userLoc", `${this.latitude},${this.longitude}`);
@@ -108,10 +105,10 @@ export class CommuteComponent implements OnInit {
     }
 
     getLocations() {
-        // tslint:disable-next-line: max-line-length
+        // gets user token as res
         this.file.readText()
             .then((res) => {
-                // tslint:disable-next-line: max-line-length
+                // search db to get users saved locations
                 const params = new HttpParams().set("token", `${res}`);
                 this.http
                     .get<Array<Commute>>(this.ROOT_URL + "/location", { params })
@@ -125,6 +122,7 @@ export class CommuteComponent implements OnInit {
             });
     }
 
+    // switches to location add screen
     addLocation() {
         const param: NavigationExtras = {
             queryParams: {
@@ -133,7 +131,8 @@ export class CommuteComponent implements OnInit {
         };
         this.routerExtensions.navigate(["/locationAdd"], param);
     }
-
+    
+    // gives user ability to go back to home screen
     homeTap(navItemRoute: string): void {
         this.routerExtensions.navigate([navItemRoute], {
             transition: {

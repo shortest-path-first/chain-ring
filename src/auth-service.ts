@@ -64,7 +64,7 @@ export function tnsOauthLogin(providerType) {
                 );
 
                 const options = {
-                    url: "https://9d8d6231.ngrok.io/userInfo",
+                    url: "http://3.17.64.34:3000/userInfo",
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -107,7 +107,7 @@ export function tnsOauthLogin(providerType) {
                                     vm.set("isItemVisible", true);
 
                                     // request({
-                                    //     url: `https://9d8d6231.ngrok.io/login/${res || "noexist"}`,
+                                    //     url: `http://3.17.64.34:3000/login/${res || "noexist"}`,
                                     //     method: "Patch",
                                     //     headers: {
                                     //         "Content-Type":

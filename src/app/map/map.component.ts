@@ -42,6 +42,7 @@ registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView
     templateUrl: "./map.component.html"
 })
 export class MapComponent implements OnInit {
+    // set some default values as well as some global variables for use later
     showDirections = false;
     compPoly;
     latitude = 30;
@@ -72,7 +73,7 @@ export class MapComponent implements OnInit {
     crashIcon = null;
     stolenIcon = null;
 
-    readonly ROOT_URL = "https://9d8d6231.ngrok.io";
+    readonly ROOT_URL = "http://3.17.64.34:3000";
 
     places: Observable<Array<Place>>;
 
@@ -85,8 +86,7 @@ export class MapComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        // Init your component properties here.
-
+        // get users location for later use
         geolocation.enableLocationRequest();
         geolocation
             .getCurrentLocation({
@@ -99,6 +99,7 @@ export class MapComponent implements OnInit {
                 this.latitude = result.latitude;
                 this.longitude = result.longitude;
             });
+        // import images to allow for use later
         const potholeImageSource = new ImageSource();
         this.potholeIcon = new Image();
         potholeImageSource.loadFromFile("~/app/images/mapPotHole.png");
@@ -133,7 +134,6 @@ export class MapComponent implements OnInit {
     getPlaces(text) {
         // search params from search bar
         this.readyToRide = false;
-
         const params = new HttpParams()
             .set("place", text)
             .set("userLoc", `${this.latitude},${this.longitude}`);
@@ -142,7 +142,7 @@ export class MapComponent implements OnInit {
             "*"
         );
         const stuff = { params, headers };
-
+        // remove previous markers
         this.markers.forEach(marker => {
             marker.visible = false;
         });
@@ -200,6 +200,7 @@ export class MapComponent implements OnInit {
     }
 
     removeGetDirections() {
+        // removes items from the map
         this.markerSelected = false;
         this.markers.forEach(marker => {
             marker.visible = false;
@@ -232,6 +233,7 @@ export class MapComponent implements OnInit {
         gMap.setMyLocationEnabled(true);
     }
 
+    // gets alternative routes to present to user when searching for routes
     getAlternative() {
         const params = new HttpParams()
             .set("place", `${markerLat},${markerLng}`)
@@ -248,6 +250,7 @@ export class MapComponent implements OnInit {
             });
     }
 
+    // changes the string that will be used when opening ride component
     onRouteTap(str) {
         this.selectedRoute = str;
         this.safest = !this.safest;
@@ -277,20 +280,13 @@ export class MapComponent implements OnInit {
             this.http.get<Array<Place>>(this.ROOT_URL + "/mapPolyline", { params }).subscribe((response) => {
                 // reassigns response to variable to avoid dealing with "<Place[]>"
                 directionsResponse = response;
+                // tslint:disable-next-line: max-line-length
                 const { turnByTurn, peterRide, safePath, wayPointArr, safePolyline, safeRide, safeTurnByTurn} = directionsResponse;
-                let { polyLine } = directionsResponse;
-        
+                const { polyLine } = directionsResponse;
+                // reassigns variables and also makes the information used to be used
                 this.safeRidePolyline = safePolyline;
                 this.safeRideFlat = safeRide.flat();
                 safeTurnBy = safeTurnByTurn.flat();
-                // let decoded = com.google.maps.android.PolyUtil.decode(polyLine);
-                //let decodedSafe = com.google.maps.android.PolyUtil.decode(safePolyline);
-                //console.log("SafePath:", safePolyline);
-
-                // if (com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, decoded, true, 75)){
-                //     this.getAlternative();
-                // }
-                //console.log("Overlap:", com.google.maps.android.PolyUtil.isLocationOnEdge(this.latLng, decoded, true, 75));
                 peterInfo = peterRide;
                 turnBy = turnByTurn;
                 this.turnByList = turnBy;
@@ -303,41 +299,23 @@ export class MapComponent implements OnInit {
                 this.safePoly = safePathPolyLine; 
                 const wayPointPath = new mapsModule.Polyline();
                 this.compPoly = path;
-               
-                // tslint:disable-next-line: prefer-for-of
                 for (let i = 0; i < bikePath.length; i++) {
                     const coord = bikePath[i];
                     path.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
                 }
-             
                 for (let i = 0; i < safePathPoints.length; i++){
                     const coord = safePathPoints[i];
                     safePathPolyLine.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
                 }
-
                 for (let i = 0; safePath.length; i++) {
                     const coord = safePath[i];
                     wayPointPath.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
                 }
-                // let wayPointLatLngs = [];
-                // if(wayPointArr){
-                //     wayPointArr.forEach((waypoint)=>{
-                //     wayPointLatLngs.push(new com.google.android.gms.maps.model.LatLng(waypoint[0], waypoint[1]));
-                //     //let locObj = {location: "", stopover: false};
-                //     //locObj.location = latlng;
-                //     //console.log(locObj);
-                  
-                //     })
-                 //   console.log("waypoints:", wayPointLatLngs);
-                //}
 
-              
                 path.visible = true;
                 safePathPolyLine.visible = true;
-                //wayPointPath.visible = true;
                 path.width = 10;
                 safePathPolyLine.width = 10;
-                //wayPointPath.visible = true;
                 path.geodesic = false;
                 safePathPolyLine.geodesic = false;
                 wayPointPath.geodesic = false;
@@ -362,7 +340,6 @@ export class MapComponent implements OnInit {
                 builder.include(finish.android.getPosition());
                 path.color = new Color("black");
                 safePathPolyLine.color = new Color("red");
-                //wayPointPath.color = new Color("pink");
                 actualMap.addMarker(finish);
                 actualMap.addPolyline(path);
                 actualMap.addPolyline(safePathPolyLine);
@@ -414,6 +391,7 @@ export class MapComponent implements OnInit {
         });
     }
 
+    // displays hazard on the map
     displayHazards() {
         console.log("yes");
         this.http.get<Array<Place>>(this.ROOT_URL + "/marker").subscribe(

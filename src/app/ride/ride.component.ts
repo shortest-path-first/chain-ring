@@ -124,7 +124,7 @@ export class RideComponent implements OnInit {
         `${this.vm.get("token") || "token"}` + `.txt`
     );
 
-    readonly ROOT_URL = "https://9d8d6231.ngrok.io";
+    readonly ROOT_URL = "http://3.17.64.34:3000";
 
     // tslint:disable-next-line: max-line-length
     constructor(

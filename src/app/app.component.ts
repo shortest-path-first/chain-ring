@@ -113,7 +113,7 @@ export class AppComponent implements OnInit {
                         vm.set("writtenContent", res);
 
                         request({
-                            url: `https://9d8d6231.ngrok.io/logout`,
+                            url: `http://3.17.64.34:3000/logout`,
                             method: "PATCH",
                             headers: {
                                 "Content-Type":
