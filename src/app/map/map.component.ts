@@ -314,6 +314,12 @@ export class MapComponent implements OnInit {
                     this.safePoly = safePathPolyLine; 
                     const wayPointPath = new mapsModule.Polyline();
                     this.compPoly = path;
+                    
+                    for(let i = 0; i < wayPointArr.length; i++){
+                        const coord = wayPointArr[i];
+                        console.log(coord);
+                        wayPointPath.addPoint(mapsModule.Position.positionFromLatLng(coord.lat, coord.lng));
+                    }
                    
                     // tslint:disable-next-line: prefer-for-of
                     for (let i = 0; i < bikePath.length; i++) {
@@ -342,10 +348,10 @@ export class MapComponent implements OnInit {
                     //}
                     path.visible = true;
                     safePathPolyLine.visible = true;
-                    //wayPointPath.visible = true;
+                    wayPointPath.visible = true;
                     path.width = 10;
                     safePathPolyLine.width = 10;
-                    //wayPointPath.visible = true;
+                    wayPointPath.width = 20;
                     path.geodesic = false;
                     safePathPolyLine.geodesic = false;
                     wayPointPath.geodesic = false;
@@ -370,7 +376,7 @@ export class MapComponent implements OnInit {
                     builder.include(finish.android.getPosition());
                     path.color = new Color("black");
                     safePathPolyLine.color = new Color("red");
-                    //wayPointPath.color = new Color("pink");
+                    //wayPointPath.color = new Color("blue");
                     actualMap.addMarker(finish);
                     actualMap.addPolyline(path);
                     actualMap.addPolyline(safePathPolyLine);
