@@ -50,7 +50,7 @@ export class LocationAddComponent implements OnInit {
         `${this.vm.get("token") || "token"}` + `.txt`
     );
 
-    readonly ROOT_URL = "http://ceabe4e9.ngrok.io";
+    readonly ROOT_URL = "https://9d8d6231.ngrok.io";
 
     places: Observable<Array<Place>>;
 

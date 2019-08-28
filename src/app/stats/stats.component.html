@@ -12,20 +12,24 @@
         <Label *ngIf=notRecentView row="1" col="0" colSpan="12" rowSpan="1" class="stats-info-line" text="Average Speed: {{displayedAverageSpeed}} mph"></Label>
         <Label *ngIf=notRecentView row="2" col="0" colSpan="12" rowSpan="1" class="stats-info-line" text="Total Distance: {{displayedTotalDistance}} miles"></Label>
         <Label *ngIf=notRecentView row="3" col="0" colSpan="12" rowSpan="1" class="stats-info-line" text="Duration: {{displayedDuration}}"></Label>
-        <GridLayout *ngIf=displayPie row="5" col="0" colSpan="12" rowSpan="3" height="100%" width="100%">
+        <GridLayout *ngIf=displayPie row="4" col="0" colSpan="12" rowSpan="3" height="100%" width="100%">
             <chart:RadPieChart allowAnimation="true" row="0" class="stats-pie-line">
                 <chart:PieSeries tkPieSeries selectionMode="DataPoint" [items]="pieSource" valueProperty="Amount" legendLabel="Speed" color="white">
                     <chart:PointLabelStyle tkPieLabelStyle textColor="white"></chart:PointLabelStyle>                    
                 </chart:PieSeries>
                 <chart:Palette tkPiePalette>
-                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="10" fillColor="#ff0048" strokeColor="#ffffff"></PaletteEntry>
-                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="10" fillColor="#48ff00" strokeColor="#ffffff"></PaletteEntry>
-                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="10" fillColor="#0091ff" strokeColor="#ffffff"></PaletteEntry>
-                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="10" fillColor="#ff5e00" strokeColor="#ffffff"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="13" fillColor="#000000" strokeColor="#000000"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="13" fillColor="#393ef9" strokeColor="#000000"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="13" fillColor="#b3b3b3" strokeColor="#000000"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="13" fillColor="#9c27b0" strokeColor="#000000"></PaletteEntry>
                 </chart:Palette>
                 <chart:RadLegendView tkPieLegend position="Right" title="Speeds (based on max speed)" offsetOrigin="TopRight" width="150" enableSelection="true"></chart:RadLegendView>
             </chart:RadPieChart>
         </GridLayout>
+        <maps:mapView *ngIf=displayPie width="95%" height="400" row="7" col="0" rowSpan="3" colSpan="12"[latitude]="latitude" [longitude]="longitude"
+            mapAnimationsEnabled="{{ mapAnimationsEnabled }}" [zoom]="zoom" padding="{{padding}}"
+            (mapReady)="onMapReady($event)">
+        </maps:mapView>
     </GridLayout>
 
     <GridLayout columns="*, *, *, *, *, *, *, *, *, *, *, *" rows="*, *, *, *, *, *, *, *, *, *" width="95%" height="95%" *ngIf=recentView>
@@ -33,7 +37,7 @@
         <Label row="0" col="4" rowSpan="1" colSpan="4" class="stats-header" (tap)="recentRideTap()" text="Recent"></Label>
         <Label row="0" col="8" rowSpan="1" colSpan="4" class="stats-header" (tap)="totalRideTap()" text="Total"></Label>
         <StackLayout row="1" col="0" rowSpan="10" colSpan="12"  class="stats-recent-line" height="100%">
-            <Label  *ngFor="let ride of statHolder; let i = index" #index [text]="ride.rideTime" [avgSpeed]="ride.avgSpeed" [totalDistance]="ride.totalDistance" [duration]="ride.duration" [breakdown]="ride.breakdown" [topSpeed]="ride.topSpeed" height="20%" textWrap="true" (tap)="statDisplayer(index.text, index.avgSpeed, index.totalDistance, index.pieChart, index.duration, index.breakdown, index.topSpeed)"></Label>
+            <Label  *ngFor="let ride of statHolder; let i = index" #index [text]="ride.rideTime" [avgSpeed]="ride.avgSpeed" [totalDistance]="ride.totalDistance" [duration]="ride.duration" [breakdown]="ride.breakdown" [topSpeed]="ride.topSpeed" height="20%" textWrap="true" (tap)="statDisplayer(index.avgSpeed, index.totalDistance, index.duration, index.breakdown, index.topSpeed)"></Label>
             
         </StackLayout>
     </GridLayout>
@@ -50,14 +54,18 @@
                     <chart:PointLabelStyle tkPieLabelStyle textColor="white"></chart:PointLabelStyle>
                 </chart:PieSeries>
                 <chart:Palette tkPiePalette>
-                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="10" fillColor="#ff0048" strokeColor="#ffffff"></PaletteEntry>
-                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="10" fillColor="#48ff00" strokeColor="#ffffff"></PaletteEntry>
-                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="10" fillColor="#0091ff" strokeColor="#ffffff"></PaletteEntry>
-                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="10" fillColor="#ff5e00" strokeColor="#ffffff"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="13" fillColor="#000000" strokeColor="#000000"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="13" fillColor="#393ef9" strokeColor="#000000"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="13" fillColor="#b3b3b3" strokeColor="#000000"></PaletteEntry>
+                    <chart:PaletteEntry tkPiePaletteEntry strokeWidth="13" fillColor="#9c27b0" strokeColor="#000000"></PaletteEntry>
                     </chart:Palette>
                 <chart:RadLegendView tkPieLegend position="Right" title="Speeds (based on max speed)" offsetOrigin="TopRight" width="150" enableSelection="true"></chart:RadLegendView>
             </chart:RadPieChart>
         </GridLayout>
+        <maps:mapView width="95%" height="400" [latitude]="latitude" [longitude]="longitude"
+            mapAnimationsEnabled="{{ mapAnimationsEnabled }}" [zoom]="zoom" padding="{{padding}}"
+            (mapReady)="onMapReady($event)" (markerSelect)="onMarkerPick($event)" (coordinateTapped)="removeGetDirections()">
+        </maps:mapView>
     </GridLayout>
 </Page>
 
