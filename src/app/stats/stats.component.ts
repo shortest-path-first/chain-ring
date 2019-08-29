@@ -28,6 +28,7 @@ registerElement("MapView", () => require("nativescript-google-maps-sdk").MapView
     templateUrl: "./stats.component.html"
 })
 export class StatsComponent implements OnInit {
+    // sets some default variables as well as some global ones used later
     displayedDuration;
     displayedAverageSpeed;
     displayedTotalDistance;
@@ -35,7 +36,6 @@ export class StatsComponent implements OnInit {
     moneySaved = 90000;
     duration = 5;
     statTotalHolder;
-    // tslint:disable-next-line: max-line-length
     statRecentHolder;
     statHolder: Array<object> = [];
     notRecentView = true;
@@ -47,6 +47,7 @@ export class StatsComponent implements OnInit {
     longitude = -90.15;
     zoom = 13;
 
+    // allows us to retrieve the use token later
     vm = new Obser.Observable();
     documents: Folder = knownFolders.documents();
     folder: Folder = this.documents.getFolder(this.vm.get("src") || "src");
@@ -56,19 +57,17 @@ export class StatsComponent implements OnInit {
 
     pieSource: Array<{ Speed: string; Amount: number }> = [];
 
-    readonly ROOT_URL = "https://9d8d6231.ngrok.io";
+    readonly ROOT_URL = "http://3.17.64.34:3000";
 
     storedStats: Observable<Array<storedStats>>;
 
-    // tslint:disable-next-line: max-line-length
     constructor(
         private http: HttpClient,
         private router: Router,
         private route: ActivatedRoute,
         private routerExtensions: RouterExtensions
     ) {
-        // Use the component constructor to inject providers.
-
+        // request to get recent and total stats from database on component inti
         this.userTotalStats();
         this.userRecentStats();
         this.route.queryParams.subscribe((params) => {
@@ -139,6 +138,7 @@ export class StatsComponent implements OnInit {
     }
 
     userTotalStats() {
+        // uses user token to get params and then redisplays db info on the totals section of the stats page
         this.file.readText()
         .then((res) => {
             const params = new HttpParams().set("token", `${res}`);
@@ -174,6 +174,7 @@ export class StatsComponent implements OnInit {
     }
 
     userRecentStats() {
+                // uses user token to get params and then redisplays db info on the recents section of the stats page
         this.file.readText()
         .then((res) => {
             const params = new HttpParams().set("token", res);
@@ -203,8 +204,7 @@ export class StatsComponent implements OnInit {
     }
 
     lastRideTap() {
-        console.log("get last ride stats");
-        console.log(this.statRecentHolder[0]);
+        // uses user token to get params and then redisplays db info for last ride taken
         this.notRecentView = true;
         this.recentView = false;
         this.displayedAverageSpeed = this.statRecentHolder[0].avgSpeed || 0;
@@ -221,6 +221,7 @@ export class StatsComponent implements OnInit {
     }
 
     recentRideTap() {
+        // changes view to show the most recent 5 rides
         console.log("get recent ride stats");
         this.notRecentView = false;
         this.indieView = false;
@@ -228,6 +229,7 @@ export class StatsComponent implements OnInit {
     }
 
     totalRideTap() {
+        // shows total stats fro all rides
         console.log("get total ride stats");
         this.notRecentView = true;
         this.recentView = false;
@@ -240,6 +242,7 @@ export class StatsComponent implements OnInit {
     }
 
     statDisplayer(avgSpeed, totalDistance, duration, breakdown, topSpeed) {
+        // when choosing an individual ride from the recent ride screen
         this.notRecentView = false;
         this.notRecentView = false;
         this.indieView = true;
@@ -284,6 +287,7 @@ export class StatsComponent implements OnInit {
     }
 
     lastPieChart() {
+        // gives the user the latest piechart information
         console.log(this.statRecentHolder);
         const { breakdown, topSpeed} = this.statRecentHolder[0];
         const speed = JSON.parse(breakdown);

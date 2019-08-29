@@ -34,6 +34,7 @@ registerElement(
     templateUrl: "./locationAdd.component.html"
 })
 export class LocationAddComponent implements OnInit {
+    // setting some default values to also reuse as global variables later
     latitude = 30;
     longitude = -90.15;
     zoom = 13;
@@ -42,7 +43,8 @@ export class LocationAddComponent implements OnInit {
     markerSelected = false;
     bottomButtonText = "Save Location";
     locName = "";
-
+    
+    // allows us to access the user token later on
     vm = new Obser.Observable();
     documents: Folder = knownFolders.documents();
     folder: Folder = this.documents.getFolder(this.vm.get("src") || "src");
@@ -50,7 +52,7 @@ export class LocationAddComponent implements OnInit {
         `${this.vm.get("token") || "token"}` + `.txt`
     );
 
-    readonly ROOT_URL = "https://9d8d6231.ngrok.io";
+    readonly ROOT_URL = "http://3.17.64.34:3000";
 
     places: Observable<Array<Place>>;
 
@@ -60,14 +62,10 @@ export class LocationAddComponent implements OnInit {
         private routerExtensions: RouterExtensions
     ) {
         // Use the component constructor to inject providers.
-        this.route.queryParams.subscribe((params) => {
-            const { user } = params;
-            userEmail = user;
-        });
     }
 
     ngOnInit(): void {
-        // Init your component properties here.
+        // retrieves user location and assigned to a global variable
         geolocation.enableLocationRequest();
         geolocation
             .getCurrentLocation({
@@ -173,9 +171,8 @@ export class LocationAddComponent implements OnInit {
     }
 
     saveLocation() {
-        console.log("button press");
-        console.log(markerLat, markerLng, this.locName);
         const info = {};
+        // gets user token and adds info to database with user info as key
         this.file.readText()
             .then((res) => {
                 // tslint:disable-next-line: max-line-length

@@ -44,7 +44,7 @@ export class LoginComponent implements OnInit {
                     res = "";
                 }
                 const options = {
-                    url: `https://6b409c5a.ngrok.io/login/${res}`,
+                    url: `http://3.17.64.34:3000/login/${res}`,
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -78,7 +78,7 @@ export class LoginComponent implements OnInit {
         console.log("username", username);
         console.log("password", password);
         request({
-            url: `https://6b409c5a.ngrok.io/login`,
+            url: `http://3.17.64.34:3000/login`,
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

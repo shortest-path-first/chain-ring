@@ -34,7 +34,7 @@ export class HomeComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        // Init your component properties here.
+        // get user locations
         geolocation.enableLocationRequest();
         geolocation
             .getCurrentLocation({
@@ -49,7 +49,8 @@ export class HomeComponent implements OnInit {
             geolocation.clearWatch(i);
             clearInterval(i);
         }
-
+        
+        // save the token of the user
         this.file.readText().then(res => {
             this.vm.set("writtenContent", res);
             console.log("Response Token", res);
