@@ -11,60 +11,44 @@ https://docs.nativescript.org/angular/ui/professional-ui-components/ng-SideDrawe
         </StackLayout>
         <ScrollView row="1" class="sidedrawer-content">
             <StackLayout>
-                <GridLayout columns="auto, *" class="sidedrawer-list-item" [class.selected]="isComponentSelected('/home')" (tap)="onNavItemTap('/home')">
+                <GridLayout columns="*, *, *, *, *" rows="*, *, *, *, *" class="sidedrawer-list-item" height="100%">
                     <Label col="0" class="fas" text="&#xf276;" style="font-size: 30rem;"></Label>
-                    <Label col="1" text="Pin Drop Commands" style="text-align: center; font-family: Roboto-Medium; font-size: 20rem; text-decoration: underline;" class="p-r-10"></Label>
+                    <Label col="1" colSpan="4"  text="Pin Drop Commands" style="text-align: center; font-family: Roboto-Medium; font-size: 20rem; text-decoration: underline;" class="p-r-10"></Label>
+                    <Image src="~/app/images/mapPotHole.png" row="1" col="0" rowSpan="1" colSpan="1"></Image>
+                    <Label text="&quot;PotHole!&quot;" textWrap=True row="1" col="1" rowSpan="1" colSpan="4" style="font-size: 20em; color: black; text-align: center; font-family: Roboto-Medium;"></Label>
+                    <Image src="~/app/images/mapAvoid.png" row="3" col="0" rowSpan="1" colSpan="1"></Image>
+                    <Label text="&quot;Close Call!&quot;" textWrap=True row="2" col="1" rowSpan="1" colSpan="4" style="font-size: 20em; color: black; text-align: center; font-family: Roboto-Medium;"></Label>
+                    <Image src="~/app/images/mapNearMiss.png" row="2" col="0" rowSpan="1" colSpan="1"></Image>
+                    <Label text="&quot;Avoid!&quot;" textWrap=True row="3" col="1" rowSpan="1" colSpan="4" style="font-size: 20em; color: black; text-align: center; font-family: Roboto-Medium;"></Label>                
                 </GridLayout>
-                <GridLayout columns="*, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *" rows="*, *, *" class="sidedrawer-list-item">
-                        <Image src="./images/mapPotHole.png" row="0" col="0" rowSpan="2" colSpan="2">
-                        </Image>
-                    <!-- <Label col="4" text="Pothole"></Label> -->
-                </GridLayout>
-
-                <GridLayout columns="auto, *" class="sidedrawer-list-item">
-                    <Label col="0" text="&#xf080;" class="fas"></Label>
-                    <Label col="1" text="    Stats" class="p-r-10"></Label>
-                </GridLayout>
-
-                <!-- <GridLayout columns="auto, *" class="sidedrawer-list-item" [class.selected]="isComponentSelected('/login')" (tap)="onNavItemTap('/login')">
-                    <Label col="0" text="&#xf002;" class="fa"></Label>
-                    <Label col="1" text="Login" class="p-r-10"></Label>
-                </GridLayout> -->
-                <StackLayout class="hr-light"></StackLayout>
-                    <GridLayout columns="auto, *" class="sidedrawer-list-item">
-                        <Label col="0" class="fas" text="&#xf5a0;" style="font-size: 30rem;"></Label>
-                        <Label col="1" text="Map Commands"
-                            style="text-align: center; font-family: Roboto-Medium; font-size: 20rem; text-decoration: underline;"
-                            class="p-r-10"></Label>
-                    </GridLayout>
-                    <!-- <GridLayout columns="auto, *" class="sidedrawer-list-item">
-                        <Label col="0" row="1" text="&quot;Zoom In&quot;" style="text-align: center; font-family: Roboto-Medium; font-size: 18rem;"></Label>
-                        <Label col="2" row="2" text="&quot;Zoom Out&quot;"></Label>
-                    </GridLayout> -->
-                <FlexboxLayout flexDirection="row" align-items="stretch" justifyContent="center">
-                    <FlexboxLayout flexDirection="column" align-items="stretch" justifyContent="space-between">
-                        <Label text="&quot;Lost&quot;" style="text-align: center; font-family: Roboto-Medium; font-size: 18rem;"></Label>
-                        <Label text="&quot;Zoom In&quot;" style="text-align: center; font-family: Roboto-Medium; font-size: 18rem;"></Label>
-                        <Label text="&quot;Zoom Out&quot;" style="text-align: center; font-family: Roboto-Medium; font-size: 18rem;"></Label>
-                        </FlexboxLayout>
-                        <FlexboxLayout flexDirection="column" align-items="stretch" justifyContent="space-between">
-                            <Label text="- reroutes from location" textWrap="true"></Label>
-                            <Label text="-    zooms map in"></Label>
-                            <Label text="-    zooms map out"></Label>    
-                        </FlexboxLayout>
-                    </FlexboxLayout>
                         <StackLayout class="hr-light"></StackLayout>
-                    <GridLayout columns="auto, *" class="sidedrawer-list-item">
-                        <Label col="0" class="fas" text="&#xf206;" style="font-size: 30rem;"></Label>
-                        <Label col="1" text="Ride Commands"
-                            style="text-align: center; font-family: Roboto-Medium; font-size: 20rem; text-decoration: underline;"
-                            class="p-r-10"></Label>
-                    </GridLayout>
 
-                <GridLayout columns="auto, *" class="sidedrawer-list-item" [class.selected]="isComponentSelected('/settings')" (tap)="onNavItemTap('/settings')">
+
+                <GridLayout columns="*, *, *, *, *" rows="*, *, *, *, *" class="sidedrawer-list-item" height="100%">
+                    <Label col="0" class="fas" text="&#xf5a0;" style="font-size: 30rem;"></Label>
+                    <Label col="1" colSpan="4" text="Map Commands" style="text-align: center; font-family: Roboto-Medium; font-size: 20rem; text-decoration: underline;" class="p-r-10"></Label>
+                    <Label text="&quot;Lost&quot;" row="1" col="0" rowSpan="1" colSpan="2" style="font-size: 20rem;"></Label>
+                    <Label text="- reroutes ride" textWrap=True row="1" col="2" rowSpan="1" colSpan="3" style="font-size: 20em; color: black; text-align: left; font-family: Roboto-Medium;"></Label>
+                    <Label text="&quot;Zoom In&quot;" row="3" col="0" rowSpan="1" colSpan="2" style="font-size: 20rem;"></Label>
+                    <Label text="- zooms map in" textWrap=True row="2" col="2" rowSpan="1" colSpan="3" style="font-size: 20em; color: black; text-align: left; font-family: Roboto-Medium;"></Label>
+                    <Label text="&quot;Zoom Out&quot;" row="2" col="0" rowSpan="1" colSpan="2" style="font-size: 20rem;"></Label>
+                    <Label text="- zooms map out" textWrap=True row="3" col="2" rowSpan="1" colSpan="3"style="font-size: 20em; color: black; text-align: left; font-family: Roboto-Medium;"></Label>
+                </GridLayout>
+
+                        <StackLayout class="hr-light"></StackLayout>
+                <GridLayout columns="*, *, *, *, *" rows="*, *, *, *, *" class="sidedrawer-list-item" height="100%">
+                    <Label col="0" class="fas" text="&#xf206;" style="font-size: 30rem;"></Label>
+                    <Label col="1" colSpan="4" text="Ride Commands" style="text-align: center; font-family: Roboto-Medium; font-size: 20rem; text-decoration: underline;" class="p-r-10"></Label>
+                    <Label text="&quot;Spedometer&quot;" row="1" col="0" rowSpan="1" colSpan="2" style="font-size: 17rem;"></Label>
+                    <Label text="- shows spedometer" textWrap=True row="1" col="2" rowSpan="1" colSpan="3" style="font-size: 17em; color: black; text-align: left; font-family: Roboto-Medium;"></Label>
+                    <Label text="&quot;Stop Ride&quot;" row="2" col="0" rowSpan="1" colSpan="2" style="font-size: 20rem;"></Label>
+                    <Label text="- stops and saves ride" textWrap=True row="2" col="2" rowSpan="1" colSpan="3" style="font-size: 16em; color: black; text-align: left; font-family: Roboto-Medium;"></Label>
+                </GridLayout>
+
+                <!-- <GridLayout columns="auto, *" class="sidedrawer-list-item" [class.selected]="isComponentSelected('/settings')" (tap)="onNavItemTap('/settings')">
                     <Label col="0" text="&#xf013;" class="fa"></Label>
                     <Label col="1" text="Settings" class="p-r-10"></Label>
-                </GridLayout>
+                </GridLayout> -->
 
                 <GridLayout columns="auto, *" class="sidedrawer-list-item" (tap)="logout()">
                     <Label col="0" text="&#xf08b;" class="fa"></Label>
